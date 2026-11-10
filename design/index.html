@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Amora — Design Showcase · My-Love Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============ SHOWCASE SHELL ============ */
+:root{
+  /* Brand tokens */
+  --rose:#FF4D6D; --rose-2:#FF758F; --violet:#7B2CFF; --indigo:#4F46E5;
+  --peach:#FFB4A2; --mint:#2DD4BF; --amber:#FFB020; --sky:#38BDF8;
+  --ink:#0E0B16; --ink-2:#1C1630; --paper:#FFFFFF; --cloud:#F6F5FA; --mist:#ECEAF4;
+  --txt:#17122B; --txt-2:#5D5775; --txt-3:#9A94B0;
+  --grad:linear-gradient(135deg,#FF4D6D 0%,#C13BFF 55%,#7B2CFF 100%);
+  --grad-soft:linear-gradient(135deg,#FFE3E9 0%,#EFE3FF 100%);
+  --r-lg:28px; --r-md:20px; --r-sm:14px;
+  --shadow-1:0 2px 10px rgba(23,18,43,.06);
+  --shadow-2:0 12px 32px rgba(23,18,43,.12);
+  --shadow-3:0 24px 60px rgba(23,18,43,.18);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;background:#0B0817;color:#EDEBF5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+h1,h2,h3,.sora{font-family:'Sora','Plus Jakarta Sans',sans-serif}
+
+/* hero */
+.hero{position:relative;padding:96px 0 64px;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-40% -20% auto;height:140%;background:
+ radial-gradient(600px 400px at 20% 10%,rgba(255,77,109,.28),transparent 60%),
+ radial-gradient(700px 500px at 80% 0%,rgba(123,44,255,.3),transparent 60%),
+ radial-gradient(500px 400px at 55% 80%,rgba(45,212,191,.12),transparent 60%);
+ pointer-events:none}
+.hero .wrap{position:relative}
+.brandmark{display:inline-flex;align-items:center;gap:14px;margin-bottom:28px}
+.logo{width:56px;height:56px;border-radius:18px;background:var(--grad);display:grid;place-items:center;box-shadow:0 12px 32px rgba(193,59,255,.45)}
+.logo svg{width:30px;height:30px}
+.brandname{font-family:Sora;font-weight:800;font-size:28px;letter-spacing:-.5px}
+.brandname span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero h1{font-size:clamp(36px,5vw,64px);font-weight:800;letter-spacing:-1.5px;line-height:1.05;max-width:820px}
+.hero h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lead{margin-top:20px;font-size:18px;line-height:1.7;color:#B7B2CC;max-width:720px;font-weight:400}
+.pills{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+.pill{padding:8px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);font-size:13px;font-weight:600;color:#D6D2E6}
+.pill b{color:#FF758F}
+
+/* section headers */
+.sect{padding:72px 0 8px}
+.kicker{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#FF758F;margin-bottom:12px}
+.sect h2{font-size:34px;font-weight:800;letter-spacing:-.8px}
+.sect p.sub{margin-top:10px;color:#A49ec0;font-size:15.5px;max-width:760px;line-height:1.7}
+
+/* gallery of phones */
+.gallery{display:flex;gap:44px;overflow-x:auto;padding:44px 32px 64px;scroll-snap-type:x proximity}
+.gallery::-webkit-scrollbar{height:10px}
+.gallery::-webkit-scrollbar-thumb{background:#2A2342;border-radius:8px}
+.shot{scroll-snap-align:center;flex:0 0 auto;text-align:center}
+.shot .cap{margin-top:20px;font-size:14px;font-weight:700;color:#CFCAE2}
+.shot .cap small{display:block;margin-top:4px;font-weight:500;color:#817BA0;font-size:12.5px;max-width:300px;margin-inline:auto;line-height:1.55}
+
+/* token cards */
+.tokens{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin:36px 0 20px}
+.tok{background:#141027;border:1px solid #241D3F;border-radius:20px;padding:22px}
+.tok h4{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#8F89AC;margin-bottom:16px}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.sw{width:44px;height:44px;border-radius:12px;position:relative}
+.sw i{position:absolute;left:0;top:50px;font-style:normal;font-size:10px;color:#716B8E;white-space:nowrap}
+.swrow{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.swrow .sw{width:34px;height:34px;border-radius:10px}
+.swrow b{font-size:13px;color:#DAD6EA}
+.swrow i{font-style:normal;font-size:11.5px;color:#716B8E;margin-left:auto}
+.type-demo div{line-height:1.25;margin-bottom:10px;color:#EDEBF5}
+.foot{padding:56px 0 80px;color:#716B8E;font-size:13.5px;border-top:1px solid #1D1735;margin-top:48px}
+.foot b{color:#B7B2CC}
+
+/* ============ PHONE FRAME ============ */
+.phone{width:320px;height:676px;border-radius:46px;background:#06050C;padding:9px;box-shadow:0 0 0 1.5px #2B2347,0 40px 90px rgba(0,0,0,.6);position:relative}
+.phone::after{content:"";position:absolute;top:17px;left:50%;transform:translateX(-50%);width:84px;height:21px;background:#06050C;border-radius:12px;z-index:60}
+.screen{width:100%;height:100%;border-radius:38px;overflow:hidden;background:var(--paper);color:var(--txt);position:relative;font-size:13px;text-align:left;display:flex;flex-direction:column}
+.screen *{font-family:'Plus Jakarta Sans',sans-serif}
+
+/* status bar */
+.sb{height:44px;display:flex;align-items:center;justify-content:space-between;padding:12px 24px 0;font-size:12.5px;font-weight:700;flex:0 0 auto;position:relative;z-index:50}
+.sb .r{display:flex;gap:5px;align-items:center}
+.sb svg{width:15px;height:15px}
+.sb.light{color:#fff}
+/* gesture bar */
+.gb{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:110px;height:4px;border-radius:4px;background:rgba(23,18,43,.25);z-index:55}
+.gb.light{background:rgba(255,255,255,.6)}
+
+/* bottom nav */
+.bnav{position:absolute;left:12px;right:12px;bottom:18px;height:64px;border-radius:24px;background:rgba(255,255,255,.86);backdrop-filter:blur(20px);box-shadow:var(--shadow-2);display:flex;align-items:center;justify-content:space-around;padding:0 6px;z-index:40;border:1px solid rgba(255,255,255,.7)}
+.bnav .ni{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;font-weight:700;color:#A49EC0;width:52px}
+.bnav .ni svg{width:21px;height:21px;stroke:#A49EC0;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.bnav .ni.on{color:#C13BFF}
+.bnav .ni.on svg{stroke:url(#gradStroke)}
+.bnav .ni.on::before{content:"";position:absolute;top:8px;width:34px;height:3px;border-radius:3px;background:var(--grad)}
+.bnav .ni{position:relative}
+.fabmid{width:48px;height:48px;border-radius:17px;background:var(--grad);display:grid;place-items:center;box-shadow:0 10px 24px rgba(193,59,255,.5);margin-top:-22px}
+.fabmid svg{width:22px;height:22px;stroke:#fff;stroke-width:2.4;fill:none;stroke-linecap:round}
+
+/* shared bits */
+.av{border-radius:50%;background-size:cover;background-position:center;flex:0 0 auto}
+.grad-ring{padding:2.5px;background:var(--grad);border-radius:50%}
+.grad-ring .av{border:2.5px solid #fff}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:700;background:var(--cloud);color:var(--txt-2)}
+.chip.on{background:var(--ink);color:#fff}
+.chip.grad{background:var(--grad);color:#fff}
+.h-app{display:flex;align-items:center;justify-content:space-between;padding:10px 20px 6px;flex:0 0 auto}
+.h-app .t{font-family:Sora;font-weight:800;font-size:21px;letter-spacing:-.5px}
+.h-app .t span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.icbtn{width:38px;height:38px;border-radius:13px;background:var(--cloud);display:grid;place-items:center;position:relative}
+.icbtn svg{width:18px;height:18px;stroke:#17122B;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.icbtn .dot{position:absolute;top:9px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--rose);border:1.5px solid #fff}
+.scroll{flex:1 1 auto;overflow:hidden;position:relative}
+</style>
+</head>
+<body>
+
+<!-- SVG defs -->
+<svg width="0" height="0" style="position:absolute"><defs>
+<linearGradient id="gradStroke" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF4D6D"/><stop offset="1" stop-color="#7B2CFF"/></linearGradient>
+<linearGradient id="gradFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF4D6D"/><stop offset=".55" stop-color="#C13BFF"/><stop offset="1" stop-color="#7B2CFF"/></linearGradient>
+</defs></svg>
+
+<!-- ============ HERO ============ -->
+<header class="hero"><div class="wrap">
+  <div class="brandmark">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 20.5C7 16.5 3.5 13.2 3.5 9.4 3.5 6.6 5.7 4.5 8.4 4.5c1.5 0 2.8.7 3.6 1.8.8-1.1 2.1-1.8 3.6-1.8 2.7 0 4.9 2.1 4.9 4.9 0 1.1-.3 2.1-.9 3.1" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M13.5 15.5h7M17 12v7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div>
+    <div class="brandname">Amora <span>· the My-Love platform</span></div>
+  </div>
+  <h1>One beautiful app for <em>love, friends &amp; work</em> — designed for the whole world.</h1>
+  <p class="lead">Amora unifies messaging, dating and social media with a full productivity layer — personal, professional, office and business. Upload <b>any file type</b> with instant rich previews, write any kind of text, and connect with anyone, anywhere. Below: the complete design system and every core screen, rendered at pixel fidelity.</p>
+  <div class="pills">
+    <span class="pill"><b>①</b> Social Feed</span><span class="pill"><b>②</b> Dating &amp; Match</span>
+    <span class="pill"><b>③</b> Messaging</span><span class="pill"><b>④</b> Universal Uploads + Previews</span>
+    <span class="pill"><b>⑤</b> Work Spaces</span><span class="pill"><b>⑥</b> Profile &amp; Dark Mode</span>
+  </div>
+</div></header>
+
+<!-- ============ DESIGN SYSTEM ============ -->
+<section class="sect"><div class="wrap">
+  <span class="kicker">01 · Design Language</span>
+  <h2>“Aurora” design system</h2>
+  <p class="sub">A warm rose-to-violet aurora gradient carries emotion (love, connection); deep ink neutrals carry trust (work, business). Soft 20–28&nbsp;px radii, airy 4-pt spacing, Sora for display, Plus Jakarta Sans for UI. WCAG-AA contrast throughout; full RTL &amp; 40+ language readiness.</p>
+  <div class="tokens">
+    <div class="tok"><h4>Brand spectrum</h4><div class="swatches">
+      <div class="sw" style="background:#FF4D6D"><i>Rose 500</i></div>
+      <div class="sw" style="background:#FF758F"><i>Rose 400</i></div>
+      <div class="sw" style="background:#C13BFF"><i>Orchid</i></div>
+      <div class="sw" style="background:#7B2CFF"><i>Violet</i></div>
+      <div class="sw" style="background:linear-gradient(135deg,#FF4D6D,#C13BFF,#7B2CFF)"><i>Aurora</i></div>
+    </div><div style="height:26px"></div></div>
+    <div class="tok"><h4>Functional</h4><div class="swatches">
+      <div class="sw" style="background:#2DD4BF"><i>Success</i></div>
+      <div class="sw" style="background:#FFB020"><i>Warning</i></div>
+      <div class="sw" style="background:#F43F5E"><i>Danger</i></div>
+      <div class="sw" style="background:#38BDF8"><i>Info</i></div>
+      <div class="sw" style="background:#4F46E5"><i>Work</i></div>
+    </div><div style="height:26px"></div></div>
+    <div class="tok"><h4>Neutrals · light / dark</h4>
+      <div class="swrow"><div class="sw" style="background:#FFFFFF;border:1px solid #333"></div><b>Paper</b><i>#FFFFFF</i></div>
+      <div class="swrow"><div class="sw" style="background:#F6F5FA"></div><b>Cloud</b><i>#F6F5FA</i></div>
+      <div class="swrow"><div class="sw" style="background:#17122B"></div><b>Ink text</b><i>#17122B</i></div>
+      <div class="swrow"><div class="sw" style="background:#0E0B16"></div><b>Night bg</b><i>#0E0B16</i></div>
+    </div>
+    <div class="tok"><h4>Type scale</h4><div class="type-demo">
+      <div style="font-family:Sora;font-weight:800;font-size:26px">Display / Sora 800</div>
+      <div style="font-weight:700;font-size:18px">Title / Jakarta 700</div>
+      <div style="font-weight:600;font-size:15px">Body strong / 600</div>
+      <div style="font-weight:400;font-size:14px;color:#A49EC0">Body / 400 · Caption 12 · Micro 10</div>
+    </div></div>
+  </div>
+</div></section>
+
+<!-- ============ SCREENS : CORE ============ -->
+<section class="sect"><div class="wrap">
+  <span class="kicker">02 · Core Experience</span>
+  <h2>Welcome · Feed · Discover · Match</h2>
+  <p class="sub">The emotional heart of Amora. A cinematic onboarding, a content-first social feed with stories, a swipeable discovery deck with rich profiles, and a celebration moment when two people match.</p>
+</div>
+<div class="gallery">
+
+  <!-- ===== S1 ONBOARDING ===== -->
+  <div class="shot"><div class="phone"><div class="screen" style="background:linear-gradient(160deg,#1A0B2E 0%,#3B0F3F 45%,#7B2CFF 160%)">
+    <div class="sb light"><span>9:41</span><div class="r"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 16h3v4H2zM7.5 12h3v8h-3zM13 8h3v12h-3zM18.5 4h3v16h-3z"/></svg><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 5C7 5 2.7 7.4.4 11.2l2.5 2C4.7 10.2 8.1 8.3 12 8.3s7.3 1.9 9.1 4.9l2.5-2C21.3 7.4 17 5 12 5z" opacity=".5"/><path d="M12 10c-2.8 0-5.3 1.3-6.9 3.4L12 20l6.9-6.6C17.3 11.3 14.8 10 12 10z"/></svg><svg viewBox="0 0 24 24" fill="#fff"><rect x="3" y="8" width="16" height="9" rx="2.5"/><rect x="20" y="10.5" width="2" height="4" rx="1"/></svg></div></div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:0 26px 110px;position:relative">
+      <div style="position:absolute;inset:0;overflow:hidden">
+        <div style="position:absolute;top:84px;left:30px;width:118px;height:118px;border-radius:40px;background:url('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=300') center/cover;transform:rotate(-8deg);box-shadow:0 20px 50px rgba(0,0,0,.45)"></div>
+        <div style="position:absolute;top:60px;right:26px;width:96px;height:96px;border-radius:34px;background:url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300') center/cover;transform:rotate(10deg);box-shadow:0 20px 50px rgba(0,0,0,.45)"></div>
+        <div style="position:absolute;top:196px;right:76px;width:76px;height:76px;border-radius:28px;background:url('https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=300') center/cover;transform:rotate(-14deg);box-shadow:0 18px 40px rgba(0,0,0,.4)"></div>
+        <div style="position:absolute;top:214px;left:120px;width:54px;height:54px;border-radius:20px;background:var(--grad);display:grid;place-items:center;transform:rotate(8deg);box-shadow:0 14px 34px rgba(255,77,109,.5)"><svg viewBox="0 0 24 24" width="26" fill="#fff"><path d="M12 21C7 17 2.5 13.3 2.5 8.9 2.5 5.9 4.9 3.5 7.9 3.5c1.7 0 3.2.8 4.1 2 .9-1.2 2.4-2 4.1-2 3 0 5.4 2.4 5.4 5.4 0 4.4-4.5 8.1-9.5 12.1z"/></svg></div>
+      </div>
+      <div style="position:relative">
+        <div style="font-family:Sora;font-weight:800;font-size:33px;line-height:1.12;color:#fff;letter-spacing:-.8px">Find love.<br/>Keep friends.<br/><span style="background:linear-gradient(90deg,#FFB4A2,#FF758F);-webkit-background-clip:text;background-clip:text;color:transparent">Get things done.</span></div>
+        <div style="margin-top:13px;color:rgba(255,255,255,.72);font-size:13.5px;line-height:1.65">Messaging, dating, social and work — one secure home for everything, in 40+ languages.</div>
+        <div style="margin-top:24px;height:54px;border-radius:19px;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#17122B;box-shadow:0 16px 40px rgba(0,0,0,.35)">Create account</div>
+        <div style="margin-top:12px;height:54px;border-radius:19px;border:1.5px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14.5px;color:#fff">I already have an account</div>
+        <div style="margin-top:18px;text-align:center;font-size:11px;color:rgba(255,255,255,.55)">🌐 English · বাংলা · Español · العربية · 中文 · +37</div>
+      </div>
+    </div>
+    <div class="gb light"></div>
+  </div></div><div class="cap">01 · Welcome<small>Cinematic onboarding — floating photo cards, aurora gradient, instant language switch.</small></div></div>
+
+  <!-- ===== S2 FEED ===== -->
+  <div class="shot"><div class="phone"><div class="screen" style="background:var(--cloud)">
+    <div class="sb"><span>9:41</span><div class="r"><svg viewBox="0 0 24 24" fill="#17122B"><path d="M2 16h3v4H2zM7.5 12h3v8h-3zM13 8h3v12h-3zM18.5 4h3v16h-3z"/></svg><svg viewBox="0 0 24 24" fill="#17122B"><path d="M12 10c-2.8 0-5.3 1.3-6.9 3.4L12 20l6.9-6.6C17.3 11.3 14.8 10 12 10z"/></svg><svg viewBox="0 0 24 24" fill="#17122B"><rect x="3" y="8" width="16" height="9" rx="2.5"/><rect x="20" y="10.5" width="2" height="4" rx="1"/></svg></div></div>
+    <div class="h-app"><div class="t">am<span>ora</span></div><div style="display:flex;gap:8px"><div class="icbtn"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div><div class="icbtn"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span class="dot"></span></div></div></div>
+    <!-- stories -->
+    <div style="display:flex;gap:13px;padding:10px 20px 14px;flex:0 0 auto">
+      <div style="text-align:center"><div style="width:58px;height:58px;border-radius:50%;background:var(--grad-soft);display:grid;place-items:center;border:1.8px dashed #C13BFF"><svg width="20" viewBox="0 0 24 24" fill="none" stroke="url(#gradStroke)" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div><div style="font-size:10px;font-weight:700;margin-top:5px;color:var(--txt-2)">You</div></div>
+      <div style="text-align:center"><div class="grad-ring"><div class="av" style="width:53px;height:53px;background-image:url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200')"></div></div><div style="font-size:10px;font-weight:700;margin-top:5px">Sofia</div></div>
+      <div style="text-align:center"><div class="grad-ring"><div class="av" style="width:53px;height:53px;background-image:url('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200')"></div></div><div style="font-size:10px;font-weight:700;margin-top:5px">Rafi</div></div>
+      <div style="text-align:center"><div class="grad-ring"><div class="av" style="width:53px;height:53px;background-image:url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')"></div></div><div style="font-size:10px;font-weight:700;margin-top:5px">Yuki</div></div>
+      <div style="text-align:center"><div style="padding:2.5px;border-radius:50%;background:#D9D5E8"><div class="av" style="width:53px;height:53px;background-image:url('https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200');border:2.5px solid #fff"></div></div><div style="font-size:10px;font-weight:700;margin-top:5px;color:var(--txt-3)">Omar</div></div>
+    </div>
+    <div class="scroll"><div style="padding:0 14px">
+      <!-- post card -->
+      <div style="background:#fff;border-radius:24px;box-shadow:var(--shadow-1);overflow:hidden;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px;padding:13px 14px 11px">
+          <div class="av" style="width:38px;height:38px;background-image:url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200')"></div>
+          <div><div style="font-weight:800;font-size:13.5px">Sofia Martínez <span style="color:#38BDF8">✔</span></div><div style="font-size:10.5px;color:var(--txt-3)">Barcelona · 12 min · 🌍 Public</div></div>
+          <svg style="margin-left:auto" width="18" viewBox="0 0 24 24" fill="#9A94B0"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+        </div>
+        <div style="padding:0 14px 10px;font-size:13px;line-height:1.55">Golden hour on the coast — sometimes the best plans are no plans at all 🧡</div>
+        <div style="height:208px;background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800') center/cover;position:relative">
+          <div style="position:absolute;bottom:10px;left:10px;background:rgba(14,11,22,.55);backdrop-filter:blur(8px);color:#fff;font-size:10px;font-weight:700;padding:5px 10px;border-radius:999px">📍 Costa Brava</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;padding:12px 16px">
+          <span style="display:flex;align-items:center;gap:6px;font-weight:800;font-size:12.5px;color:#FF4D6D"><svg width="19" viewBox="0 0 24 24" fill="url(#gradFill)"><path d="M12 21C7 17 2.5 13.3 2.5 8.9 2.5 5.9 4.9 3.5 7.9 3.5c1.7 0 3.2.8 4.1 2 .9-1.2 2.4-2 4.1-2 3 0 5.4 2.4 5.4 5.4 0 4.4-4.5 8.1-9.5 12.1z"/></svg>2.4k</span>
+          <span style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;color:var(--txt-2)"><svg width="18" viewBox="0 0 24 24" fill="none" stroke="#5D5775" stroke-width="2"><path d="M21 12a8 8 0 01-8 8H4l2-3a8 8 0 1115-5z"/></svg>186</span>
+          <span style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;color:var(--txt-2)"><svg width="18" viewBox="0 0 24 24" fill="none" stroke="#5D5775" stroke-width="2" stroke-linecap="round"><path d="M15 6l6 6-6 6M21 12H8a5 5 0 00-5 5"/></svg>92</span>
+          <svg style="margin-left:auto" width="18" viewBox="0 0 24 24" fill="none" stroke="#5D5775" stroke-width="2"><path d="M6 4h12v17l-6-4-6 4z"/></svg>
+        </div>
+      </div>
+      <!-- document post -->
+      <div style="background:#fff;border-radius:24px;box-shadow:var(--shadow-1);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:10px;padding:13px 14px 11px">
+          <div class="av" style="width:38px;height:38px;background-image:url('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200')"></div>
+          <div><div style="font-weight:800;font-size:13.5px">Daniel Okafor</div><div style="font-size:10.5px;color:var(--txt-3)">Product Lead · 1 h · 👥 Network</div></div>
+        </div>
+        <div style="padding:0 14px 10px;font-size:13px;line-height:1.55">Sharing our open-source launch playbook — 40 pages, free for everyone 🚀</div>
+        <div style="margin:0 14px 12px;border:1.5px solid var(--mist);border-radius:16px;display:flex;gap:12px;padding:12px;align-items:center">
+          <div style="width:44px;height:52px;border-radius:10px;background:linear-gradient(160deg,#F43F5E,#C2185B);display:grid;place-items:center;color:#fff;font-size:9px;font-weight:800">PDF</div>
+          <div style="flex:1"><div style="font-weight:800;font-size:12.5px">Launch-Playbook-2026.pdf</div><div style="font-size:10.5px;color:var(--txt-3);margin-top:2px">40 pages · 8.2 MB · Tap to preview</div>
+          <div style="margin-top:6px;height:34px;border-radius:8px;background:var(--cloud);display:flex;align-items:center;padding:0 8px;gap:6px"><div style="width:22px;height:26px;background:#fff;border:1px solid var(--mist);border-radius:3px"></div><div style="width:22px;height:26px;background:#fff;border:1px solid var(--mist);border-radius:3px"></div><div style="width:22px;height:26px;background:#fff;border:1px solid var(--mist);border-radius:3px"></div><span style="font-size:9px;color:var(--txt-3);font-weight:700">+37</span></div></div>
+        </div>
+      </div>
+      </div></div>
+    <div class="bnav">
+      <div class="ni on"><svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V21h-6v-6h-6v6H3z"/></svg>Home</div>
+      <div class="ni"><svg viewBox="0 0 24 24"><path d="M12 21C7 17 2.5 13.3 2.5 8.9 2.5 5.9 4.9 3.5 7.9 3.5c1.7 0 3.2.8 4.1 2 .9-1.2 2.4-2 4.1-2 3 0 5.4 2.4 5.4 5.4 0 4.4-4.5 8.1-9.5 12.1z"/></svg>Discover</div>
+      <div class="fabmid"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+      <div class="ni"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-8 8H4l2-3a8 8 0 1115-5z"/></svg>Chats</div>
+      <div class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Spaces</div>
+    </div>
+    <div class="gb"></div>
+  </div></div><div class="cap">02 · Home Feed<small>Stories, rich posts, inline PDF preview strip, glass bottom nav with aurora FAB.</small></div></div>
+
+  <!-- ===== S3 DISCOVER ===== -->
+  <div class="shot"><div class="phone"><div class="screen" style="background:var(--cloud)">
+    <div class="sb"><span>9:41</span><div class="r"><svg viewBox="0 0 24 24" fill="#17122B"><path d="M2 16h3v4H2zM7.5 12h3v8h-3zM13 8h3v12h-3zM18.5 4h3v16h-3z"/></svg><svg viewBox="0 0 24 24" fill="#17122B"><rect x="3" y="8" width="16" height="9" rx="2.5"/><rect x="20" y="10.5" width="2" height="4" rx="1"/></svg></div></div>
+    <div class="h-app"><div class="t">Discover</div><div style="display:flex;gap:8px"><div class="icbtn"><svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg></div></div></div>
+    <div style="display:flex;gap:8px;padding:2px 20px 12px;flex:0 0 auto">
+      <span class="chip grad">💘 Dating</span><span class="chip">🤝 Friends</span><span class="chip">💼 Mentors</span><span class="chip">🌍 Nearby</span>
+    </div>
+    <div class="scroll"><div style="padding:0 18px;position:relative;height:100%">
+      <!-- card behind -->
+      <div style="position:absolute;left:28px;right:28px;top:14px;height:430px;border-radius:28px;background:#DCD7EA;"></div>
+      <div style="position:absolute;left:18px;right:18px;top:4px;height:432px;border-radius:28px;overflow:hidden;box-shadow:var(--shadow-3);background:url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=700') center/cover">
+        <div style="position:absolute;inset:auto 0 0 0;height:62%;background:linear-gradient(180deg,transparent,rgba(10,7,20,.88))"></div>
+        <div style="position:absolute;top:14px;left:14px;background:rgba(255,255,255,.2);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);color:#fff;font-size:10.5px;font-weight:800;padding:6px 11px;border-radius:999px">✦ 94% match</div>
+        <div style="position:absolute;top:14px;right:14px;background:rgba(45,212,191,.9);color:#063;font-size:10.5px;font-weight:800;padding:6px 11px;border-radius:999px;color:#04332C">● Online</div>
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:18px">
+          <div style="font-family:Sora;font-weight:800;font-size:25px;color:#fff;letter-spacing:-.5px">Amara, 26 <span style="color:#38BDF8;font-size:17px">✔</span></div>
+          <div style="color:rgba(255,255,255,.85);font-size:12px;font-weight:600;margin-top:3px">📍 4 km away · Lagos → living in Dhaka · UX Designer</div>
+          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+            <span style="background:rgba(255,255,255,.16);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:10px;font-weight:700;padding:5px 10px;border-radius:999px">🎨 Design</span>
+            <span style="background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:10px;font-weight:700;padding:5px 10px;border-radius:999px">🎧 Afrobeats</span>
+            <span style="background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:10px;font-weight:700;padding:5px 10px;border-radius:999px">✈️ Travel</span>
+            <span style="background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:10px;font-weight:700;padding:5px 10px;border-radius:999px">☕ Coffee</span>
+          </div>
+        </div>
+      </div>
+      <!-- action row -->
+      <div style="position:absolute;top:456px;left:0;right:0;display:flex;justify-content:center;gap:16px;align-items:center">
+        <div style="width:52px;height:52px;border-radius:50%;background:#fff;box-shadow:var(--shadow-2);display:grid;place-items:center"><svg width="22" viewBox="0 0 24 24" stroke="#9A94B0" stroke-width="2.6" fill="none" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+        <div style="width:66px;height:66px;border-radius:50%;background:var(--grad);box-shadow:0 16px 36px rgba(255,77,109,.45);display:grid;place-items:center"><svg width="30" viewBox="0 0 24 24" fill="#fff"><path d="M12 21C7 17 2.5 13.3 2.5 8.9 2.5 5.9 4.9 3.5 7.9 3.5c1.7 0 3.2.8 4.1 2 .9-1.2 2.4-2 4.1-2 3 0 5.4 2.4 5.4 5.4 0 4.4-4.5 8.1-9.5 12.1z"/></svg></div>
+        <div style="width:52px;height:52px;border-radius:50%;background:#fff;box-shadow:var(--shadow-2);display:grid;place-items:center"><svg width="22" viewBox="0 0 24 24" fill="#FFB020"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17l-6.1 3.6 1.4-6.8L2.2 9.1l6.9-.8z"/></svg></div>
+      </div>
+    </div></div>
+    <div class="bnav">
+      <div class="ni"><svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V21h-6v-6h-6v6H3z"/></svg>Home</div>
+      <div class="ni on"><svg viewBox="0 0 24 24"><path d="M12 21C7 17 2.5 13.3 2.5 8.9 2.5 5.9 4.9 3.5 7.9 3.5c1.7 0 3.2.8 4.1 2 .9-1.2 2.4-2 4.1-2 3 0 5.4 2.4 5.4 5.4 0 4.4-4.5 8.1-9.5 12.1z"/></svg>Discover</div>
+      <div class="fabmid"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+      <div class="ni"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-8 8H4l2-3a8 8 0 1115-5z"/></svg>Chats</div>
+      <div class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Spaces</div>
+    </div>
+    <div class="gb"></div>
+  </div></div><div class="cap">03 · Discover deck<small>Dating, friends, mentors &amp; nearby modes. Compatibility score, verified badge, interest chips.</small></div></div>
+
+  <!-- ===== S4 MATCH ===== -->
+  <div class="shot"><div class="phone"><div class="screen" style="background:radial-gradient(130% 90% at 50% 0%,#5B21B6 0%,#2E1065 48%,#140A2E 100%)">
+    <div class="sb light"><span>9:41</span><div class="r"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 16h3v4H2zM7.5 12h3v8h-3zM13 8h3v12h-3zM18.5 4h3v16h-3z"/></svg><svg viewBox="0 0 24 24" fill="#fff"><rect x="3" y="8" width="16" height="9" rx="2.5"/><rect x="20" y="10.5" width="2" height="4" rx="1"/></svg></div></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 30px;position:relative">
+      <div style="position:absolute;top:70px;left:40px;font-size:18px">✨</div><div style="position:absolute;top:120px;right:50px;font-size:13px">💫</div><div style="position:absolute;bottom:160px;left:54px;font-size:13px">✨</div><div style="position:absolute;top:92px;right:112px;font-size:10px">⭐</div>
+      <div style="position:relative;height:190px;width:230px;margin-bottom:8px">
+        <div style="position:absolute;left:0;top:18px;width:124px;height:160px;border-radius:26px;background:url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400') center/cover;transform:rotate(-9deg);border:4px solid rgba(255,255,255,.95);box-shadow:0 24px 50px rgba(0,0,0,.5)"></div>
+        <div style="position:absolute;right:0;top:4px;width:124px;height:160px;border-radius:26px;background:url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400') center/cover;transform:rotate(9deg);border:4px solid rgba(255,255,255,.95);box-shadow:0 24px 50px rgba(0,0,0,.5)"></div>
+        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:50%;background:var(--grad);display:grid;place-items:center;border:4px solid #fff;box-shadow:0 14px 34px rgba(255,77,109,.6)"><svg width="26" viewBox="0 0 24 24" fill="#fff"><path d="M12 21C7 17 2.5 13.3 2.5 8.9 2.5 5.9 4.9 3.5 7.9 3.5c1.7 0 3.2.8 4.1 2 .9-1.2 2.4-2 4.1-2 3 0 5.4 2.4 5.4 5.4 0 4.4-4.5 8.1-9.5 12.1z"/></svg></div>
+      </div>
+      <div style="font-family:Sora;font-weight:800;font-size:34px;color:#fff;letter-spacing:-1px;margin-top:18px">It's a match!</div>
+      <div style="margin-top:8px;color:rgba(255,255,255,.75);font-size:13px;text-align:center;line-height:1.6">You and <b style="color:#FF9EB0">Amara</b> liked each other.<br/>94% compatible · 6 shared interests</div>
+      <div style="margin-top:26px;width:100%;height:54px;border-radius:19px;background:var(--grad);display:flex;align-items:center;justify-content:center;gap:9px;font-weight:800;font-size:14.5px;color:#fff;box-shadow:0 16px 40px rgba(255,77,109,.4)"><svg width="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M21 12a8 8 0 01-8 8H4l2-3a8 8 0 1115-5z"/></svg>Say hello</div>
+      <div style="margin-top:12px;width:100%;height:50px;border-radius:19px;border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;color:#fff">Keep exploring</div>
+      <div style="margin-top:18px;display:flex;gap:7px">
+        <span style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#EDE9FE;font-size:10px;font-weight:700;padding:5px 11px;border-radius:999px">🎨 Design</span>
+        <span style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#EDE9FE;font-size:10px;font-weight:700;padding:5px 11px;border-radius:999px">✈️ Travel</span>
+        <span style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#EDE9FE;font-size:10px;font-weight:700;padding:5px 11px;border-radius:999px">☕ Coffee</span>
+      </div>
+    </div>
+    <div class="gb light"></div>
+  </div></div><div class="cap">04 · Match moment<small>A celebration screen — tilted photo cards, shared interests, instant path to the first message.</small></div></div>
+</div></section>
+
+<!-- ============ SCREENS : MESSAGING ============ -->
+<section class="sect"><div class="wrap">
+  <span class="kicker">03 · Messaging &amp; Universal Files</span>
+  <h2>Chats · Conversation · Upload anything · Preview everything</h2>
+  <p class="sub">End-to-end encrypted messaging for people and teams. The composer accepts <b>every file type</b> — images, video, audio, PDF, Office docs, code, archives, 3D, CAD — and every file gets a rich inline preview before and after sending.</p>
+</div>
+<div class="gallery">
+
+  <!-- ===== S5 CHAT LIST ===== -->
+  <div class="shot"><div class="phone"><div class="screen" style="background:#fff">
+    <div class="sb"><span>9:41</span><div class="r"><svg viewBox="0 0 24 24" fill="#17122B"><path d="M2 16h3v4H2zM7.5 12h3v8h-3zM13 8h3v12h-3zM18.5 4h3v16h-3z"/></svg><svg viewBox="0 0 24 24" fill="#17122B"><rect x="3" y="8" width="16" height="9" rx="2.5"/><rect x="20" y="10.5" width="2" height="4" rx="1"/></svg></div></div>
+    <div class="h-app"><div class="t">Chats</div><div style="display:flex;gap:8px"><div class="icbtn"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div><div class="icbtn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div></div></div>
+    <div style="display:flex;gap:8px;padding:2px 20px 12px;flex:0 0 auto">
+      <span class="chip on">All</span><span class="chip">💘 Matches</span><span class="chip">👥 Groups</span><span class="chip">💼 Work</span>
+    </div>
+    <div class="scroll"><div style="padding:0 16px">
+      <!-- rows -->
+      <div style="display:flex;gap:12px;align-items:center;padding:11px 6px;border-bottom:1px solid #F3F1F9">
+        <div style="position:relative"><div class="grad-ring"><div class="av" style="width:48px;height:48px;background-image:url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200')"></div></div><span style="position:absolute;bottom:2px;right:2px;width:12px;height:12px;border-radius:50%;background:#2DD4BF;border:2.5px solid #fff"></span></div>
+        <div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between"><b style="font-size:13.5px">Amara 💘</b><span style="font-size:10px;color:#C13BFF;font-weight:800">now</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:3px"><span style="font-size:11.5px;color:var(--txt-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">typing…</span><span style="min-width:18px;height:18px;border-radius:9px;background:var(--grad);color:#fff;font-size:9.5px;font-weight:800;display:grid;place-items:center;padding:0 5px">2</span></div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;padding:11px 6px;border-bottom:1px solid #F3F1F9">
+        <div style="width:48px;height:48px;border-radius:17px;background:linear-gradient(135deg,#4F46E5,#38BDF8);display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px">PX</div>
+        <div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between"><b style="font-size:13.5px">Project Phoenix 💼</b><span style="font-size:10px;color:var(--txt-3)">09:12</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:3px"><span style="font-size:11.5px;color:var(--txt-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📊 Nadia: Q3-Forecast.xlsx · 2.1 MB</span><span style="min-width:18px;height:18px;border-radius:9px;background:#4F46E5;color:#fff;font-size:9.5px;font-weight:800;display:grid;place-items:center;padding:0 5px">5</span></div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;padding:11px 6px;border-bottom:1px solid #F3F1F9">
+        <div style="position:relative"><div class="av" style="width:48px;height:48px;background-image:url('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200')"></div><span style="position:absolute;bottom:2px;right:2px;width:12px;height:12px;border-radius:50%;background:#2DD4BF;border:2.5px solid #fff"></span></div>
+        <div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between"><b style="font-size:13.5px">Rafi Ahmed</b><span style="font-size:10px;color:var(--txt-3)">08:47</span></div>
+        <div style="margin-top:3px;font-size:11.5px;color:var(--txt-2)">🎙️ Voice message · 0:42 <span style="color:#38BDF8">✓✓</span></div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;padding:11px 6px;border-bottom:1px solid #F3F1F9">
+        <div style="width:48px;height:48px;border-radius:17px;background:linear-gradient(135deg,#FF8E53,#FF4D6D);display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px">FA</div>
+        <div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between"><b style="font-size:13.5px">Family ❤️</b><span style="font-size:10px;color:var(--txt-3)">Yesterday</span></div>
+        <div style="margin-top:3px;font-size:11.5px;color:var(--txt-2)">📷 Mum shared 4 photos</div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;padding:11px 6px;border-bottom:1px solid #F3F1F9">
+        <div class="av" style="width:48px;height:48px;background-image:url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')"></div>
+        <div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between"><b style="font-size:13.5px">Yuki Tanaka</b><span style="font-size:10px;color:var(--txt-3)">Yesterday</span></div>
+        <div style="margin-top:3px;font-size:11.5px;color:var(--txt-2)">🎬 trailer_final_v3.mp4 · seen</div></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;padding:11px 6px">
+        <div class="av" style="width:48px;height:48px;background-image:url('https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200')"></div>
+        <div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between"><b style="font-size:13.5px">Omar Haddad</b><span style="font-size:10px;color:var(--txt-3)">Mon</span></div>
+        <div style="margin-top:3px;font-size:11.5px;color:var(--txt-2)">🗜️ assets-pack.zip · 48 files inside</div></div>
+      </div>
+    </div></div>
+    <div class="bnav">
+      <div class="ni"><svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V21h-6v-6h-6v6H3z"/></svg>Home</div>
+      <div class="ni"><svg viewBox="0 0 24 24"><path d="M12 21C7 17 2.5 13.3 2.5 8.9 2.5 5.9 4.9 3.5 7.9 3.5c1.7 0 3.2.8 4.1 2 .9-1.2 2.4-2 4.1-2 3 0 5.4 2.4 5.4 5.4 0 4.4-4.5 8.1-9.5 12.1z"/></svg>Discover</div>
+      <div class="fabmid"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+      <div class="ni on"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-8 8H4l2-3a8 8 0 1115-5z"/></svg>Chats</div>
+      <div class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Spaces</div>
+    </div>
+    <div class="gb"></div>
+  </div></div><div class="cap">05 · Chats<small>Unified inbox: matches, friends, family, work groups — file-type aware subtitles.</small></div></div>
+
+  <!-- ===== S6 CONVERSATION ===== -->
+  <div class="shot"><div class="phone"><div class="screen" style="background:#FBFAFE">
+    <div class="sb"><span>9:41</span><div class="r"><svg viewBox="0 0 24 24" fill="#17122B"><path d="M2 16h3v4H2zM7.5 12h3v8h-3zM13 8h3v12h-3zM18.5 4h3v16h-3z"/></svg><svg viewBox="0 0 24 24" fill="#17122B"><rect x="3" y="8" width="16" height="9" rx="2.5"/><rect x="20" y="10.5" width="2" height="4" rx="1"/></svg></div></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 16px 10px;border-bottom:1px solid #F0EDF8;flex:0 0 auto;background:#fff">
+      <svg width="20" viewBox="0 0 24 24" fill="none" stroke="#17122B" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>
+      <div style="position:relative"><div class="av" style="width:38px;height:38px;background-image:url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200')"></div><span style="position:absolute;bottom:0;right:0;width:10px;height:10px;border-radius:50%;background:#2DD4BF;border:2px solid #fff"></span></div>
+      <div style="flex:1"><div style="font-weight:800;font-size:14px">Amara <span style="font-size:10px">💘</span></div><div style="font-size:10.5px;color:#2DD4BF;font-weight:700">Online · E2E encrypted 🔒</div></div>
+      <div class="icbtn" style="width:34px;height:34px"><svg viewBox="0 0 24 24"><path d="M5 4h3l2 5-2.5 1.5a12 12 0 006 6L15 14l5 2v3a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg></div>
+      <div class="icbtn" style="width:34px;height:34px"><svg viewBox="0 0 24 24"><path d="M15 10l5-3v10l-5-3M4 6h11v12H4z"/></svg></div>
+    </div>
+    <div class="scroll"><div style="padding:14px 14px 8px;display:flex;flex-direction:column;gap:9px">
+      <div style="align-self:center;font-size:10px;font-weight:700;color:var(--txt-3);background:var(--cloud);padding:4px 12px;border-radius:999px">Today</div>
+      <!-- received text -->
+      <div style="align-self:flex-start;max-width:78%;background:#fff;border:1px solid #EFEBF8;border-radius:19px 19px 19px 6px;padding:10px 14px;font-size:12.5px;line-height:1.5;box-shadow:var(--shadow-1)">Hey! Did you check the gallery I sent? 🖼️</div>
+      <!-- received image grid -->
+      <div style="align-self:flex-start;max-width:78%;background:#fff;border:1px solid #EFEBF8;border-radius:19px;padding:5px;box-shadow:var(--shadow-1)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px"><div style="height:74px;border-radius:12px;background:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300') center/cover"></div><div style="height:74px;border-radius:12px;background:url('https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=300') center/cover"></div><div style="height:74px;border-radius:12px;background:url('https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=300') center/cover"></div><div style="height:74px;border-radius:12px;background:url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=300') center/cover;position:relative"><div style="position:absolute;inset:0;background:rgba(10,7,20,.55);border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px">+9</div></div></div>
+        <div style="font-size:9.5px;color:var(--txt-3);padding:5px 6px 3px;font-weight:600">13 photos · 09:02</div>
+      </div>
+      <!-- sent pdf -->
+      <div style="align-self:flex-end;max-width:80%;background:var(--grad);border-radius:19px 19px 6px 19px;padding:7px;box-shadow:0 8px 20px rgba(193,59,255,.3)">
+        <div style="background:rgba(255,255,255,.95);border-radius:14px;padding:9px;display:flex;gap:10px;align-items:center">
+          <div style="width:36px;height:44px;border-radius:9px;background:linear-gradient(160deg,#F43F5E,#C2185B);display:grid;place-items:center;color:#fff;font-size:8px;font-weight:800">PDF</div>
+          <div style="min-width:0"><div style="font-weight:800;font-size:11.5px;color:#17122B">Trip-Itinerary-Bali.pdf</div><div style="font-size:9.5px;color:#9A94B0;margin-top:2px">12 pages · 3.4 MB · tap to preview</div>
+          <div style="margin-top:5px;display:flex;gap:4px"><div style="width:20px;height:24px;background:#F6F5FA;border:1px solid #ECEAF4;border-radius:3px"></div><div style="width:20px;height:24px;background:#F6F5FA;border:1px solid #ECEAF4;border-radius:3px"></div><div style="width:20px;height:24px;background:#F6F5FA;border:1px solid #ECEAF4;border-radius:3px"></div></div></div>
+        </div>
+        <div style="font-size:9.5px;color:rgba(255,255,255,.85);padding:5px 7px 2px;text-align:right;font-weight:600">09:05 ✓✓</div>
+      </div>
+      <!-- received voice -->
+      <div style="align-self:flex-start;max-width:78%;background:#fff;border:1px solid #EFEBF8;border-radius:19px 19px 19px 6px;padding:10px 13px;box-shadow:var(--shadow-1);display:flex;align-items:center;gap:9px">
+        <div style="width:30px;height:30px;border-radius:50%;background:var(--grad);display:grid;place-items:center"><svg width="12" viewBox="0 0 24 24" fill="#fff"><path d="M7 5l12 7-12 7z"/></svg></div>
+        <svg width="104" height="22" viewBox="0 0 104 22">
+          <g fill="#C13BFF"><rect x="0" y="8" width="3" height="6" rx="1.5"/><rect x="6" y="5" width="3" height="12" rx="1.5"/><rect x="12" y="2" width="3" height="18" rx="1.5"/><rect x="18" y="6" width="3" height="10" rx="1.5"/><rect x="24" y="3" width="3" height="16" rx="1.5"/><rect x="30" y="8" width="3" height="6" rx="1.5"/><rect x="36" y="4" width="3" height="14" rx="1.5"/></g>
+          <g fill="#E3DDF2"><rect x="42" y="7" width="3" height="8" rx="1.5"/><rect x="48" y="2" width="3" height="18" rx="1.5"/><rect x="54" y="6" width="3" height="10" rx="1.5"/><rect x="60" y="9" width="3" height="4" rx="1.5"/><rect x="66" y="4" width="3" height="14" rx="1.5"/><rect x="72" y="7" width="3" height="8" rx="1.5"/><rect x="78" y="3" width="3" height="16" rx="1.5"/><rect x="84" y="8" width="3" height="6" rx="1.5"/><rect x="90" y="5" width="3" height="12" rx="1.5"/><rect x="96" y="8" width="3" height="6" rx="1.5"/></g>
+        </svg>
+        <span style="font-size:9.5px;color:var(--txt-3);font-weight:700">0:42</span>
+      </div>
+      <!-- sent text -->
+      <div style="align-self:flex-end;max-width:78%;background:var(--grad);color:#fff;border-radius:19px 19px 6px 19px;padding:10px 14px;font-size:12.5px;line-height:1.5;box-shadow:0 8px 20px rgba(193,59,255,.3)">Can't wait! Also sending the budget sheet for the trip 🧾</div>
+      <!-- sent spreadsheet -->
+      <div style="align-self:flex-end;max-width:80%;background:#fff;border:1px solid #EFEBF8;border-radius:19px 19px 6px 19px;padding:9px;box-shadow:var(--shadow-1);display:flex;gap:10px;align-items:center">
+        <div style="width:36px;height:44px;border-radius:9px;background:linear-gradient(160deg,#10B981,#047857);display:grid;place-items:center;color:#fff;font-size:7.5px;font-weight:800">XLSX</div>
+        <div><div style="font-weight:800;font-size:11.5px">Bali-Budget.xlsx</div><div style="font-size:9.5px;color:#9A94B0;margin-top:2px">3 sheets · 214 KB · live preview ✓</div></div>
+      </div>
+    </div></div>
+    <!-- composer -->
+    <div style="flex:0 0 auto;padding:8px 12px 14px;background:#fff;border-top:1px solid #F0EDF8;display:flex;gap:8px;align-items:center">
+      <div style="width:38px;height:38px;border-radius:50%;background:var(--grad-soft);display:grid;place-items:center"><svg width="18" viewBox="0 0 24 24" fill="none" stroke="url(#gradStroke)" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+      <div style="flex:1;height:40px;border-radius:999px;background:var(--cloud);display:flex;align-items:center;padding:0 14px;color:var(--txt-3);font-size:12.5px;gap:8px">Message… <span style="margin-left:auto">😊</span></div>
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--grad);display:grid;place-items:center;box-shadow:0 8px 18px rgba(193,59,255,.4)"><svg width="17" viewBox="0 0 24 24" fill="#fff"><path d="M3 11l18-8-8 18-2-7z"/></svg></div>
+    </div>
+    <div class="gb"></div>
+  </div></div><div class="cap">06 · Conversation<small>E2E-encrypted thread: photo grids, PDF with page thumbnails, voice waveform, live spreadsheet preview.</small></div></div>
+
+  <!-- ===== S7 UPLOAD SHEET ===== -->
+  <div class="shot"><div class="phone"><div class="screen" style="background:#CBC6DD">
+    <div style="position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600') center/cover;filter:blur(14px) brightness(.62);transform:scale(1.1)"></div>
+    <div class="sb light" style="position:relative"><span>9:41</span><div class="r"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 16h3v4H2zM7.5 12h3v8h-3zM13 8h3v12h-3zM18.5 4h3v16h-3z"/></svg><svg viewBox="0 0 24 24" fill="#fff"><rect x="3" y="8" width="16" height="9" rx="2.5"/><rect x="20" y="10.5" width="2" height="4" rx="1"/></svg></div></div>
+    <div style="flex:1"></div>
+    <div style="position:relative;background:#fff;border-radius:30px 30px 0 0;padding:10px 18px 20px;box-shadow:0 -20px 60px rgba(0,0,0,.35)">
+      <div style="width:44px;height:5px;border-radius:5px;background:#E4E0F0;margin:4px auto 14px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><b style="font-family:Sora;font-size:16.5px;letter-spacing:-.3px">Share anything</b><span style="font-size:11px;font-weight:800;color:#C13BFF">Any file · any size*</span></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px 6px;text-align:center;font-size:10px;font-weight:700;color:var(--txt-2)">
+        <div><div style="width:52px;height:52px;margin:0 auto 6px;border-radius:18px;background:linear-gradient(135deg,#FF4D6D,#FF8E53);display:grid;place-items:center"><svg width="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.8" fill="#fff" stroke="none"/><path d="M4 17l5-4 3 2 4-3 4 3"/></svg></div>Gallery</div>
+        <div><div style="width:52px;height:52px;margin:0 auto 6px;border-radius:18px;background:linear-gradient(135deg,#7B2CFF,#C13BFF);display:grid;place-items:center"><svg width="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="13" r="4"/><path d="M4 7h3l2-2.5h6L17 7h3v12H4z"/></svg></div>Camera</div>
+        <div><div style="width:52px;height:52px;margin:0 auto 6px;border-radius:18px;background:linear-gradient(135deg,#4F46E5,#38BDF8);display:grid;place-items:center"><svg width="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M13 3H6v18h12V8z"/><path d="M13 3v5h5"/></svg></div>Document</div>
+        <div><div style="width:52px;height:52px;margin:0 auto 6px;border-radius:18px;background:linear-gradient(135deg,#10B981,#2DD4BF);display:grid;place-items:center"><svg width="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></div>Audio</div>
+        <div><div style="width:52px;height:52px;margin:0 auto 6px;border-radius:18px;background:linear-gradient(135deg,#F59E0B,#F97316);display:grid;place-items:center"><svg width="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18M8 4v5"/></svg></div>Video</div>
+        <div><div style="width:52px;height:52px;margin:0 auto 6px;border-radius:18px;background:linear-gradient(135deg,#64748B,#334155);display:grid;place-items:center"><svg width="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg></div>Code</div>
+        <div><div style="width:52px;height:52px;margin:0 auto 6px;border-radius:18px;background:linear-gradient(135deg,#EC4899,#D946EF);display:grid;place-items:center"><svg width="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 10.5V19a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h8.5z"/><path d="M12 11v6M9 14h6"/></svg></div>Archive</div>
+        <div><div style="width:52px;height:52px;margin:0 auto 6px;border-radius:18px;background:linear-gradient(135deg,#17122B,#5D5775);display:grid;place-items:center"><svg width="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></div>Any file</div>
+      </div>
+      <div style="margin-top:16px;border-top:1px solid #F0EDF8;padding-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:12.5px">Ready to send · 4 items</b><span style="font-size:10.5px;color:var(--txt-3);font-weight:700">All previews generated ✓</span></div>
+        <div style="display:flex;gap:8px">
+          <div style="width:62px;height:62px;border-radius:14px;background:url('https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=200') center/cover;position:relative"><span style="position:absolute;top:-5px;right:-5px;width:17px;height:17px;border-radius:50%;background:#17122B;color:#fff;display:grid;place-items:center;font-size:9px">✕</span></div>
+          <div style="width:62px;height:62px;border-radius:14px;background:#17122B;position:relative;display:grid;place-items:center"><svg width="20" viewBox="0 0 24 24" fill="#fff"><path d="M8 5l11 7-11 7z"/></svg><span style="position:absolute;bottom:4px;right:5px;font-size:8px;color:#fff;font-weight:800">0:38</span></div>
+          <div style="width:62px;height:62px;border-radius:14px;background:linear-gradient(160deg,#F43F5E,#C2185B);display:grid;place-items:center;color:#fff;font-size:8.5px;font-weight:800;flex-direction:column;gap:3px;display:flex;align-items:center;justify-content:center"><span style="font-size:15px">📄</span>PDF · 12p</div>
+          <div style="width:62px;height:62px;border-radius:14px;background:var(--cloud);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;color:var(--txt-2);font-size:8.5px;font-weight:800"><span style="font-size:15px">🗜️</span>ZIP · 48</div>
+        </div>
+        <div style="margin-top:14px;height:50px;border-radius:17px;background:var(--grad);display:flex;align-items:center;justify-content:center;gap:8px;color:#fff;font-weight:800;font-size:14px;box-shadow:0 12px 30px rgba(193,59,255,.4)"><svg width="16" viewBox="0 0 24 24" fill="#fff"><path d="M3 11l18-8-8 18-2-7z"/></svg>Send 4 files</div>
+      </div>
+    </div>
+    <div class="gb"></div>
+  </div></div><div class="cap">07 · Universal upload<small>Eight source types + “Any file”. Previews generated client-side before sending — nothing is a mystery box.</small></div></div>
+
+  <!-- ===== S8 FILE PREVIEW ===== -->
+  <div class="shot"><div class="phone"><div class="screen" style="background:#0E0B16">
+    <div class="sb light"><span>9:41</span><div class="r"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 16h3v4H2zM7.5 12h3v8h-3zM13 8h3v12h-3zM18.5 4h3v16h-3z"/></svg><svg viewBox="0 0 24 24" fill="#fff"><rect x="3" y="8" width="16" height="9" rx="2.5"/><rect x="20" y="10.5" width="2" height="4" rx="1"/></svg></div></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 16px 12px;flex:0 0 auto">
+      <svg width="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>
+      <div style="flex:1;color:#fff"><div style="font-weight:800;font-size:13px">Launch-Playbook-2026.pdf</div><div style="font-size:10px;color:#8F89AC">Page 4 of 40 · 8.2 MB · from Daniel</div></div>
+      <div style="width:34px;height:34px;border-radius:12px;background:rgba(255,255,255,.1);display:grid;place-items:center"><svg width="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg></div>
+      <div style="width:34px;height:34px;border-radius:12px;background:rgba(255,255,255,.1);display:grid;place-items:center"><svg width="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="6" cy="12" r="2.3"/><circle cx="18" cy="6.5" r="2.3"/><circle cx="18" cy="17.5" r="2.3"/><path d="M8 11l8-3.5M8 13l8 3.5"/></svg></div>
+    </div>
+    <div class="scroll"><div style="padding:0 22px">
+      <div style="background:#fff;border-radius:14px;padding:22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.5);min-height:380px">
+        <div style="width:46px;height:8px;border-radius:4px;background:var(--grad);margin-bottom:16px"></div>
+        <div style="font-family:Sora;font-weight:800;font-size:17px;color:#17122B;line-height:1.3">04 · Go-to-market<br/>strategy that scales</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:7px">
+          <div style="height:7px;border-radius:4px;background:#ECEAF4;width:100%"></div><div style="height:7px;border-radius:4px;background:#ECEAF4;width:94%"></div><div style="height:7px;border-radius:4px;background:#ECEAF4;width:97%"></div><div style="height:7px;border-radius:4px;background:#ECEAF4;width:72%"></div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:10px;align-items:flex-end;height:86px;padding:0 6px">
+          <div style="flex:1;background:linear-gradient(180deg,#FF758F,#FF4D6D);height:40%;border-radius:6px 6px 0 0"></div>
+          <div style="flex:1;background:linear-gradient(180deg,#C98BFF,#C13BFF);height:62%;border-radius:6px 6px 0 0"></div>
+          <div style="flex:1;background:linear-gradient(180deg,#A78BFA,#7B2CFF);height:84%;border-radius:6px 6px 0 0"></div>
+          <div style="flex:1;background:linear-gradient(180deg,#67E8F9,#38BDF8);height:100%;border-radius:6px 6px 0 0"></div>
+        </div>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:7px">
+          <div style="height:7px;border-radius:4px;background:#ECEAF4;width:88%"></div><div style="height:7px;border-radius:4px;background:#ECEAF4;width:95%"></div><div style="height:7px;border-radius:4px;background:#ECEAF4;width:60%"></div>
+        </div>
+      </div>
+      <!-- page thumbs -->
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
+        <div style="width:34px;height:44px;border-radius:7px;background:rgba(255,255,255,.14)"></div>
+        <div style="width:34px;height:44px;border-radius:7px;background:rgba(255,255,255,.14)"></div>
+        <div style="width:38px;height:50px;border-radius:8px;background:#fff;outline:2.5px solid #C13BFF;outline-offset:2px"></div>
+        <div style="width:34px;height:44px;border-radius:7px;background:rgba(255,255,255,.14)"></div>
+        <div style="width:34px;height:44px;border-radius:7px;background:rgba(255,255,255,.14)"></div>
+      </div>
+      <div style="margin-top:14px;display:flex;justify-content:center;gap:8px">
+        <span style="background:rgba(255,255,255,.1);color:#CFCAE2;font-size:10px;font-weight:700;padding:6px 12px;border-radius:999px">🔍 Search inside</span>
+        <span style="background:rgba(255,255,255,.1);color:#CFCAE2;font-size:10px;font-weight:700;padding:6px 12px;border-radius:999px">✏️ Annotate</span>
+        <span style="background:rgba(255,255,255,.1);color:#CFCAE2;font-size:10px;font-weight:700;padding:6px 12px;border-radius:999px">🖨️ Print</span>
+      </div>
+    </div></div>
+    <div class="gb light"></div>
+  </div></div><div class="cap">08 · In-app file viewer<small>Full-screen preview for 300+ formats — PDF, Office, media, code, archives, 3D — with search, annotate, share.</small></div></div>
+</div></section>
+
+<!-- ============ SCREENS : WORK + PROFILE ============ -->
+<section class="sect"><div class="wrap">
+  <span class="kicker">04 · Work, Profile &amp; Night</span>
+  <h2>Spaces · Profile · Dark mode</h2>
+  <p class="sub">Spaces is the productivity layer: personal boards, office channels, business storefronts, cloud + on-device file vault. The profile unifies your social, dating and professional identity with granular visibility controls. And everything ships with a hand-tuned dark theme.</p>
+</div>
+<div class="gallery">
+
+  <!-- ===== S9 SPACES ===== -->
+  <div class="shot"><div class="phone"><div class="screen" style="background:var(--cloud)">
+    <div class="sb"><span>9:41</span><div class="r"><svg viewBox="0 0 24 24" fill="#17122B"><path d="M2 16h3v4H2zM7.5 12h3v8h-3zM13 8h3v12h-3zM18.5 4h3v16h-3z"/></svg><svg viewBox="0 0 24 24" fill="#17122B"><rect x="3" y="8" width="16" height="9" rx="2.5"/><rect x="20" y="10.5" width="2" height="4" rx="1"/></svg></div></div>
+    <div class="h-app"><div class="t">Spaces</div><div class="icbtn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div></div>
+    <div class="scroll"><div style="padding:0 16px">
+      <div style="background:linear-gradient(135deg,#17122B,#372A5E);border-radius:22px;padding:16px;color:#fff;margin-bottom:12px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(193,59,255,.3);filter:blur(30px)"></div>
+        <div style="font-size:10.5px;font-weight:800;letter-spacing:.14em;color:#B7A8FF">MY VAULT · SYNCED ✓</div>
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:8px"><div style="font-family:Sora;font-weight:800;font-size:22px">34.2 GB</div><div style="font-size:10.5px;color:#B7B2CC">of 100 GB · cloud + this device</div></div>
+        <div style="margin-top:10px;height:7px;border-radius:5px;background:rgba(255,255,255,.15)"><div style="width:34%;height:100%;border-radius:5px;background:var(--grad)"></div></div>
+        <div style="margin-top:10px;display:flex;gap:6px;font-size:9.5px;font-weight:700">
+          <span style="background:rgba(255,255,255,.12);padding:4px 9px;border-radius:999px">🖼️ 2,418 photos</span><span style="background:rgba(255,255,255,.12);padding:4px 9px;border-radius:999px">📄 312 docs</span><span style="background:rgba(255,255,255,.12);padding:4px 9px;border-radius:999px">🎬 86 videos</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:#fff;border-radius:20px;padding:14px;box-shadow:var(--shadow-1)">
+          <div style="width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#FF4D6D,#FF8E53);display:grid;place-items:center;margin-bottom:9px"><svg width="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 3.5-6 7-6s6 2 7 6"/></svg></div>
+          <b style="font-size:12.5px">Personal</b><div style="font-size:10px;color:var(--txt-3);margin-top:3px;line-height:1.5">Notes, journal, goals, 3 reminders today</div>
+        </div>
+        <div style="background:#fff;border-radius:20px;padding:14px;box-shadow:var(--shadow-1)">
+          <div style="width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#4F46E5,#38BDF8);display:grid;place-items:center;margin-bottom:9px"><svg width="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></div>
+          <b style="font-size:12.5px">Office</b><div style="font-size:10px;color:var(--txt-3);margin-top:3px;line-height:1.5">Project Phoenix · stand-up in 20 min</div>
+        </div>
+        <div style="background:#fff;border-radius:20px;padding:14px;box-shadow:var(--shadow-1)">
+          <div style="width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#10B981,#2DD4BF);display:grid;place-items:center;margin-bottom:9px"><svg width="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 20V10l8-6 8 6v10h-5v-6h-6v6z"/></svg></div>
+          <b style="font-size:12.5px">Business</b><div style="font-size:10px;color:var(--txt-3);margin-top:3px;line-height:1.5">Storefront · 12 orders · $1,840 this week</div>
+        </div>
+        <div style="background:#fff;border-radius:20px;padding:14px;box-shadow:var(--shadow-1)">
+          <div style="width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#F59E0B,#F97316);display:grid;place-items:center;margin-bottom:9px"><svg width="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 3l2 5 5.5.5-4 3.8 1.2 5.7L12 15l-4.7 3 1.2-5.7-4-3.8L10 8z"/></svg></div>
+          <b style="font-size:12.5px">Learning</b><div style="font-size:10px;color:var(--txt-3);margin-top:3px;line-height:1.5">UX course · 68% · certificate soon 🎓</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 2px 10px"><b style="font-size:13.5px">Recent files</b><span style="font-size:11px;font-weight:800;color:#C13BFF">See all</span></div>
+      <div style="background:#fff;border-radius:18px;box-shadow:var(--shadow-1);padding:4px 12px;margin-bottom:8px">
+        <div style="display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #F5F3FA">
+          <div style="width:34px;height:34px;border-radius:10px;background:#FEE2E2;display:grid;place-items:center;font-size:13px">📄</div>
+          <div style="flex:1"><b style="font-size:11.5px">Q3-Report-final.pdf</b><div style="font-size:9.5px;color:var(--txt-3)">Office · 2 h ago · shared with 8</div></div><span style="font-size:10px;color:#2DD4BF;font-weight:800">✓ synced</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #F5F3FA">
+          <div style="width:34px;height:34px;border-radius:10px;background:#E0E7FF;display:grid;place-items:center;font-size:13px">🎨</div>
+          <div style="flex:1"><b style="font-size:11.5px">brand-refresh.fig</b><div style="font-size:9.5px;color:var(--txt-3)">Personal · yesterday · preview ready</div></div><span style="font-size:10px;color:#2DD4BF;font-weight:800">✓ synced</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;padding:9px 0">
+          <div style="width:34px;height:34px;border-radius:10px;background:#D1FAE5;display:grid;place-items:center;font-size:13px">📊</div>
+          <div style="flex:1"><b style="font-size:11.5px">orders-week-45.xlsx</b><div style="font-size:9.5px;color:var(--txt-3)">Business · Mon · auto-backup</div></div><span style="font-size:10px;color:#FFB020;font-weight:800">↑ device</span>
+        </div>
+      </div>
+    </div></div>
+    <div class="bnav">
+      <div class="ni"><svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V21h-6v-6h-6v6H3z"/></svg>Home</div>
+      <div class="ni"><svg viewBox="0 0 24 24"><path d="M12 21C7 17 2.5 13.3 2.5 8.9 2.5 5.9 4.9 3.5 7.9 3.5c1.7 0 3.2.8 4.1 2 .9-1.2 2.4-2 4.1-2 3 0 5.4 2.4 5.4 5.4 0 4.4-4.5 8.1-9.5 12.1z"/></svg>Discover</div>
+      <div class="fabmid"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+      <div class="ni"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-8 8H4l2-3a8 8 0 1115-5z"/></svg>Chats</div>
+      <div class="ni on"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Spaces</div>
+    </div>
+    <div class="gb"></div>
+  </div></div><div class="cap">09 · Spaces (work hub)<small>Personal / Office / Business / Learning + a cloud-and-device file vault with sync states.</small></div></div>
+
+  <!-- ===== S10 PROFILE ===== -->
+  <div class="shot"><div class="phone"><div class="screen" style="background:var(--cloud)">
+    <div style="height:172px;background:linear-gradient(135deg,#FF4D6D 0%,#C13BFF 55%,#7B2CFF 100%);position:relative;flex:0 0 auto">
+      <div class="sb light"><span>9:41</span><div class="r"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 16h3v4H2zM7.5 12h3v8h-3zM13 8h3v12h-3zM18.5 4h3v16h-3z"/></svg><svg viewBox="0 0 24 24" fill="#fff"><rect x="3" y="8" width="16" height="9" rx="2.5"/><rect x="20" y="10.5" width="2" height="4" rx="1"/></svg></div></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 18px"><div style="width:34px;height:34px;border-radius:12px;background:rgba(255,255,255,.2);display:grid;place-items:center"><svg width="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></div><div style="width:34px;height:34px;border-radius:12px;background:rgba(255,255,255,.2);display:grid;place-items:center"><svg width="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 00-2-1.2L14 3h-4l-.4 2.6a7 7 0 00-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 005 12z"/></svg></div></div>
+      <div style="position:absolute;bottom:-44px;left:50%;transform:translateX(-50%)"><div style="padding:4px;background:#fff;border-radius:50%;box-shadow:var(--shadow-2)"><div class="av" style="width:88px;height:88px;background-image:url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300')"></div></div>
+      <span style="position:absolute;bottom:4px;right:2px;width:26px;height:26px;border-radius:50%;background:var(--grad);border:3px solid #fff;display:grid;place-items:center"><svg width="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></div>
+    </div>
+    <div class="scroll"><div style="padding:52px 18px 0;text-align:center">
+      <div style="font-family:Sora;font-weight:800;font-size:19px">Shakil Rahman <span style="color:#38BDF8;font-size:14px">✔</span></div>
+      <div style="font-size:11.5px;color:var(--txt-2);margin-top:4px;font-weight:600">@shakil · Mymensingh, Bangladesh 🇧🇩 · he/him</div>
+      <div style="font-size:11.5px;color:var(--txt-2);margin-top:7px;line-height:1.6">Builder of things · Photographer · “Love people,<br/>use things — the opposite never works.”</div>
+      <div style="display:flex;justify-content:center;gap:22px;margin-top:14px">
+        <div><div style="font-family:Sora;font-weight:800;font-size:16px">1,284</div><div style="font-size:9.5px;color:var(--txt-3);font-weight:700">FRIENDS</div></div>
+        <div style="width:1px;background:#E6E2F2"></div>
+        <div><div style="font-family:Sora;font-weight:800;font-size:16px">48.2k</div><div style="font-size:9.5px;color:var(--txt-3);font-weight:700">FOLLOWERS</div></div>
+        <div style="width:1px;background:#E6E2F2"></div>
+        <div><div style="font-family:Sora;font-weight:800;font-size:16px">312</div><div style="font-size:9.5px;color:var(--txt-3);font-weight:700">POSTS</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <div style="flex:1;height:42px;border-radius:14px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;box-shadow:0 10px 24px rgba(193,59,255,.35)">Edit profile</div>
+        <div style="flex:1;height:42px;border-radius:14px;background:#fff;border:1.5px solid var(--mist);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px">Share</div>
+        <div style="width:42px;height:42px;border-radius:14px;background:#fff;border:1.5px solid var(--mist);display:grid;place-items:center"><svg width="16" viewBox="0 0 24 24" fill="none" stroke="#17122B" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/></svg></div>
+      </div>
+      <!-- identity modes -->
+      <div style="margin-top:16px;background:#fff;border-radius:18px;box-shadow:var(--shadow-1);padding:13px 14px;text-align:left">
+        <b style="font-size:12px">Identity visibility</b>
+        <div style="display:flex;gap:7px;margin-top:9px">
+          <span style="flex:1;text-align:center;background:var(--grad-soft);border:1.5px solid #E8B6FF;color:#A21CAF;font-size:10px;font-weight:800;padding:8px 4px;border-radius:12px">💘 Dating ON</span>
+          <span style="flex:1;text-align:center;background:#EEF2FF;border:1.5px solid #C7D2FE;color:#4338CA;font-size:10px;font-weight:800;padding:8px 4px;border-radius:12px">💼 Work ON</span>
+          <span style="flex:1;text-align:center;background:var(--cloud);border:1.5px solid var(--mist);color:#9A94B0;font-size:10px;font-weight:800;padding:8px 4px;border-radius:12px">🌍 Social ⚙</span>
+        </div>
+      </div>
+      <!-- grid preview -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:14px;padding-bottom:20px">
+        <div style="height:84px;border-radius:12px;background:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300') center/cover"></div>
+        <div style="height:84px;border-radius:12px;background:url('https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=300') center/cover"></div>
+        <div style="height:84px;border-radius:12px;background:url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=300') center/cover"></div>
+        <div style="height:84px;border-radius:12px;background:url('https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=300') center/cover"></div>
+        <div style="height:84px;border-radius:12px;background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300') center/cover"></div>
+        <div style="height:84px;border-radius:12px;background:#17122B;display:grid;place-items:center;color:#fff;font-weight:800;font-size:12px">+306</div>
+      </div>
+    </div></div>
+    <div class="gb"></div>
+  </div></div><div class="cap">10 · Profile<small>One identity, three faces — dating, work and social visibility are independently switchable.</small></div></div>
+
+  <!-- ===== S11 DARK FEED ===== -->
+  <div class="shot"><div class="phone"><div class="screen" style="background:#0E0B16;color:#EDEBF5">
+    <div class="sb light"><span>9:41</span><div class="r"><svg viewBox="0 0 24 24" fill="#fff"><path d="M2 16h3v4H2zM7.5 12h3v8h-3zM13 8h3v12h-3zM18.5 4h3v16h-3z"/></svg><svg viewBox="0 0 24 24" fill="#fff"><rect x="3" y="8" width="16" height="9" rx="2.5"/><rect x="20" y="10.5" width="2" height="4" rx="1"/></svg></div></div>
+    <div class="h-app"><div class="t" style="color:#fff">am<span>ora</span></div><div style="display:flex;gap:8px"><div class="icbtn" style="background:#1C1630"><svg viewBox="0 0 24 24" style="stroke:#EDEBF5"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div><div class="icbtn" style="background:#1C1630"><svg viewBox="0 0 24 24" style="stroke:#EDEBF5"><path d="M18 8a6 6 0 10-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span class="dot"></span></div></div></div>
+    <div style="display:flex;gap:13px;padding:10px 20px 14px;flex:0 0 auto">
+      <div style="text-align:center"><div style="width:58px;height:58px;border-radius:50%;background:#1C1630;display:grid;place-items:center;border:1.8px dashed #7B2CFF"><svg width="20" viewBox="0 0 24 24" fill="none" stroke="url(#gradStroke)" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div><div style="font-size:10px;font-weight:700;margin-top:5px;color:#8F89AC">You</div></div>
+      <div style="text-align:center"><div class="grad-ring"><div class="av" style="width:53px;height:53px;background-image:url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200');border-color:#0E0B16"></div></div><div style="font-size:10px;font-weight:700;margin-top:5px">Sofia</div></div>
+      <div style="text-align:center"><div class="grad-ring"><div class="av" style="width:53px;height:53px;background-image:url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200');border-color:#0E0B16"></div></div><div style="font-size:10px;font-weight:700;margin-top:5px">Yuki</div></div>
+      <div style="text-align:center"><div class="grad-ring"><div class="av" style="width:53px;height:53px;background-image:url('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200');border-color:#0E0B16"></div></div><div style="font-size:10px;font-weight:700;margin-top:5px">Rafi</div></div>
+    </div>
+    <div class="scroll"><div style="padding:0 14px">
+      <div style="background:#171226;border:1px solid #241D3F;border-radius:24px;overflow:hidden;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px;padding:13px 14px 11px">
+          <div class="av" style="width:38px;height:38px;background-image:url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200')"></div>
+          <div><div style="font-weight:800;font-size:13.5px;color:#fff">Yuki Tanaka</div><div style="font-size:10.5px;color:#716B8E">Tokyo · 31 min · 🌍 Public</div></div>
+        </div>
+        <div style="padding:0 14px 10px;font-size:13px;line-height:1.55;color:#D6D2E6">Night walk in Shibuya. The city never sleeps and honestly, same 🌃</div>
+        <div style="height:200px;background:url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800') center/cover"></div>
+        <div style="display:flex;align-items:center;gap:16px;padding:12px 16px">
+          <span style="display:flex;align-items:center;gap:6px;font-weight:800;font-size:12.5px;color:#FF758F"><svg width="19" viewBox="0 0 24 24" fill="url(#gradFill)"><path d="M12 21C7 17 2.5 13.3 2.5 8.9 2.5 5.9 4.9 3.5 7.9 3.5c1.7 0 3.2.8 4.1 2 .9-1.2 2.4-2 4.1-2 3 0 5.4 2.4 5.4 5.4 0 4.4-4.5 8.1-9.5 12.1z"/></svg>8.1k</span>
+          <span style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;color:#8F89AC"><svg width="18" viewBox="0 0 24 24" fill="none" stroke="#8F89AC" stroke-width="2"><path d="M21 12a8 8 0 01-8 8H4l2-3a8 8 0 1115-5z"/></svg>432</span>
+          <span style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:12.5px;color:#8F89AC"><svg width="18" viewBox="0 0 24 24" fill="none" stroke="#8F89AC" stroke-width="2" stroke-linecap="round"><path d="M15 6l6 6-6 6M21 12H8a5 5 0 00-5 5"/></svg>210</span>
+        </div>
+      </div>
+      <div style="background:#171226;border:1px solid #241D3F;border-radius:24px;padding:13px 14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="av" style="width:38px;height:38px;background-image:url('https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200')"></div>
+          <div><div style="font-weight:800;font-size:13.5px;color:#fff">Omar Haddad</div><div style="font-size:10.5px;color:#716B8E">1 h · 🎵 Audio post</div></div>
+        </div>
+        <div style="margin-top:11px;background:#201937;border-radius:16px;padding:11px 13px;display:flex;align-items:center;gap:10px">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--grad);display:grid;place-items:center"><svg width="13" viewBox="0 0 24 24" fill="#fff"><path d="M7 5l12 7-12 7z"/></svg></div>
+          <svg width="130" height="24" viewBox="0 0 130 24"><g fill="#7B2CFF"><rect x="0" y="9" width="3" height="6" rx="1.5"/><rect x="6" y="5" width="3" height="14" rx="1.5"/><rect x="12" y="2" width="3" height="20" rx="1.5"/><rect x="18" y="7" width="3" height="10" rx="1.5"/><rect x="24" y="4" width="3" height="16" rx="1.5"/><rect x="30" y="9" width="3" height="6" rx="1.5"/></g><g fill="#312A4E"><rect x="36" y="6" width="3" height="12" rx="1.5"/><rect x="42" y="2" width="3" height="20" rx="1.5"/><rect x="48" y="8" width="3" height="8" rx="1.5"/><rect x="54" y="5" width="3" height="14" rx="1.5"/><rect x="60" y="10" width="3" height="4" rx="1.5"/><rect x="66" y="4" width="3" height="16" rx="1.5"/><rect x="72" y="7" width="3" height="10" rx="1.5"/><rect x="78" y="3" width="3" height="18" rx="1.5"/><rect x="84" y="9" width="3" height="6" rx="1.5"/><rect x="90" y="6" width="3" height="12" rx="1.5"/><rect x="96" y="2" width="3" height="20" rx="1.5"/><rect x="102" y="8" width="3" height="8" rx="1.5"/><rect x="108" y="5" width="3" height="14" rx="1.5"/><rect x="114" y="9" width="3" height="6" rx="1.5"/><rect x="120" y="6" width="3" height="12" rx="1.5"/></g></svg>
+          <span style="font-size:10px;color:#716B8E;font-weight:700;margin-left:auto">2:14</span>
+        </div>
+      </div>
+    </div></div>
+    <div class="bnav" style="background:rgba(23,18,38,.9);border-color:#2A2342">
+      <div class="ni on"><svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V21h-6v-6h-6v6H3z"/></svg>Home</div>
+      <div class="ni"><svg viewBox="0 0 24 24"><path d="M12 21C7 17 2.5 13.3 2.5 8.9 2.5 5.9 4.9 3.5 7.9 3.5c1.7 0 3.2.8 4.1 2 .9-1.2 2.4-2 4.1-2 3 0 5.4 2.4 5.4 5.4 0 4.4-4.5 8.1-9.5 12.1z"/></svg>Discover</div>
+      <div class="fabmid"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+      <div class="ni"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-8 8H4l2-3a8 8 0 1115-5z"/></svg>Chats</div>
+      <div class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Spaces</div>
+    </div>
+    <div class="gb light"></div>
+  </div></div><div class="cap">11 · Dark mode<small>Hand-tuned night palette (#0E0B16 base) — not inverted, re-designed. Audio posts with waveforms.</small></div></div>
+</div></section>
+
+<!-- ============ ARCHITECTURE NOTE ============ -->
+<section class="sect"><div class="wrap">
+  <span class="kicker">05 · How it gets real</span>
+  <h2>Open-source backbone, user-powered edge</h2>
+  <p class="sub">The design above maps to a practical, buildable stack: <b>Kotlin + Jetpack Compose (Material 3)</b> on Android; <b>Matrix (Synapse/Dendrite)</b> for E2E-encrypted messaging &amp; federation; <b>ActivityPub</b> for the global social graph; open-source media pipeline (<b>Thumbor / LibreOffice headless / pdf.js / ExoPlayer</b>) to generate previews for 300+ file formats; <b>MinIO or users' own devices (P2P via WebRTC + libtorrent)</b> for storage. Everything self-hostable — the platform can run on community servers or on the users' own hardware.</p>
+  <div class="tokens" style="margin-top:28px">
+    <div class="tok"><h4>Messaging</h4><div style="color:#CFCAE2;font-size:13.5px;line-height:1.8">Matrix protocol · E2E (Olm/Megolm) · voice &amp; video via WebRTC · offline queue · federated worldwide</div></div>
+    <div class="tok"><h4>Social + Dating</h4><div style="color:#CFCAE2;font-size:13.5px;line-height:1.8">ActivityPub feed · on-device match scoring · consent-first visibility · verified profiles</div></div>
+    <div class="tok"><h4>Files &amp; Previews</h4><div style="color:#CFCAE2;font-size:13.5px;line-height:1.8">Any type, chunked upload · client-side thumbnails · server render for PDF/Office/CAD · in-app viewer</div></div>
+    <div class="tok"><h4>Infrastructure</h4><div style="color:#CFCAE2;font-size:13.5px;line-height:1.8">Self-hostable Docker stack · or P2P device mesh · nothing proprietary, nothing locked in</div></div>
+  </div>
+</div></section>
+
+<footer class="foot"><div class="wrap">
+  <b>Amora — the My-Love platform</b> · Design concept v1.0 · 11 screens · “Aurora” design system · Built for global scale: 40+ languages, RTL, WCAG-AA, dark mode. Photography placeholders via Unsplash.
+</div></footer>
+
+</body>
+</html>
