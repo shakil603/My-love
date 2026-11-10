@@ -73,6 +73,12 @@ fun AmoraApp() {
         composable("story") { StoryScreen(onBack = back) }
         composable("reels") { ReelsScreen(onBack = back) }
         composable("call") { CallScreen(onBack = back) }
+        composable("incoming") {
+            IncomingCallScreen(
+                onAccept = { nav.navigate("call") { popUpTo("incoming") { inclusive = true } } },
+                onDecline = back
+            )
+        }
         composable("notifications") { NotificationsScreen(onBack = back) }
         composable("search") { SearchScreen(onBack = back) }
         composable("comments") { CommentsScreen(onBack = back) }
