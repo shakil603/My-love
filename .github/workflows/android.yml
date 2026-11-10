@@ -48,7 +48,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v0.1.0
-          name: "Amora v0.1.0 — first APK \uD83D\uDC9C"
+          name: "Amora v0.1.0 - first APK"
           body: |
             First buildable version of **Amora** (the My-Love platform) — Kotlin + Jetpack Compose.
 
