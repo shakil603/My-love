@@ -32,7 +32,23 @@ jobs:
           gradle-version: "8.9"
 
       - name: Build debug APK
-        run: gradle assembleDebug --no-daemon
+        run: |
+          set -o pipefail
+          gradle assembleDebug --no-daemon 2>&1 | tee build-log.txt
+
+      - name: Save error log on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          grep -nE "^e: |error:|FAILURE|Caused by|What went wrong|> Task .* FAILED" build-log.txt | head -120 > ci-error.txt || true
+          [ -s ci-error.txt ] || tail -120 build-log.txt > ci-error.txt
+          SHA=$(gh api "repos/${{ github.repository }}/contents/ci-error.log?ref=${{ github.ref_name }}" --jq .sha 2>/dev/null || true)
+          if [ -n "$SHA" ]; then
+            gh api -X PUT "repos/${{ github.repository }}/contents/ci-error.log" -f message="ci: error log" -f content="$(base64 -w0 ci-error.txt)" -f branch="${{ github.ref_name }}" -f sha="$SHA"
+          else
+            gh api -X PUT "repos/${{ github.repository }}/contents/ci-error.log" -f message="ci: error log" -f content="$(base64 -w0 ci-error.txt)" -f branch="${{ github.ref_name }}"
+          fi
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -42,18 +58,18 @@ jobs:
           if-no-files-found: error
 
       - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk Amora-v0.2.0-debug.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk Amora-v0.3.0-debug.apk
 
       - name: Publish APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.2.0
-          name: "Amora v0.2.0 - first APK"
+          tag_name: v0.3.0
+          name: "Amora v0.3.0 - first APK"
           body: |
-            Second release — 22+ screens of **Amora** (the My-Love platform) — Kotlin + Jetpack Compose.
+            Third release — full messenger upgrade of **Amora** (the My-Love platform) — Kotlin + Jetpack Compose.
 
             **Included screens:** Onboarding · Sign-up · OTP · Feed · Stories · Reels · Discover · Match · Chats · Conversation · Video Call · Upload sheet · Comments · Notifications · Search · Spaces · Task Board · Calendar · Shop · Wallet · Settings · Safety Center · Profile.
 
-            **Install:** download `Amora-v0.2.0-debug.apk` on your Android phone (Android 8.0+), allow "install from unknown sources", open it. Internet needed for demo images.
+            **Install:** download `Amora-v0.3.0-debug.apk` on your Android phone (Android 8.0+), allow "install from unknown sources", open it. Internet needed for demo images.
           prerelease: true
-          files: Amora-v0.2.0-debug.apk
+          files: Amora-v0.3.0-debug.apk
