@@ -10,6 +10,9 @@ on:
       - ".github/workflows/android.yml"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -37,3 +40,20 @@ jobs:
           name: amora-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - name: Rename APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk Amora-v0.1.0-debug.apk
+
+      - name: Publish APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.1.0
+          name: "Amora v0.1.0 — first APK \uD83D\uDC9C"
+          body: |
+            First buildable version of **Amora** (the My-Love platform) — Kotlin + Jetpack Compose.
+
+            **Included screens:** Onboarding · Home Feed (stories + posts + file previews) · Discover (dating card) · Chats · Conversation (E2E UI, file & image bubbles) · Spaces (vault + personal/office/business/learning) · Profile.
+
+            **Install:** download `Amora-v0.1.0-debug.apk` on your Android phone (Android 8.0+), allow "install from unknown sources", open it. Internet needed for demo images.
+          prerelease: true
+          files: Amora-v0.1.0-debug.apk
