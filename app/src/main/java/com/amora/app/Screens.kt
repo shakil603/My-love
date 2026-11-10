@@ -26,7 +26,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Star
@@ -123,7 +126,7 @@ fun FileChip(name: String, meta: String, light: Boolean = false) {
 /* ---------- 01 · Onboarding ---------- */
 
 @Composable
-fun OnboardingScreen(onDone: () -> Unit) {
+fun OnboardingScreen(onCreate: () -> Unit, onLogin: () -> Unit) {
     Box(
         Modifier
             .fillMaxSize()
@@ -163,7 +166,7 @@ fun OnboardingScreen(onDone: () -> Unit) {
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(19.dp))
                     .background(Color.White)
-                    .clickable(onClick = onDone)
+                    .clickable(onClick = onCreate)
                     .padding(vertical = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -175,7 +178,7 @@ fun OnboardingScreen(onDone: () -> Unit) {
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(19.dp))
                     .border(1.5.dp, Color.White.copy(alpha = 0.35f), RoundedCornerShape(19.dp))
-                    .clickable(onClick = onDone)
+                    .clickable(onClick = onLogin)
                     .padding(vertical = 15.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -195,7 +198,7 @@ fun OnboardingScreen(onDone: () -> Unit) {
 /* ---------- 02 · Feed ---------- */
 
 @Composable
-fun FeedScreen() {
+fun FeedScreen(go: (String) -> Unit = {}) {
     LazyColumn(Modifier.fillMaxSize()) {
         item {
             Row(
@@ -206,9 +209,11 @@ fun FeedScreen() {
             ) {
                 Text("amora", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Orchid)
                 Spacer(Modifier.weight(1f))
-                Icon(Icons.Filled.Search, null, tint = Ink)
+                Icon(Icons.Filled.PlayArrow, null, tint = Ink, modifier = Modifier.clickable { go("reels") })
                 Spacer(Modifier.width(16.dp))
-                Icon(Icons.Filled.Notifications, null, tint = Ink)
+                Icon(Icons.Filled.Search, null, tint = Ink, modifier = Modifier.clickable { go("search") })
+                Spacer(Modifier.width(16.dp))
+                Icon(Icons.Filled.Notifications, null, tint = Ink, modifier = Modifier.clickable { go("notifications") })
             }
         }
         item {
@@ -217,7 +222,10 @@ fun FeedScreen() {
                 horizontalArrangement = Arrangement.spacedBy(13.dp)
             ) {
                 items(Mock.stories) { story ->
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.clickable { if (!story.isAdd) go("story") else go("upload") }
+                    ) {
                         if (story.isAdd) {
                             Box(
                                 Modifier
@@ -239,14 +247,14 @@ fun FeedScreen() {
             Spacer(Modifier.height(14.dp))
         }
         items(Mock.posts) { post ->
-            PostCard(post)
+            PostCard(post, go)
             Spacer(Modifier.height(14.dp))
         }
     }
 }
 
 @Composable
-fun PostCard(post: Post) {
+fun PostCard(post: Post, go: (String) -> Unit = {}) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -300,7 +308,7 @@ fun PostCard(post: Post) {
                 Spacer(Modifier.width(6.dp))
                 Text(post.likes, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, color = Rose)
                 Spacer(Modifier.width(18.dp))
-                Text("\uD83D\uDCAC ${post.comments}", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Txt2)
+                Text("\uD83D\uDCAC ${post.comments}", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Txt2, modifier = Modifier.clickable { go("comments") })
                 Spacer(Modifier.weight(1f))
                 Icon(Icons.Filled.Send, null, tint = Txt2, modifier = Modifier.size(18.dp))
             }
@@ -311,7 +319,7 @@ fun PostCard(post: Post) {
 /* ---------- 03 · Discover ---------- */
 
 @Composable
-fun DiscoverScreen() {
+fun DiscoverScreen(go: (String) -> Unit = {}) {
     val (photo, name, meta) = Mock.discover
     Column(Modifier.fillMaxSize()) {
         Row(
@@ -394,7 +402,7 @@ fun DiscoverScreen() {
                     .size(66.dp)
                     .clip(CircleShape)
                     .background(AuroraGradient)
-                    .clickable {},
+                    .clickable { go("match") },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(Icons.Filled.Favorite, null, tint = Color.White, modifier = Modifier.size(30.dp))
@@ -485,7 +493,7 @@ fun ChatsScreen(onOpenChat: (String) -> Unit) {
 /* ---------- 05 · Conversation ---------- */
 
 @Composable
-fun ConversationScreen(chatId: String, onBack: () -> Unit) {
+fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit = {}) {
     val chat = Mock.chats.firstOrNull { it.id == chatId } ?: Mock.chats.first()
     var input by remember { mutableStateOf("") }
     Column(
@@ -512,6 +520,10 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit) {
                     fontSize = 10.sp, color = Mint, fontWeight = FontWeight.Bold
                 )
             }
+            Spacer(Modifier.weight(1f))
+            IconButton(onClick = { go("call") }) {
+                Icon(Icons.Filled.Call, null, tint = Ink)
+            }
         }
         LazyColumn(
             Modifier
@@ -536,7 +548,8 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit) {
                 Modifier
                     .size(38.dp)
                     .clip(CircleShape)
-                    .background(AuroraSoft),
+                    .background(AuroraSoft)
+                    .clickable { go("upload") },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(Icons.Filled.Add, null, tint = Orchid, modifier = Modifier.size(20.dp))
@@ -626,7 +639,7 @@ fun MessageBubble(msg: Message) {
 /* ---------- 06 · Spaces ---------- */
 
 @Composable
-fun SpacesScreen() {
+fun SpacesScreen(go: (String) -> Unit = {}) {
     LazyColumn(Modifier.fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 20.dp)) {
         item {
             Row(
@@ -647,6 +660,7 @@ fun SpacesScreen() {
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(22.dp))
                     .background(VaultGradient)
+                    .clickable { go("wallet") }
                     .padding(16.dp)
             ) {
                 Text("MY VAULT · SYNCED ✓", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFFB7A8FF), letterSpacing = 2.sp)
@@ -687,6 +701,14 @@ fun SpacesScreen() {
                                     .weight(1f)
                                     .clip(RoundedCornerShape(20.dp))
                                     .background(Color.White)
+                                    .clickable {
+                                        when (card.first) {
+                                            "Personal" -> go("calendar")
+                                            "Office" -> go("board")
+                                            "Business" -> go("shop")
+                                            else -> go("wallet")
+                                        }
+                                    }
                                     .padding(14.dp)
                             ) {
                                 Box(
@@ -762,7 +784,7 @@ fun SpacesScreen() {
 /* ---------- 07 · Profile ---------- */
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(go: (String) -> Unit = {}) {
     LazyColumn(Modifier.fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 20.dp)) {
         item {
             Box(Modifier.fillMaxWidth()) {
@@ -815,6 +837,17 @@ fun ProfileScreen() {
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     GradientButton("Edit profile", Modifier.weight(1f))
+                    Box(
+                        Modifier
+                            .clip(RoundedCornerShape(17.dp))
+                            .border(1.5.dp, Mist, RoundedCornerShape(17.dp))
+                            .background(Color.White)
+                            .clickable { go("settings") }
+                            .padding(15.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Filled.Settings, null, tint = Ink, modifier = Modifier.size(20.dp))
+                    }
                     Box(
                         Modifier
                             .weight(1f)

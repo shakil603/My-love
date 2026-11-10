@@ -46,26 +46,50 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AmoraApp() {
     val nav = rememberNavController()
+    val go: (String) -> Unit = { route -> nav.navigate(route) }
+    val back: () -> Unit = { nav.popBackStack() }
     NavHost(navController = nav, startDestination = "onboarding") {
         composable("onboarding") {
-            OnboardingScreen(onDone = {
-                nav.navigate("main") { popUpTo("onboarding") { inclusive = true } }
-            })
+            OnboardingScreen(
+                onCreate = { nav.navigate("signup") },
+                onLogin = { nav.navigate("main") { popUpTo("onboarding") { inclusive = true } } }
+            )
         }
-        composable("main") {
-            MainScreen(onOpenChat = { id -> nav.navigate("chat/$id") })
+        composable("signup") { SignupScreen(onNext = { nav.navigate("otp") }, onBack = back) }
+        composable("otp") {
+            OtpScreen(
+                onNext = { nav.navigate("main") { popUpTo("onboarding") { inclusive = true } } },
+                onBack = back
+            )
         }
+        composable("main") { MainScreen(go = go) }
         composable("chat/{id}") { backStack ->
             val id = backStack.arguments?.getString("id") ?: "1"
-            ConversationScreen(chatId = id, onBack = { nav.popBackStack() })
+            ConversationScreen(chatId = id, onBack = back, go = go)
         }
+        composable("match") {
+            MatchScreen(onHello = { nav.navigate("chat/1") { popUpTo("main") } }, onBack = back)
+        }
+        composable("story") { StoryScreen(onBack = back) }
+        composable("reels") { ReelsScreen(onBack = back) }
+        composable("call") { CallScreen(onBack = back) }
+        composable("notifications") { NotificationsScreen(onBack = back) }
+        composable("search") { SearchScreen(onBack = back) }
+        composable("comments") { CommentsScreen(onBack = back) }
+        composable("settings") { SettingsScreen(onBack = back, onSafety = { nav.navigate("safety") }) }
+        composable("safety") { SafetyScreen(onBack = back) }
+        composable("wallet") { WalletScreen(onBack = back) }
+        composable("shop") { ShopScreen(onBack = back) }
+        composable("calendar") { CalendarScreen(onBack = back) }
+        composable("board") { BoardScreen(onBack = back) }
+        composable("upload") { UploadScreen(onBack = back) }
     }
 }
 
 private data class Tab(val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
 
 @Composable
-fun MainScreen(onOpenChat: (String) -> Unit) {
+fun MainScreen(go: (String) -> Unit) {
     var selected by remember { mutableIntStateOf(0) }
     val tabs = listOf(
         Tab("Home", Icons.Filled.Home),
@@ -98,11 +122,11 @@ fun MainScreen(onOpenChat: (String) -> Unit) {
     ) { pad ->
         Box(Modifier.padding(pad)) {
             when (selected) {
-                0 -> FeedScreen()
-                1 -> DiscoverScreen()
-                2 -> ChatsScreen(onOpenChat = onOpenChat)
-                3 -> SpacesScreen()
-                else -> ProfileScreen()
+                0 -> FeedScreen(go = go)
+                1 -> DiscoverScreen(go = go)
+                2 -> ChatsScreen(onOpenChat = { id -> go("chat/$id") })
+                3 -> SpacesScreen(go = go)
+                else -> ProfileScreen(go = go)
             }
         }
     }
