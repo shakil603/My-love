@@ -258,7 +258,7 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
                 "⏱", fontSize = 16.sp,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(if (vanish) AuroraSoft else Color.Transparent)
+                    .background(if (vanish) Color(0xFFF6E7FF) else Color.Transparent)
                     .clickable { vanish = !vanish }
                     .padding(8.dp)
             )
@@ -648,7 +648,7 @@ private fun VoiceBubbleContent(msg: Message) {
             Modifier
                 .size(32.dp)
                 .clip(CircleShape)
-                .background(if (msg.mine) Color.White else AuroraGradient)
+                .then(if (msg.mine) Modifier.background(Color.White) else Modifier.background(AuroraGradient))
                 .clickable { playing = !playing },
             contentAlignment = Alignment.Center
         ) {
