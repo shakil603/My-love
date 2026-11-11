@@ -24,8 +24,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PlayArrow
@@ -265,7 +268,9 @@ fun PostCard(post: Post, go: (String) -> Unit = {}) {
     ) {
         Column {
             Row(
-                Modifier.padding(14.dp),
+                Modifier
+                    .clickable { go("user/${post.authorId}") }
+                    .padding(14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Avatar(post.avatar, 38)
@@ -330,11 +335,29 @@ fun DiscoverScreen(go: (String) -> Unit = {}) {
         ) {
             Text("Discover", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
             Spacer(Modifier.weight(1f))
-            Text("\uD83D\uDC98 Dating", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(AuroraGradient)
-                    .padding(horizontal = 14.dp, vertical = 8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    Modifier
+                        .size(38.dp)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                        .border(1.dp, Mist, CircleShape)
+                        .clickable { go("nearby") },
+                    contentAlignment = Alignment.Center
+                ) { Icon(Icons.Filled.NearMe, "Nearby", tint = Ink, modifier = Modifier.size(18.dp)) }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(AuroraGradient)
+                        .clickable { go("likedyou") }
+                        .padding(horizontal = 13.dp, vertical = 9.dp)
+                ) {
+                    Icon(Icons.Filled.Favorite, null, tint = Color.White, modifier = Modifier.size(13.dp))
+                    Spacer(Modifier.width(5.dp))
+                    Text("Liked you · 27", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+                }
+            }
         }
         Box(
             Modifier
@@ -342,6 +365,7 @@ fun DiscoverScreen(go: (String) -> Unit = {}) {
                 .fillMaxWidth()
                 .weight(1f)
                 .clip(RoundedCornerShape(28.dp))
+                .clickable { go("user/1") }
         ) {
             AsyncImage(
                 model = photo, contentDescription = null, contentScale = ContentScale.Crop,
@@ -604,7 +628,10 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     listOf("1,284" to "FRIENDS", "48.2k" to "FOLLOWERS", "312" to "POSTS").forEach { (num, label) ->
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.clickable { go("followers") }
+                        ) {
                             Text(num, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
                             Text(label, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Txt3)
                         }
@@ -615,7 +642,7 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                     Modifier.padding(horizontal = 18.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    GradientButton("Edit profile", Modifier.weight(1f))
+                    GradientButton("Edit profile", Modifier.weight(1f)) { go("editprofile") }
                     Box(
                         Modifier
                             .clip(RoundedCornerShape(17.dp))
@@ -637,6 +664,33 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                         contentAlignment = Alignment.Center
                     ) {
                         Text("Share", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = Ink)
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    Modifier.padding(horizontal = 18.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    listOf(
+                        Triple(Icons.Filled.BookmarkBorder, "Saved", "saved"),
+                        Triple(Icons.Filled.Event, "Events", "events"),
+                        Triple(Icons.Filled.Favorite, "Liked you", "likedyou")
+                    ).forEach { (icon, label, route) ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(Color.White)
+                                .border(1.dp, Mist, RoundedCornerShape(14.dp))
+                                .clickable { go(route) }
+                                .padding(vertical = 11.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(icon, null, tint = Orchid, modifier = Modifier.size(15.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(label, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
+                        }
                     }
                 }
                 Spacer(Modifier.height(16.dp))
