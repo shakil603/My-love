@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Inicio</string>
+    <string name="tab_discover">Descubrir</string>
+    <string name="tab_chats">Chats</string>
+    <string name="tab_spaces">Espacios</string>
+    <string name="tab_profile">Perfil</string>
+    <string name="onboard_create">Crear cuenta</string>
+    <string name="onboard_login">Iniciar sesión</string>
+    <string name="language">Idioma</string>
+    <string name="spaces_title">Espacios</string>
+    <string name="create_group">Crear grupo</string>
+</resources>

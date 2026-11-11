@@ -1,7 +1,7 @@
 package com.amora.app
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
@@ -31,7 +31,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -52,13 +52,14 @@ fun AmoraApp() {
         composable("onboarding") {
             OnboardingScreen(
                 onCreate = { nav.navigate("signup") },
-                onLogin = { nav.navigate("main") { popUpTo("onboarding") { inclusive = true } } }
+                onLogin = { nav.navigate("permissions") },
+                onLanguage = { nav.navigate("language") }
             )
         }
         composable("signup") { SignupScreen(onNext = { nav.navigate("otp") }, onBack = back) }
         composable("otp") {
             OtpScreen(
-                onNext = { nav.navigate("main") { popUpTo("onboarding") { inclusive = true } } },
+                onNext = { nav.navigate("permissions") },
                 onBack = back
             )
         }
@@ -102,10 +103,17 @@ fun AmoraApp() {
         composable("notifications") { NotificationsScreen(onBack = back) }
         composable("search") { SearchScreen(onBack = back) }
         composable("comments") { CommentsScreen(onBack = back) }
-        composable("settings") { SettingsScreen(onBack = back, onSafety = { nav.navigate("safety") }) }
+        composable("settings") {
+            SettingsScreen(onBack = back, onSafety = { nav.navigate("safety") }, onLanguage = { nav.navigate("language") })
+        }
+        composable("language") { LanguageScreen(onBack = back) }
+        composable("permissions") {
+            PermissionsScreen(onDone = { nav.navigate("main") { popUpTo("onboarding") { inclusive = true } } })
+        }
+        composable("creategroup") {
+            CreateGroupScreen(onBack = back, onCreated = { nav.navigate("chat/4") { popUpTo("main") } })
+        }
         composable("safety") { SafetyScreen(onBack = back) }
-        composable("wallet") { WalletScreen(onBack = back) }
-        composable("shop") { ShopScreen(onBack = back) }
         composable("calendar") { CalendarScreen(onBack = back) }
         composable("board") { BoardScreen(onBack = back) }
         composable("upload") { UploadScreen(onBack = back) }
@@ -118,11 +126,11 @@ private data class Tab(val label: String, val icon: androidx.compose.ui.graphics
 fun MainScreen(go: (String) -> Unit) {
     var selected by remember { mutableIntStateOf(0) }
     val tabs = listOf(
-        Tab("Home", Icons.Filled.Home),
-        Tab("Discover", Icons.Filled.Favorite),
-        Tab("Chats", Icons.Filled.Email),
-        Tab("Spaces", Icons.Filled.Menu),
-        Tab("Profile", Icons.Filled.Person)
+        Tab(androidx.compose.ui.res.stringResource(R.string.tab_home), Icons.Filled.Home),
+        Tab(androidx.compose.ui.res.stringResource(R.string.tab_discover), Icons.Filled.Favorite),
+        Tab(androidx.compose.ui.res.stringResource(R.string.tab_chats), Icons.Filled.Email),
+        Tab(androidx.compose.ui.res.stringResource(R.string.tab_spaces), Icons.Filled.Menu),
+        Tab(androidx.compose.ui.res.stringResource(R.string.tab_profile), Icons.Filled.Person)
     )
     Scaffold(
         containerColor = Cloud,

@@ -25,7 +25,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.NearMe
@@ -129,7 +134,7 @@ fun FileChip(name: String, meta: String, light: Boolean = false) {
 /* ---------- 01 · Onboarding ---------- */
 
 @Composable
-fun OnboardingScreen(onCreate: () -> Unit, onLogin: () -> Unit) {
+fun OnboardingScreen(onCreate: () -> Unit, onLogin: () -> Unit, onLanguage: () -> Unit = {}) {
     Box(
         Modifier
             .fillMaxSize()
@@ -173,7 +178,7 @@ fun OnboardingScreen(onCreate: () -> Unit, onLogin: () -> Unit) {
                     .padding(vertical = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Create account", color = Ink, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
+                Text(androidx.compose.ui.res.stringResource(R.string.onboard_create), color = Ink, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
             }
             Spacer(Modifier.height(12.dp))
             Box(
@@ -189,9 +194,14 @@ fun OnboardingScreen(onCreate: () -> Unit, onLogin: () -> Unit) {
             }
             Spacer(Modifier.height(18.dp))
             Text(
-                "\uD83C\uDF10 English · বাংলা · Español · العربية · 中文 · +37",
-                color = Color.White.copy(alpha = 0.55f), fontSize = 11.sp,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                "English · বাংলা · Español · العربية · 中文 · हिन्दी · +8",
+                color = Color.White.copy(alpha = 0.75f), fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .clip(RoundedCornerShape(50))
+                    .background(Color.White.copy(alpha = 0.12f))
+                    .clickable(onClick = onLanguage)
+                    .padding(horizontal = 14.dp, vertical = 8.dp)
             )
             Spacer(Modifier.height(24.dp))
         }
@@ -451,9 +461,9 @@ fun SpacesScreen(go: (String) -> Unit = {}) {
                     .padding(horizontal = 20.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Spaces", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
+                Text(androidx.compose.ui.res.stringResource(R.string.spaces_title), fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
                 Spacer(Modifier.weight(1f))
-                Icon(Icons.Filled.Add, null, tint = Ink)
+                IconButton(onClick = { go("creategroup") }) { Icon(Icons.Filled.Add, null, tint = Ink) }
             }
         }
         item {
@@ -461,124 +471,117 @@ fun SpacesScreen(go: (String) -> Unit = {}) {
                 Modifier
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(22.dp))
-                    .background(VaultGradient)
-                    .clickable { go("wallet") }
-                    .padding(16.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(AuroraGradient)
+                    .clickable { go("creategroup") }
+                    .padding(18.dp)
             ) {
-                Text("MY VAULT · SYNCED ✓", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFFB7A8FF), letterSpacing = 2.sp)
-                Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Text("34.2 GB", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
-                    Spacer(Modifier.weight(1f))
-                    Text("of 100 GB · cloud + this device", color = Color(0xFFB7B2CC), fontSize = 10.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        Modifier.size(46.dp).clip(RoundedCornerShape(16.dp)).background(Color.White.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) { Icon(Icons.Filled.Group, null, tint = Color.White, modifier = Modifier.size(22.dp)) }
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(androidx.compose.ui.res.stringResource(R.string.create_group), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
+                        Text("Friends, family, work, business — unlimited, no restrictions", color = Color.White.copy(alpha = 0.85f), fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                    }
+                    Icon(Icons.Filled.Add, null, tint = Color.White, modifier = Modifier.size(20.dp))
                 }
-                Spacer(Modifier.height(10.dp))
-                LinearProgressIndicator(
-                    progress = { 0.34f },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(7.dp)
-                        .clip(RoundedCornerShape(5.dp)),
-                    color = Orchid,
-                    trackColor = Color.White.copy(alpha = 0.15f)
-                )
-                Spacer(Modifier.height(10.dp))
-                Text("\uD83D\uDDBC 2,418 photos   \uD83D\uDCC4 312 docs   \uD83C\uDFAC 86 videos", color = Color.White.copy(alpha = 0.8f), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            }
+            Spacer(Modifier.height(18.dp))
+        }
+        item {
+            Text(
+                "YOUR GROUPS", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3,
+                modifier = Modifier.padding(horizontal = 22.dp)
+            )
+            Spacer(Modifier.height(6.dp))
+            Column(Modifier.padding(horizontal = 16.dp)) {
+                Mock.chats.filter { it.kind == "group" || it.kind == "work" }.forEach { c ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                            .clip(RoundedCornerShape(18.dp))
+                            .background(Color.White)
+                            .border(1.dp, Color(0xFFEFEBF8), RoundedCornerShape(18.dp))
+                            .clickable { go("chat/${c.id}") }
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Avatar(c.avatar, 46, ringed = c.unread > 0)
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(c.name, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Ink, maxLines = 1)
+                            Text(c.last, fontSize = 11.sp, color = Txt2, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                        if (c.unread > 0) {
+                            Box(
+                                Modifier.clip(CircleShape).background(AuroraGradient).padding(horizontal = 7.dp, vertical = 2.dp)
+                            ) { Text("${c.unread}", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold) }
+                        }
+                    }
+                }
             }
             Spacer(Modifier.height(12.dp))
         }
         item {
-            val cards = listOf(
-                Triple("Personal", "Notes, journal, goals · 3 reminders today", Rose),
-                Triple("Office", "Project Phoenix · stand-up in 20 min", Indigo),
-                Triple("Business", "Storefront · 12 orders · \$1,840 this week", Mint),
-                Triple("Learning", "UX course · 68% · certificate soon \uD83C\uDF93", Amber)
+            Text(
+                "TOOLS", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3,
+                modifier = Modifier.padding(horizontal = 22.dp)
             )
+            Spacer(Modifier.height(6.dp))
             Column(Modifier.padding(horizontal = 16.dp)) {
-                for (row in cards.chunked(2)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        for (card in row) {
+                listOf(
+                    listOf(
+                        Triple(Icons.Filled.Description, "Notes & tasks", "board"),
+                        Triple(Icons.Filled.DateRange, "Calendar", "calendar")
+                    ),
+                    listOf(
+                        Triple(Icons.Filled.PhotoLibrary, "Media", "saved"),
+                        Triple(Icons.Filled.CloudUpload, "Share any file", "upload")
+                    )
+                ).forEach { rowItems ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        rowItems.forEach { (icon, label, route) ->
                             Column(
                                 Modifier
                                     .weight(1f)
                                     .clip(RoundedCornerShape(20.dp))
                                     .background(Color.White)
-                                    .clickable {
-                                        when (card.first) {
-                                            "Personal" -> go("calendar")
-                                            "Office" -> go("board")
-                                            "Business" -> go("shop")
-                                            else -> go("wallet")
-                                        }
-                                    }
-                                    .padding(14.dp)
+                                    .border(1.dp, Color(0xFFEFEBF8), RoundedCornerShape(20.dp))
+                                    .clickable { go(route) }
+                                    .padding(16.dp)
                             ) {
                                 Box(
-                                    Modifier
-                                        .size(38.dp)
-                                        .clip(RoundedCornerShape(13.dp))
-                                        .background(card.third.copy(alpha = 0.18f)),
+                                    Modifier.size(40.dp).clip(RoundedCornerShape(14.dp)).background(Color(0xFFF6E7FF)),
                                     contentAlignment = Alignment.Center
-                                ) {
-                                    Box(
-                                        Modifier
-                                            .size(16.dp)
-                                            .clip(CircleShape)
-                                            .background(card.third)
-                                    )
-                                }
-                                Spacer(Modifier.height(9.dp))
-                                Text(card.first, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
-                                Text(card.second, fontSize = 10.sp, color = Txt3, lineHeight = 15.sp)
+                                ) { Icon(icon, null, tint = Orchid, modifier = Modifier.size(19.dp)) }
+                                Spacer(Modifier.height(10.dp))
+                                Text(label, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, color = Ink)
                             }
                         }
                     }
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(8.dp))
                 }
             }
         }
         item {
             Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 18.dp, vertical = 6.dp),
+                Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Recent files", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
+                Text("RECENT FILES", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3)
                 Spacer(Modifier.weight(1f))
-                Text("See all", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Orchid)
+                Text("See all", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Orchid, modifier = Modifier.clickable { go("upload") })
             }
-            Column(
-                Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(Color.White)
-                    .padding(horizontal = 12.dp, vertical = 4.dp)
-            ) {
-                val files = listOf(
-                    Triple("Q3-Report-final.pdf", "Office · 2 h ago · shared with 8", "✓ synced"),
-                    Triple("brand-refresh.fig", "Personal · yesterday · preview ready", "✓ synced"),
-                    Triple("orders-week-45.xlsx", "Business · Mon · auto-backup", "↑ device")
-                )
-                files.forEach { f ->
-                    Row(Modifier.padding(vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            Modifier
-                                .size(34.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Cloud),
-                            contentAlignment = Alignment.Center
-                        ) { Text("\uD83D\uDCC4", fontSize = 13.sp) }
-                        Spacer(Modifier.width(10.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(f.first, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                            Text(f.second, fontSize = 10.sp, color = Txt3)
-                        }
-                        Text(f.third, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = if (f.third.startsWith("✓")) Mint else Amber)
-                    }
-                }
+            Column(Modifier.padding(horizontal = 16.dp)) {
+                FileChip("Q3-Report-final.pdf", "Project Phoenix · 2 h ago · shared with 8")
+                Spacer(Modifier.height(6.dp))
+                FileChip("brand-refresh.fig", "Personal · yesterday · preview ready")
+                Spacer(Modifier.height(6.dp))
+                FileChip("trip-photos.zip", "Family · Mon · 48 files")
             }
         }
     }

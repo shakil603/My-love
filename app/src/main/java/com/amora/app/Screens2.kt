@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
@@ -477,7 +478,7 @@ fun NotificationsScreen(onBack: () -> Unit) {
     val notifs = listOf(
         Notif("\uD83D\uDC98", "Amara matched with you — 94% compatible", "8 min ago", "Say hi"),
         Notif("❤️", "Sofia and 213 others liked your post", "26 min ago", null),
-        Notif("\uD83D\uDECD", "New order #1294 — Sunset print A3 · \$24 paid", "1 h ago · ship by Thu", "View"),
+        Notif("\uD83C\uDF99", "Rafi sent you a voice message", "1 h ago · 0:42", "Play"),
         Notif("\uD83D\uDCC5", "Stand-up in 20 min · Project Phoenix", "6 people joining", "Join"),
         Notif("\uD83D\uDCC4", "Daniel shared Launch-Playbook-2026.pdf with you", "2 h ago · preview ready ✓", null),
         Notif("\uD83C\uDF93", "UX course — module 7 unlocked", "68% complete · keep going!", null)
@@ -550,7 +551,7 @@ fun SearchScreen(onBack: () -> Unit) {
             Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(7.dp)
         ) {
-            listOf("All" to true, "People" to false, "Posts" to false, "Files" to false, "Shops" to false).forEach { (c, on) ->
+            listOf("All" to true, "People" to false, "Posts" to false, "Files" to false, "Groups" to false).forEach { (c, on) ->
                 Text(
                     c, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold,
                     color = if (on) Color.White else Txt2,
@@ -698,7 +699,7 @@ fun CommentsScreen(onBack: () -> Unit) {
 /* ---------- Settings & Safety ---------- */
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit) {
+fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> Unit = {}) {
     LazyColumn(Modifier.fillMaxSize().background(Cloud).statusBarsPadding(), contentPadding = PaddingValues(bottom = 24.dp)) {
         item { ScreenHeader("Settings", onBack) }
         item {
@@ -741,14 +742,20 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit) {
                 Text("APP", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3, letterSpacing = 2.sp)
                 Spacer(Modifier.height(7.dp))
                 WhiteCard {
-                    Row(Modifier.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        Modifier.fillMaxWidth().clickable(onClick = onLanguage).padding(vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Box(
                             Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(Cloud),
                             contentAlignment = Alignment.Center
-                        ) { Text("\uD83C\uDF10", fontSize = 15.sp) }
+                        ) { Icon(Icons.Filled.Public, null, tint = Orchid, modifier = Modifier.size(17.dp)) }
                         Spacer(Modifier.width(11.dp))
-                        Text("Language", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, modifier = Modifier.weight(1f))
-                        Text("বাংলা ›", color = Orchid, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                        Column(Modifier.weight(1f)) {
+                            Text("Language · ভাষা", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                            Text("14 languages · also in Android Settings", fontSize = 10.sp, color = Txt3)
+                        }
+                        Text("›", color = Txt3, fontSize = 18.sp)
                     }
                     Row(Modifier.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(
@@ -767,7 +774,7 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit) {
                         Spacer(Modifier.width(11.dp))
                         Column(Modifier.weight(1f)) {
                             Text("Storage & sync", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                            Text("34.2 GB used · cloud + this device", fontSize = 10.sp, color = Txt3)
+                            Text("Auto-backup on this device", fontSize = 10.sp, color = Txt3)
                         }
                         Text("›", color = Txt3, fontSize = 18.sp)
                     }
@@ -883,197 +890,6 @@ fun SafetyScreen(onBack: () -> Unit) {
     }
 }
 
-/* ---------- Wallet ---------- */
-
-@Composable
-fun WalletScreen(onBack: () -> Unit) {
-    LazyColumn(Modifier.fillMaxSize().background(Cloud).statusBarsPadding(), contentPadding = PaddingValues(bottom = 24.dp)) {
-        item { ScreenHeader("Wallet", onBack) }
-        item {
-            Column(Modifier.padding(horizontal = 16.dp)) {
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(Brush.linearGradient(listOf(Ink, Color(0xFF3B0F3F), Violet)))
-                        .padding(18.dp)
-                ) {
-                    Text("TOTAL BALANCE", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFFB7A8FF), letterSpacing = 2.sp)
-                    Spacer(Modifier.height(8.dp))
-                    Row(verticalAlignment = Alignment.Bottom) {
-                        Text("\$2,418.60", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.ExtraBold)
-                        Spacer(Modifier.width(8.dp))
-                        Text("▲ +\$312 this week", color = Mint, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(bottom = 6.dp))
-                    }
-                    Text("≈ ৳ 2,92,000 BDT", color = Color(0xFFB7B2CC), fontSize = 10.sp)
-                    Spacer(Modifier.height(14.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Box(
-                            Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).background(Color.White).padding(vertical = 12.dp),
-                            contentAlignment = Alignment.Center
-                        ) { Text("↓ Add", color = Ink, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp) }
-                        Box(
-                            Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).background(Color.White.copy(alpha = 0.14f)).padding(vertical = 12.dp),
-                            contentAlignment = Alignment.Center
-                        ) { Text("↑ Send", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp) }
-                        Box(
-                            Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).background(Color.White.copy(alpha = 0.14f)).padding(vertical = 12.dp),
-                            contentAlignment = Alignment.Center
-                        ) { Text("\uD83C\uDFE6 Withdraw", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp) }
-                    }
-                }
-                Spacer(Modifier.height(12.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(
-                        Modifier.weight(1f).clip(RoundedCornerShape(16.dp)).background(Color.White).padding(11.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            Modifier.size(34.dp).clip(RoundedCornerShape(11.dp)).background(Color(0xFFE2136E)),
-                            contentAlignment = Alignment.Center
-                        ) { Text("bK", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 11.sp) }
-                        Spacer(Modifier.width(8.dp))
-                        Column {
-                            Text("bKash", fontWeight = FontWeight.ExtraBold, fontSize = 11.sp)
-                            Text("Linked ✓", fontSize = 9.sp, color = Color(0xFF047857), fontWeight = FontWeight.ExtraBold)
-                        }
-                    }
-                    Row(
-                        Modifier.weight(1f).clip(RoundedCornerShape(16.dp)).background(Color.White).padding(11.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            Modifier.size(34.dp).clip(RoundedCornerShape(11.dp)).background(Color(0xFF1A1F71)),
-                            contentAlignment = Alignment.Center
-                        ) { Text("VISA", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 8.sp) }
-                        Spacer(Modifier.width(8.dp))
-                        Column {
-                            Text("•• 4821", fontWeight = FontWeight.ExtraBold, fontSize = 11.sp)
-                            Text("Linked ✓", fontSize = 9.sp, color = Color(0xFF047857), fontWeight = FontWeight.ExtraBold)
-                        }
-                    }
-                }
-                Spacer(Modifier.height(14.dp))
-                Text("Recent activity", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
-                Spacer(Modifier.height(8.dp))
-                WhiteCard {
-                    listOf(
-                        Triple("\uD83D\uDECD", "Order #1294 · Yuki T." to "Today 08:12 · bKash", "+\$30.02" to true),
-                        Triple("\uD83C\uDF81", "Gift to Amara \uD83D\uDC98" to "Yesterday · sticker pack", "−\$2.99" to false),
-                        Triple("\uD83D\uDCBC", "Freelance invoice · studio.co" to "Mon · bank transfer", "+\$280.00" to true),
-                        Triple("\uD83C\uDFE6", "Withdraw to DBBL •• 221" to "Nov 7 · completed", "−\$150.00" to false)
-                    ).forEach { (emoji, titleSub, amt) ->
-                        Row(Modifier.padding(vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(Cloud),
-                                contentAlignment = Alignment.Center
-                            ) { Text(emoji, fontSize = 14.sp) }
-                            Spacer(Modifier.width(10.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(titleSub.first, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                                Text(titleSub.second, fontSize = 9.sp, color = Txt3)
-                            }
-                            Text(
-                                amt.first, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp,
-                                color = if (amt.second) Color(0xFF047857) else Color(0xFFBE123C)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-/* ---------- Shop ---------- */
-
-@Composable
-fun ShopScreen(onBack: () -> Unit) {
-    LazyColumn(Modifier.fillMaxSize().background(Cloud).statusBarsPadding(), contentPadding = PaddingValues(bottom = 24.dp)) {
-        item { ScreenHeader("My shop", onBack) }
-        item {
-            Column(Modifier.padding(horizontal = 16.dp)) {
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(22.dp))
-                        .background(Brush.linearGradient(listOf(Color(0xFF10B981), Color(0xFF047857))))
-                        .padding(16.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(Color.White),
-                            contentAlignment = Alignment.Center
-                        ) { Text("\uD83D\uDCF7", fontSize = 20.sp) }
-                        Spacer(Modifier.width(10.dp))
-                        Column {
-                            Text("Shakil Prints & Presets ✔", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
-                            Text("⭐ 4.9 (218) · ships worldwide \uD83C\uDF0D", color = Color.White.copy(alpha = 0.8f), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                    Spacer(Modifier.height(14.dp))
-                    Row {
-                        listOf("\$1,840" to "THIS WEEK", "12" to "NEW ORDERS", "3" to "TO SHIP").forEach { (num, label) ->
-                            Column(Modifier.weight(1f)) {
-                                Text(num, color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
-                                Text(label, color = Color.White.copy(alpha = 0.75f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    }
-                }
-                Spacer(Modifier.height(12.dp))
-                val products = listOf(
-                    Triple("Sunset print A3", "\$24 · 18 sold", "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400"),
-                    Triple("Lightroom presets", "\$9 · digital ⚡", "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=400"),
-                    Triple("Mountain series", "\$32 · 3 left", "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=400")
-                )
-                for (row in (products + Triple("ADD", "", "")).chunked(2)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        row.forEach { p ->
-                            if (p.first == "ADD") {
-                                Column(
-                                    Modifier
-                                        .weight(1f)
-                                        .height(150.dp)
-                                        .clip(RoundedCornerShape(18.dp))
-                                        .border(1.8.dp, Color(0xFFD9D2EC), RoundedCornerShape(18.dp)),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    Box(
-                                        Modifier.size(40.dp).clip(RoundedCornerShape(14.dp)).background(AuroraGradient),
-                                        contentAlignment = Alignment.Center
-                                    ) { Icon(Icons.Filled.Add, null, tint = Color.White) }
-                                    Spacer(Modifier.height(7.dp))
-                                    Text("Add product", fontWeight = FontWeight.ExtraBold, fontSize = 11.sp, color = Txt2)
-                                }
-                            } else {
-                                Column(
-                                    Modifier
-                                        .weight(1f)
-                                        .clip(RoundedCornerShape(18.dp))
-                                        .background(Color.White)
-                                ) {
-                                    AsyncImage(
-                                        model = p.third, contentDescription = null, contentScale = ContentScale.Crop,
-                                        modifier = Modifier.fillMaxWidth().height(96.dp)
-                                    )
-                                    Column(Modifier.padding(10.dp)) {
-                                        Text(p.first, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                                        Text(p.second, fontSize = 10.sp, color = Color(0xFF047857), fontWeight = FontWeight.ExtraBold)
-                                    }
-                                }
-                            }
-                        }
-                        if (row.size == 1) Spacer(Modifier.weight(1f))
-                    }
-                    Spacer(Modifier.height(10.dp))
-                }
-            }
-        }
-    }
-}
-
 /* ---------- Calendar & Board ---------- */
 
 @Composable
@@ -1127,7 +943,7 @@ fun CalendarScreen(onBack: () -> Unit) {
                 Spacer(Modifier.height(14.dp))
                 listOf(
                     Triple("11:00", "Design review — onboarding v2" to "11:00–12:00 · Meet room · \uD83D\uDCCE brand-refresh.fig", Mint),
-                    Triple("13:00", "Ship order #1294 \uD83D\uDCE6" to "Task from My shop · Sunset print A3", Amber),
+                    Triple("13:00", "Photo walk with Amara \uD83D\uDCF8" to "Golden hour · Riverside park", Amber),
                     Triple("17:30", "Coffee with Amara ☕\uD83D\uDC98" to "Crimson Cup · share live location ON", Rose),
                     Triple("20:00", "UX course · module 7 \uD83C\uDF93" to "Flexible · 40 min remaining", Txt3)
                 ).forEach { (time, titleSub, color) ->
