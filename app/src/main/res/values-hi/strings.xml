@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">होम</string>
+    <string name="tab_discover">खोजें</string>
+    <string name="tab_chats">चैट</string>
+    <string name="tab_spaces">स्पेस</string>
+    <string name="tab_profile">प्रोफ़ाइल</string>
+    <string name="onboard_create">खाता बनाएं</string>
+    <string name="onboard_login">लॉग इन</string>
+    <string name="language">भाषा</string>
+    <string name="spaces_title">स्पेस</string>
+    <string name="create_group">समूह बनाएं</string>
+</resources>

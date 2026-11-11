@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">首页</string>
+    <string name="tab_discover">发现</string>
+    <string name="tab_chats">聊天</string>
+    <string name="tab_spaces">空间</string>
+    <string name="tab_profile">我的</string>
+    <string name="onboard_create">创建账号</string>
+    <string name="onboard_login">登录</string>
+    <string name="language">语言</string>
+    <string name="spaces_title">空间</string>
+    <string name="create_group">创建群组</string>
+</resources>

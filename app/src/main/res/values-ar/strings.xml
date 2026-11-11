@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">الرئيسية</string>
+    <string name="tab_discover">استكشف</string>
+    <string name="tab_chats">الدردشات</string>
+    <string name="tab_spaces">المساحات</string>
+    <string name="tab_profile">الملف الشخصي</string>
+    <string name="onboard_create">إنشاء حساب</string>
+    <string name="onboard_login">تسجيل الدخول</string>
+    <string name="language">اللغة</string>
+    <string name="spaces_title">المساحات</string>
+    <string name="create_group">إنشاء مجموعة</string>
+</resources>

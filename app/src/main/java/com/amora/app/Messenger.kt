@@ -103,7 +103,7 @@ fun ChatsScreen(onOpenChat: (String) -> Unit, go: (String) -> Unit = {}) {
                 Text("Chats", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
                 Spacer(Modifier.weight(1f))
                 IconButton(onClick = { go("incoming/1") }) { Icon(Icons.Filled.Videocam, "New call", tint = Ink) }
-                Icon(Icons.Filled.Add, "New chat", tint = Ink)
+                IconButton(onClick = { go("creategroup") }) { Icon(Icons.Filled.Add, "New group", tint = Ink) }
             }
         }
         item {

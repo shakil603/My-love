@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Amora</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_discover">Discover</string>
+    <string name="tab_chats">Chats</string>
+    <string name="tab_spaces">Spaces</string>
+    <string name="tab_profile">Profile</string>
+    <string name="onboard_create">Create account</string>
+    <string name="onboard_login">Log in</string>
+    <string name="language">Language</string>
+    <string name="spaces_title">Spaces</string>
+    <string name="create_group">Create group</string>
 </resources>
