@@ -35,9 +35,20 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.filled.Reply
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -69,7 +80,7 @@ import kotlinx.coroutines.delay
 /* ---------- Chats list (search + filters + pinned) ---------- */
 
 @Composable
-fun ChatsScreen(onOpenChat: (String) -> Unit) {
+fun ChatsScreen(onOpenChat: (String) -> Unit, go: (String) -> Unit = {}) {
     var query by remember { mutableStateOf("") }
     var filter by remember { mutableStateOf("All") }
     val filtered = Mock.chats.filter { c ->
@@ -91,7 +102,8 @@ fun ChatsScreen(onOpenChat: (String) -> Unit) {
             ) {
                 Text("Chats", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
                 Spacer(Modifier.weight(1f))
-                Icon(Icons.Filled.Add, null, tint = Ink)
+                IconButton(onClick = { go("incoming/1") }) { Icon(Icons.Filled.Videocam, "New call", tint = Ink) }
+                Icon(Icons.Filled.Add, "New chat", tint = Ink)
             }
         }
         item {
@@ -154,7 +166,7 @@ fun ChatsScreen(onOpenChat: (String) -> Unit) {
                         Text(chat.name, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, maxLines = 1)
                         if (chat.pinned) {
                             Spacer(Modifier.width(5.dp))
-                            Text("\uD83D\uDCCC", fontSize = 10.sp)
+                            Icon(Icons.Filled.PushPin, "Pinned", tint = Txt3, modifier = Modifier.size(11.dp))
                         }
                     }
                     Text(chat.last, fontSize = 12.sp, color = Txt2, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -238,6 +250,13 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, null, tint = Ink) }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { go(if (isGroup) "groupinfo/$chatId" else "user/$chatId") }
+            ) {
             Avatar(chat.avatar, 38)
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
@@ -254,21 +273,18 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
                     fontWeight = FontWeight.Bold
                 )
             }
-            Text(
-                "⏱", fontSize = 16.sp,
-                modifier = Modifier
+            }
+            Box(
+                Modifier
                     .clip(CircleShape)
                     .background(if (vanish) Color(0xFFF6E7FF) else Color.Transparent)
                     .clickable { vanish = !vanish }
                     .padding(8.dp)
-            )
-            IconButton(onClick = { go("incoming") }) { Icon(Icons.Filled.Call, null, tint = Ink) }
-            Text(
-                "\uD83C\uDFA5", fontSize = 16.sp,
-                modifier = Modifier
-                    .clickable { go("call") }
-                    .padding(8.dp)
-            )
+            ) {
+                Icon(Icons.Filled.Timer, "Disappearing messages", tint = if (vanish) Orchid else Ink, modifier = Modifier.size(20.dp))
+            }
+            IconButton(onClick = { go("audiocall/$chatId") }) { Icon(Icons.Filled.Call, "Audio call", tint = Ink) }
+            IconButton(onClick = { go("video/$chatId") }) { Icon(Icons.Filled.Videocam, "Video call", tint = Ink) }
         }
         if (vanish) {
             Row(
@@ -279,7 +295,7 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "⏱ Disappearing messages ON · new messages vanish after 24 h",
+                    "Disappearing messages ON · new messages vanish after 24 h",
                     fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA21CAF)
                 )
             }
@@ -340,8 +356,8 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
                             .padding(6.dp)
                     )
                 }
-                Text(
-                    "↩ Reply", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = Orchid,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .clip(RoundedCornerShape(50))
                         .background(AuroraSoft)
@@ -350,7 +366,11 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
                             pickerFor = -1
                         }
                         .padding(horizontal = 12.dp, vertical = 8.dp)
-                )
+                ) {
+                    Icon(Icons.Filled.Reply, null, tint = Orchid, modifier = Modifier.size(14.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Reply", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = Orchid)
+                }
             }
         }
         /* reply bar */
@@ -394,19 +414,19 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
                     .padding(horizontal = 14.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                AttachOption("\uD83D\uDCF7", "Photo") {
+                AttachOption(Icons.Filled.PhotoCamera, "Photo") {
                     send(Message(true, image = "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=500", time = "now", quoted = replyTo?.text))
                 }
-                AttachOption("\uD83D\uDCC4", "PDF") {
+                AttachOption(Icons.Filled.PictureAsPdf, "PDF") {
                     send(Message(true, fileName = "shared-notes.pdf", fileMeta = "6 pages · 1.1 MB · preview ✓", time = "now"))
                 }
-                AttachOption("\uD83C\uDF99", "Voice") {
+                AttachOption(Icons.Filled.Mic, "Voice") {
                     send(Message(true, voice = true, voiceLen = "0:07", time = "now"))
                 }
-                AttachOption("\uD83D\uDCCD", "Location") {
+                AttachOption(Icons.Filled.LocationOn, "Location") {
                     send(Message(true, text = "\uD83D\uDCCD Live location shared · 42 min", time = "now"))
                 }
-                AttachOption("\uD83D\uDCC1", "Any file") { go("upload") }
+                AttachOption(Icons.Filled.Folder, "Any file") { go("upload") }
             }
         }
         /* emoji quick bar */
@@ -480,15 +500,15 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
                     },
                 contentAlignment = Alignment.Center
             ) {
-                if (input.isBlank()) Text("\uD83C\uDF99", fontSize = 16.sp)
-                else Icon(Icons.Filled.Send, null, tint = Color.White, modifier = Modifier.size(18.dp))
+                if (input.isBlank()) Icon(Icons.Filled.Mic, "Record voice", tint = Color.White, modifier = Modifier.size(19.dp))
+                else Icon(Icons.Filled.Send, "Send", tint = Color.White, modifier = Modifier.size(18.dp))
             }
         }
     }
 }
 
 @Composable
-private fun AttachOption(emoji: String, label: String, onClick: () -> Unit) {
+private fun AttachOption(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -502,7 +522,7 @@ private fun AttachOption(emoji: String, label: String, onClick: () -> Unit) {
                 .clip(RoundedCornerShape(15.dp))
                 .background(Cloud),
             contentAlignment = Alignment.Center
-        ) { Text(emoji, fontSize = 18.sp) }
+        ) { Icon(icon, label, tint = Orchid, modifier = Modifier.size(20.dp)) }
         Spacer(Modifier.height(4.dp))
         Text(label, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Txt2)
     }
@@ -615,12 +635,19 @@ fun MessageBubble(msg: Message, onLongPress: () -> Unit = {}) {
                         FileChip(it, msg.fileMeta ?: "", light = msg.mine)
                     }
                     Spacer(Modifier.height(3.dp))
-                    Text(
-                        if (msg.mine) "${msg.time} ✓✓" else msg.time,
-                        fontSize = 9.sp,
-                        color = if (msg.mine) Color.White.copy(alpha = 0.85f) else Txt3,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.align(Alignment.End)
-                    )
+                    ) {
+                        Text(
+                            msg.time, fontSize = 9.sp,
+                            color = if (msg.mine) Color.White.copy(alpha = 0.85f) else Txt3
+                        )
+                        if (msg.mine) {
+                            Spacer(Modifier.width(3.dp))
+                            Icon(Icons.Filled.DoneAll, "Seen", tint = Color.White.copy(alpha = 0.9f), modifier = Modifier.size(12.dp))
+                        }
+                    }
                 }
                 msg.reaction?.let { r ->
                     Text(
@@ -653,7 +680,7 @@ private fun VoiceBubbleContent(msg: Message) {
             contentAlignment = Alignment.Center
         ) {
             if (playing) {
-                Text("❚❚", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = if (msg.mine) Orchid else Color.White)
+                Icon(Icons.Filled.Pause, "Pause", tint = if (msg.mine) Orchid else Color.White, modifier = Modifier.size(18.dp))
             } else {
                 Icon(
                     Icons.Filled.PlayArrow, null,
@@ -686,114 +713,5 @@ private fun VoiceBubbleContent(msg: Message) {
             msg.voiceLen, fontSize = 10.sp, fontWeight = FontWeight.Bold,
             color = if (msg.mine) Color.White.copy(alpha = 0.9f) else Txt3
         )
-    }
-}
-
-/* ---------- Incoming call ---------- */
-
-@Composable
-fun IncomingCallScreen(onAccept: () -> Unit, onDecline: () -> Unit) {
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(Color(0xFF1A0B2E), Color(0xFF2E1065), InkDeep)))
-    ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .navigationBarsPadding()
-                .padding(horizontal = 26.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(Modifier.height(30.dp))
-            Text(
-                "\uD83D\uDD12 E2E encrypted · Amora Video",
-                color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(Color.White.copy(alpha = 0.14f))
-                    .padding(horizontal = 14.dp, vertical = 7.dp)
-            )
-            Spacer(Modifier.height(40.dp))
-            Box(contentAlignment = Alignment.Center) {
-                val t = rememberInfiniteTransition(label = "ring")
-                val a by t.animateFloat(
-                    0.1f, 0.4f,
-                    infiniteRepeatable(tween(900), RepeatMode.Reverse),
-                    label = "ringAlpha"
-                )
-                Box(
-                    Modifier
-                        .size(190.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, Color.White.copy(alpha = a), CircleShape)
-                )
-                Box(
-                    Modifier
-                        .size(158.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, Color.White.copy(alpha = a * 1.6f), CircleShape)
-                )
-                Avatar("https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400", 122, ringed = true)
-            }
-            Spacer(Modifier.height(28.dp))
-            Text("Amara \uD83D\uDC98", color = Color.White, fontSize = 27.sp, fontWeight = FontWeight.ExtraBold)
-            Spacer(Modifier.height(7.dp))
-            Text("Incoming video call…", color = Color.White.copy(alpha = 0.75f), fontSize = 13.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(14.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    "\uD83D\uDCAC Message", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(Color.White.copy(alpha = 0.12f))
-                        .padding(horizontal = 13.dp, vertical = 8.dp)
-                )
-                Text(
-                    "⏰ Remind me", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(Color.White.copy(alpha = 0.12f))
-                        .padding(horizontal = 13.dp, vertical = 8.dp)
-                )
-            }
-            Spacer(Modifier.weight(1f))
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(
-                        Modifier
-                            .size(62.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFF43F5E))
-                            .clickable(onClick = onDecline),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Filled.Call, null, tint = Color.White, modifier = Modifier.size(26.dp).rotate(135f))
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    Text("Decline", color = Color.White.copy(alpha = 0.7f), fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(
-                        Modifier
-                            .size(74.dp)
-                            .clip(CircleShape)
-                            .background(Brush.linearGradient(listOf(Color(0xFF10B981), Mint)))
-                            .clickable(onClick = onAccept),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Filled.Call, null, tint = Color.White, modifier = Modifier.size(30.dp))
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    Text("Accept", color = Color.White.copy(alpha = 0.7f), fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                }
-            }
-            Spacer(Modifier.height(40.dp))
-        }
     }
 }

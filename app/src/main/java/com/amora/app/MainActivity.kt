@@ -72,13 +72,33 @@ fun AmoraApp() {
         }
         composable("story") { StoryScreen(onBack = back) }
         composable("reels") { ReelsScreen(onBack = back) }
-        composable("call") { CallScreen(onBack = back) }
-        composable("incoming") {
+        composable("call") { VideoCallScreen("1", onBack = back) }
+        composable("video/{id}") { bs ->
+            VideoCallScreen(bs.arguments?.getString("id") ?: "1", onBack = back)
+        }
+        composable("audiocall/{id}") { bs ->
+            AudioCallScreen(bs.arguments?.getString("id") ?: "1", onBack = back, go = go)
+        }
+        composable("incoming/{id}") { bs ->
+            val id = bs.arguments?.getString("id") ?: "1"
             IncomingCallScreen(
-                onAccept = { nav.navigate("call") { popUpTo("incoming") { inclusive = true } } },
+                userId = id,
+                onAccept = { nav.navigate("video/$id") { popUpTo("incoming/{id}") { inclusive = true } } },
                 onDecline = back
             )
         }
+        composable("user/{id}") { bs ->
+            UserProfileScreen(bs.arguments?.getString("id") ?: "1", onBack = back, go = go)
+        }
+        composable("groupinfo/{id}") { bs ->
+            GroupInfoScreen(bs.arguments?.getString("id") ?: "4", onBack = back, go = go)
+        }
+        composable("editprofile") { EditProfileScreen(onBack = back) }
+        composable("followers") { FollowersScreen(onBack = back, go = go) }
+        composable("likedyou") { LikedYouScreen(onBack = back, go = go) }
+        composable("nearby") { NearbyScreen(onBack = back, go = go) }
+        composable("saved") { SavedPostsScreen(onBack = back) }
+        composable("events") { EventsScreen(onBack = back) }
         composable("notifications") { NotificationsScreen(onBack = back) }
         composable("search") { SearchScreen(onBack = back) }
         composable("comments") { CommentsScreen(onBack = back) }
@@ -130,7 +150,7 @@ fun MainScreen(go: (String) -> Unit) {
             when (selected) {
                 0 -> FeedScreen(go = go)
                 1 -> DiscoverScreen(go = go)
-                2 -> ChatsScreen(onOpenChat = { id -> go("chat/$id") })
+                2 -> ChatsScreen(onOpenChat = { id -> go("chat/$id") }, go = go)
                 3 -> SpacesScreen(go = go)
                 else -> ProfileScreen(go = go)
             }
