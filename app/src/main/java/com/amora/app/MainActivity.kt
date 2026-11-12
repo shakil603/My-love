@@ -107,6 +107,10 @@ fun AmoraApp() {
             SettingsScreen(onBack = back, onSafety = { nav.navigate("safety") }, onLanguage = { nav.navigate("language") })
         }
         composable("language") { LanguageScreen(onBack = back) }
+        composable("livehub") { LiveHubScreen(onBack = back, go = go) }
+        composable("live/{room}") { bs ->
+            LiveChatScreen(bs.arguments?.getString("room") ?: "global", onBack = back)
+        }
         composable("permissions") {
             PermissionsScreen(onDone = { nav.navigate("main") { popUpTo("onboarding") { inclusive = true } } })
         }

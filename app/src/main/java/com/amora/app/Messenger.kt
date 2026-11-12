@@ -33,6 +33,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DoneAll
@@ -137,6 +138,29 @@ fun ChatsScreen(onOpenChat: (String) -> Unit, go: (String) -> Unit = {}) {
                             .padding(horizontal = 14.dp, vertical = 8.dp)
                     )
                 }
+            }
+        }
+        item {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(AuroraGradient)
+                    .clickable { go("livehub") }
+                    .padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    Modifier.size(40.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.2f)),
+                    contentAlignment = Alignment.Center
+                ) { Icon(Icons.Filled.Bolt, null, tint = Color.White, modifier = Modifier.size(20.dp)) }
+                Spacer(Modifier.width(11.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Live messaging — real people", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold)
+                    Text("Global & private rooms over the open network", color = Color.White.copy(alpha = 0.85f), fontSize = 10.sp, fontWeight = FontWeight.Medium)
+                }
+                Box(Modifier.size(8.dp).clip(CircleShape).background(Mint))
             }
         }
         itemsIndexed(filtered) { _, chat ->
