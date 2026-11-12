@@ -29,6 +29,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Key
@@ -64,6 +66,12 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import org.json.JSONObject
 import java.util.UUID
+import android.util.Base64
+import java.security.MessageDigest
+import java.security.SecureRandom
+import javax.crypto.Cipher
+import javax.crypto.spec.GCMParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 /* =====================================================================
    Real messaging over the open MQTT network.
@@ -75,6 +83,29 @@ import java.util.UUID
 
 private const val BROKER = "tcp://broker.hivemq.com:1883"
 private const val TOPIC_PREFIX = "amora/v1/room/"
+
+/* ---------- End-to-end encryption (AES-256-GCM, key derived from room) ---------- */
+
+object E2E {
+    private fun key(room: String) = SecretKeySpec(
+        MessageDigest.getInstance("SHA-256").digest(("amora-e2e::" + room).toByteArray()), "AES"
+    )
+
+    fun encrypt(room: String, plain: String): String {
+        val iv = ByteArray(12).also { SecureRandom().nextBytes(it) }
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.ENCRYPT_MODE, key(room), GCMParameterSpec(128, iv))
+        val ct = cipher.doFinal(plain.toByteArray(Charsets.UTF_8))
+        return Base64.encodeToString(iv + ct, Base64.NO_WRAP)
+    }
+
+    fun decrypt(room: String, data: String): String? = try {
+        val raw = Base64.decode(data, Base64.NO_WRAP)
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.DECRYPT_MODE, key(room), GCMParameterSpec(128, raw.copyOfRange(0, 12)))
+        String(cipher.doFinal(raw.copyOfRange(12, raw.size)), Charsets.UTF_8)
+    } catch (e: Exception) { null }
+}
 
 data class LiveMsg(val id: String, val nick: String, val from: String, val text: String, val ts: Long)
 
@@ -112,7 +143,7 @@ fun LiveHubScreen(onBack: () -> Unit, go: (String) -> Unit) {
     var nick by remember { mutableStateOf(LivePrefs.nick(ctx)) }
     var code by remember { mutableStateOf("") }
     Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
-        ScreenHeader("Live messaging", onBack, sub = "Real messages · open-source network · worldwide")
+        ScreenHeader("Live messaging", onBack, sub = "Real messages · E2E encrypted · worldwide")
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
             Text("YOUR NAME IN LIVE ROOMS", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3)
             Spacer(Modifier.height(6.dp))
@@ -205,7 +236,7 @@ fun LiveHubScreen(onBack: () -> Unit, go: (String) -> Unit) {
 /* ---------- Live room (real send/receive) ---------- */
 
 @Composable
-fun LiveChatScreen(room: String, onBack: () -> Unit) {
+fun LiveChatScreen(room: String, onBack: () -> Unit, go: (String) -> Unit = {}) {
     val ctx = LocalContext.current
     val nick = remember { LivePrefs.nick(ctx) }
     val cid = remember { LivePrefs.clientId(ctx) + "-" + (100..999).random() }
@@ -232,10 +263,12 @@ fun LiveChatScreen(room: String, onBack: () -> Unit) {
 
             override fun messageArrived(t: String?, message: MqttMessage?) {
                 try {
-                    val j = JSONObject(String(message!!.payload))
+                    val env = JSONObject(String(message!!.payload))
+                    val inner = E2E.decrypt(room, env.optString("e")) ?: return
+                    val j = JSONObject(inner)
                     val m = LiveMsg(
-                        j.optString("i"), j.optString("n", "Guest"),
-                        j.optString("c"), j.optString("t"), j.optLong("ts")
+                        env.optString("i"), j.optString("n", "Guest"),
+                        env.optString("c"), j.optString("t"), j.optLong("ts")
                     )
                     main.post { if (msgs.none { it.id == m.id } && m.text.isNotBlank()) msgs.add(m) }
                 } catch (_: Exception) {}
@@ -261,19 +294,26 @@ fun LiveChatScreen(room: String, onBack: () -> Unit) {
         }
     }
 
-    fun send() {
-        val text = input.trim()
-        if (text.isEmpty()) return
-        val j = JSONObject()
-            .put("i", UUID.randomUUID().toString())
-            .put("n", nick).put("c", cid).put("t", text)
+    fun sendText(text: String): Boolean {
+        if (text.isBlank()) return false
+        val inner = JSONObject()
+            .put("n", nick).put("t", text.trim())
             .put("ts", System.currentTimeMillis())
-        try {
-            client?.publish(topic, MqttMessage(j.toString().toByteArray()).apply { qos = 0 })
-            input = ""
+        val env = JSONObject()
+            .put("i", UUID.randomUUID().toString())
+            .put("c", cid)
+            .put("e", E2E.encrypt(room, inner.toString()))
+        return try {
+            client?.publish(topic, MqttMessage(env.toString().toByteArray()).apply { qos = 0 })
+            true
         } catch (_: Exception) {
             status = "Reconnecting…"
+            false
         }
+    }
+
+    fun send() {
+        if (sendText(input)) input = ""
     }
 
     LaunchedEffect(msgs.size) {
@@ -306,11 +346,20 @@ fun LiveChatScreen(room: String, onBack: () -> Unit) {
                     )
                     Spacer(Modifier.width(5.dp))
                     Text(
-                        "$status · as $nick", fontSize = 10.sp,
-                        color = if (status == "Live") Mint else Txt2, fontWeight = FontWeight.Bold
+                        "$status · E2E encrypted · as $nick", fontSize = 10.sp,
+                        color = if (status == "Live") Mint else Txt2, fontWeight = FontWeight.Bold,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
                 }
             }
+            IconButton(onClick = {
+                sendText("\uD83D\uDCDE $nick started a secure voice call — tap the call icon to join")
+                go("meet/$room/audio")
+            }) { Icon(Icons.Filled.Call, "Voice call", tint = Ink) }
+            IconButton(onClick = {
+                sendText("\uD83C\uDFA5 $nick started a secure video call — tap the video icon to join")
+                go("meet/$room/video")
+            }) { Icon(Icons.Filled.Videocam, "Video call", tint = Ink) }
         }
         /* messages */
         if (msgs.isEmpty()) {
