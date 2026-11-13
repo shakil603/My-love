@@ -637,7 +637,6 @@ fun SearchScreen(onBack: () -> Unit) {
 fun CommentsScreen(onBack: () -> Unit) {
     var input by remember { mutableStateOf("") }
     Column(Modifier.fillMaxSize().background(Color.White).statusBarsPadding().navigationBarsPadding()) {
-        ScreenHeader("Comments · ${comments.size}", onBack)
         val ctx = androidx.compose.ui.platform.LocalContext.current
         val myName = remember { Store.get(ctx, "pname", "Shakil Rahman") }
         val comments = remember { androidx.compose.runtime.mutableStateListOf(
@@ -646,6 +645,7 @@ fun CommentsScreen(onBack: () -> Unit) {
                 Triple("Yuki Tanaka", "Adding Costa Brava to my list right now \uD83E\uDDF3", "58 m · ❤ 12" to "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200"),
                 Triple("Omar Haddad", "\uD83D\uDCCE attached my edit preset pack for this vibe", "31 m · ❤ 34" to "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200")
             ) }
+        ScreenHeader("Comments · ${comments.size}", onBack)
         LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(16.dp)) {
             items(comments.size) { i ->
                 val (name, text, metaAv) = comments[i]
