@@ -637,14 +637,16 @@ fun SearchScreen(onBack: () -> Unit) {
 fun CommentsScreen(onBack: () -> Unit) {
     var input by remember { mutableStateOf("") }
     Column(Modifier.fillMaxSize().background(Color.White).statusBarsPadding().navigationBarsPadding()) {
-        ScreenHeader("Comments · 186", onBack)
-        LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(16.dp)) {
-            val comments = listOf(
+        ScreenHeader("Comments · ${comments.size}", onBack)
+        val ctx = androidx.compose.ui.platform.LocalContext.current
+        val myName = remember { Store.get(ctx, "pname", "Shakil Rahman") }
+        val comments = remember { androidx.compose.runtime.mutableStateListOf(
                 Triple("Rafi Ahmed", "This light is unreal \uD83D\uDE0D Which lens did you use?", "2 h · ❤ 48" to "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200"),
                 Triple("Sofia Martínez (Author)", "@Rafi 35mm f/1.4 — golden hour did the rest ✨", "1 h · ❤ 21" to "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200"),
                 Triple("Yuki Tanaka", "Adding Costa Brava to my list right now \uD83E\uDDF3", "58 m · ❤ 12" to "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200"),
                 Triple("Omar Haddad", "\uD83D\uDCCE attached my edit preset pack for this vibe", "31 m · ❤ 34" to "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200")
-            )
+            ) }
+        LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(16.dp)) {
             items(comments.size) { i ->
                 val (name, text, metaAv) = comments[i]
                 Row(Modifier.padding(vertical = 8.dp)) {
@@ -691,7 +693,21 @@ fun CommentsScreen(onBack: () -> Unit) {
                 singleLine = true
             )
             Spacer(Modifier.width(8.dp))
-            Icon(Icons.Filled.Send, null, tint = Orchid)
+            Box(
+                Modifier.size(40.dp).clip(CircleShape).background(AuroraGradient)
+                    .clickable {
+                        if (input.isNotBlank()) {
+                            comments.add(
+                                Triple(
+                                    myName, input.trim(),
+                                    "now · ❤ 0" to "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200"
+                                )
+                            )
+                            input = ""
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) { Icon(Icons.Filled.Send, "Send", tint = Color.White, modifier = Modifier.size(17.dp)) }
         }
     }
 }
@@ -699,7 +715,10 @@ fun CommentsScreen(onBack: () -> Unit) {
 /* ---------- Settings & Safety ---------- */
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> Unit = {}) {
+fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> Unit = {}, onSignOut: () -> Unit = {}) {
+    val sctx = androidx.compose.ui.platform.LocalContext.current
+    val sname = remember { Store.get(sctx, "pname", "Shakil Rahman") }
+    val shandle = remember { Store.get(sctx, "phandle", "@shakil") }
     LazyColumn(Modifier.fillMaxSize().background(Cloud).statusBarsPadding(), contentPadding = PaddingValues(bottom = 24.dp)) {
         item { ScreenHeader("Settings", onBack) }
         item {
@@ -709,8 +728,8 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                         Avatar("https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200", 50)
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
-                            Text("Shakil Rahman", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
-                            Text("@shakil · amora.id/shakil", fontSize = 11.sp, color = Txt3)
+                            Text(sname, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
+                            Text("$shandle · amora.id", fontSize = 11.sp, color = Txt3)
                         }
                         Text("Edit", color = Orchid, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
                     }
@@ -783,7 +802,10 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                 WhiteCard {
                     Text(
                         "Sign out", color = Color(0xFFF43F5E), fontWeight = FontWeight.ExtraBold, fontSize = 13.sp,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .clickable(onClick = onSignOut)
+                            .padding(4.dp)
                     )
                 }
             }

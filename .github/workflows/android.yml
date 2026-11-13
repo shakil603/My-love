@@ -58,18 +58,19 @@ jobs:
           if-no-files-found: error
 
       - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk Amora-v0.7.0-debug.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk Amora-v1.0.0-debug.apk
 
       - name: Publish APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.7.0
-          name: "Amora v0.7.0"
+          tag_name: v1.0.0
+          name: "Amora v1.0.0 — complete release"
           body: |
-            Fourth release — professional icon system, redesigned audio/video calls, user profiles, and 8 new screens for **Amora** (the My-Love platform) — Kotlin + Jetpack Compose.
+            **Amora 1.0.0 — the complete release.** Messaging + dating + social + work in one app, built on a 100% open-source stack.
 
-            **Included screens:** Onboarding · Sign-up · OTP · Feed · Stories · Reels · Discover · Match · Chats · Conversation · Video Call · Upload sheet · Comments · Notifications · Search · Spaces · Task Board · Calendar · Shop · Wallet · Settings · Safety Center · Profile.
+            REAL features: live E2E-encrypted messaging (AES-256-GCM over the open MQTT network), real encrypted audio/video calls (Jitsi/WebRTC on an open-source server), global + private rooms, 14 languages with Android per-app language support, runtime permissions, on-device message persistence, 35+ screens.
 
-            **Install:** download `Amora-v0.7.0-debug.apk` on your Android phone (Android 8.0+), allow "install from unknown sources", open it. Internet needed for demo images.
-          prerelease: true
-          files: Amora-v0.7.0-debug.apk
+            **Install:** download `Amora-v1.0.0-debug.apk` (Android 8.0+), allow "install from unknown sources", open it.
+            **Try it live:** install on two phones -> Chats -> Live messaging -> join the same room code -> chat and call for real.
+          prerelease: false
+          files: Amora-v1.0.0-debug.apk

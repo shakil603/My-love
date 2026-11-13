@@ -208,11 +208,12 @@ private fun InfoCell(icon: androidx.compose.ui.graphics.vector.ImageVector, text
 
 @Composable
 fun EditProfileScreen(onBack: () -> Unit) {
-    var name by remember { mutableStateOf("Shakil Rahman") }
-    var handle by remember { mutableStateOf("@shakil") }
-    var bio by remember { mutableStateOf("Builder of Amora · dreaming big from Mymensingh \uD83C\uDF0C") }
-    var work by remember { mutableStateOf("Founder · Amora") }
-    var location by remember { mutableStateOf("Mymensingh, Bangladesh") }
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    var name by remember { mutableStateOf(Store.get(ctx, "pname", "Shakil Rahman")) }
+    var handle by remember { mutableStateOf(Store.get(ctx, "phandle", "@shakil")) }
+    var bio by remember { mutableStateOf(Store.get(ctx, "pbio", "Builder of Amora · dreaming big from Mymensingh \uD83C\uDF0C")) }
+    var work by remember { mutableStateOf(Store.get(ctx, "pwork", "Founder · Amora")) }
+    var location by remember { mutableStateOf(Store.get(ctx, "ploc", "Mymensingh, Bangladesh")) }
     Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
         ScreenHeader("Edit profile", onBack)
         Column(
@@ -236,7 +237,16 @@ fun EditProfileScreen(onBack: () -> Unit) {
             EditField("Location", location) { location = it }
             Spacer(Modifier.height(8.dp))
         }
-        Box(Modifier.padding(18.dp)) { GradientButton("Save changes", Modifier.fillMaxWidth(), onClick = onBack) }
+        Box(Modifier.padding(18.dp)) {
+            GradientButton("Save changes", Modifier.fillMaxWidth()) {
+                Store.set(ctx, "pname", name.trim())
+                Store.set(ctx, "phandle", handle.trim())
+                Store.set(ctx, "pbio", bio.trim())
+                Store.set(ctx, "pwork", work.trim())
+                Store.set(ctx, "ploc", location.trim())
+                onBack()
+            }
+        }
     }
 }
 

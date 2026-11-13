@@ -32,7 +32,10 @@ import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Notifications
@@ -268,6 +271,7 @@ fun FeedScreen(go: (String) -> Unit = {}) {
 
 @Composable
 fun PostCard(post: Post, go: (String) -> Unit = {}) {
+    var liked by remember { mutableStateOf(false) }
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -290,7 +294,7 @@ fun PostCard(post: Post, go: (String) -> Unit = {}) {
                         Text(post.author, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
                         if (post.verified) {
                             Spacer(Modifier.width(4.dp))
-                            Text("✔", color = Sky, fontSize = 12.sp)
+                            Icon(Icons.Filled.Verified, null, tint = Sky, modifier = Modifier.size(14.dp))
                         }
                     }
                     Text(post.meta, fontSize = 11.sp, color = Txt3)
@@ -319,13 +323,26 @@ fun PostCard(post: Post, go: (String) -> Unit = {}) {
                 Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Filled.Favorite, null, tint = Rose, modifier = Modifier.size(19.dp))
+                Icon(
+                    if (liked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder, "Like",
+                    tint = Rose, modifier = Modifier.size(20.dp).clickable { liked = !liked }
+                )
                 Spacer(Modifier.width(6.dp))
-                Text(post.likes, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, color = Rose)
+                Text(
+                    if (liked) "${post.likes} · You" else post.likes,
+                    fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, color = Rose
+                )
                 Spacer(Modifier.width(18.dp))
-                Text("\uD83D\uDCAC ${post.comments}", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Txt2, modifier = Modifier.clickable { go("comments") })
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { go("comments") }
+                ) {
+                    Icon(Icons.Filled.ChatBubbleOutline, "Comments", tint = Txt2, modifier = Modifier.size(17.dp))
+                    Spacer(Modifier.width(5.dp))
+                    Text(post.comments, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Txt2)
+                }
                 Spacer(Modifier.weight(1f))
-                Icon(Icons.Filled.Send, null, tint = Txt2, modifier = Modifier.size(18.dp))
+                Icon(Icons.Filled.Send, "Share", tint = Txt2, modifier = Modifier.size(18.dp).clickable { go("upload") })
             }
         }
     }
@@ -335,7 +352,8 @@ fun PostCard(post: Post, go: (String) -> Unit = {}) {
 
 @Composable
 fun DiscoverScreen(go: (String) -> Unit = {}) {
-    val (photo, name, meta) = Mock.discover
+    var idx by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    val u = Mock.users[idx % Mock.users.size]
     Column(Modifier.fillMaxSize()) {
         Row(
             Modifier
@@ -375,10 +393,10 @@ fun DiscoverScreen(go: (String) -> Unit = {}) {
                 .fillMaxWidth()
                 .weight(1f)
                 .clip(RoundedCornerShape(28.dp))
-                .clickable { go("user/1") }
+                .clickable { go("user/" + u.id) }
         ) {
             AsyncImage(
-                model = photo, contentDescription = null, contentScale = ContentScale.Crop,
+                model = u.avatar.replace("w=400", "w=700"), contentDescription = u.name, contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
             Box(
@@ -391,24 +409,39 @@ fun DiscoverScreen(go: (String) -> Unit = {}) {
                         )
                     )
             )
-            Text(
-                "✦ 94% match", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier
-                    .padding(14.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(Color.White.copy(alpha = 0.25f))
-                    .padding(horizontal = 12.dp, vertical = 7.dp)
-            )
+            if (u.match > 0) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(14.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(Color.White.copy(alpha = 0.25f))
+                        .padding(horizontal = 12.dp, vertical = 7.dp)
+                ) {
+                    Icon(Icons.Filled.Favorite, null, tint = Color.White, modifier = Modifier.size(11.dp))
+                    Spacer(Modifier.width(5.dp))
+                    Text("${u.match}% match", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
+                }
+            }
             Column(
                 Modifier
                     .align(Alignment.BottomStart)
                     .padding(18.dp)
             ) {
-                Text(name, color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
-                Text(meta, color = Color.White.copy(alpha = 0.85f), fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(u.name, color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
+                    if (u.verified) {
+                        Spacer(Modifier.width(7.dp))
+                        Icon(Icons.Filled.Verified, null, tint = Color.White, modifier = Modifier.size(19.dp))
+                    }
+                }
+                Text(
+                    "${u.distance} · ${u.job}",
+                    color = Color.White.copy(alpha = 0.85f), fontSize = 13.sp, fontWeight = FontWeight.Medium
+                )
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    listOf("\uD83C\uDFA8 Design", "\uD83C\uDFA7 Afrobeats", "✈️ Travel").forEach {
+                    u.interests.take(3).forEach {
                         Text(
                             it, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold,
                             modifier = Modifier
@@ -428,7 +461,7 @@ fun DiscoverScreen(go: (String) -> Unit = {}) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(shape = CircleShape, color = Color.White, shadowElevation = 4.dp) {
-                IconButton(onClick = {}) { Icon(Icons.Filled.Close, null, tint = Txt3) }
+                IconButton(onClick = { idx++ }) { Icon(Icons.Filled.Close, "Skip", tint = Txt3) }
             }
             Spacer(Modifier.width(18.dp))
             Box(
@@ -436,14 +469,14 @@ fun DiscoverScreen(go: (String) -> Unit = {}) {
                     .size(66.dp)
                     .clip(CircleShape)
                     .background(AuroraGradient)
-                    .clickable { go("match") },
+                    .clickable { if (u.match >= 90) go("match") else idx++ },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Filled.Favorite, null, tint = Color.White, modifier = Modifier.size(30.dp))
+                Icon(Icons.Filled.Favorite, "Like", tint = Color.White, modifier = Modifier.size(30.dp))
             }
             Spacer(Modifier.width(18.dp))
             Surface(shape = CircleShape, color = Color.White, shadowElevation = 4.dp) {
-                IconButton(onClick = {}) { Icon(Icons.Filled.Star, null, tint = Amber) }
+                IconButton(onClick = { idx++ }) { Icon(Icons.Filled.Star, "Super like", tint = Amber) }
             }
         }
     }
@@ -591,6 +624,10 @@ fun SpacesScreen(go: (String) -> Unit = {}) {
 
 @Composable
 fun ProfileScreen(go: (String) -> Unit = {}) {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val pname = remember { Store.get(ctx, "pname", "Shakil Rahman") }
+    val phandle = remember { Store.get(ctx, "phandle", "@shakil") }
+    val ploc = remember { Store.get(ctx, "ploc", "Mymensingh, Bangladesh") }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 20.dp)) {
         item {
             Box(Modifier.fillMaxWidth()) {
@@ -623,8 +660,12 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(Modifier.height(10.dp))
-                Text("Shakil Rahman ✔", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
-                Text("@shakil · Mymensingh, Bangladesh \uD83C\uDDE7\uD83C\uDDE9", fontSize = 12.sp, color = Txt2, fontWeight = FontWeight.Medium)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(pname, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                    Spacer(Modifier.width(6.dp))
+                    Icon(Icons.Filled.Verified, null, tint = Sky, modifier = Modifier.size(17.dp))
+                }
+                Text("$phandle · $ploc", fontSize = 12.sp, color = Txt2, fontWeight = FontWeight.Medium)
                 Spacer(Modifier.height(14.dp))
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(28.dp),
