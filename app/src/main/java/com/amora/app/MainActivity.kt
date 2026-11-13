@@ -104,7 +104,12 @@ fun AmoraApp() {
         composable("search") { SearchScreen(onBack = back) }
         composable("comments") { CommentsScreen(onBack = back) }
         composable("settings") {
-            SettingsScreen(onBack = back, onSafety = { nav.navigate("safety") }, onLanguage = { nav.navigate("language") })
+            SettingsScreen(
+                onBack = back,
+                onSafety = { nav.navigate("safety") },
+                onLanguage = { nav.navigate("language") },
+                onSignOut = { nav.navigate("onboarding") { popUpTo(0) { inclusive = true } } }
+            )
         }
         composable("language") { LanguageScreen(onBack = back) }
         composable("livehub") { LiveHubScreen(onBack = back, go = go) }

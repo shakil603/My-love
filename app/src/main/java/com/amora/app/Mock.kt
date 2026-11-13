@@ -1,5 +1,37 @@
 package com.amora.app
 
+import android.content.Context
+import org.json.JSONArray
+import org.json.JSONObject
+
+object Store {
+    private fun p(ctx: Context) = ctx.getSharedPreferences("amora", Context.MODE_PRIVATE)
+
+    fun get(ctx: Context, key: String, def: String): String =
+        p(ctx).getString(key, null)?.takeIf { it.isNotBlank() } ?: def
+
+    fun set(ctx: Context, key: String, value: String) {
+        p(ctx).edit().putString(key, value).apply()
+    }
+
+    fun loadChat(ctx: Context, chatId: String): List<Message> = try {
+        val arr = JSONArray(p(ctx).getString("chat_" + chatId, "[]") ?: "[]")
+        (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            Message(true, text = o.optString("t"), time = o.optString("at", "earlier"))
+        }
+    } catch (e: Exception) { emptyList() }
+
+    fun appendChat(ctx: Context, chatId: String, text: String) {
+        try {
+            val key = "chat_" + chatId
+            val arr = JSONArray(p(ctx).getString(key, "[]") ?: "[]")
+            arr.put(JSONObject().put("t", text).put("at", "earlier"))
+            p(ctx).edit().putString(key, arr.toString()).apply()
+        } catch (_: Exception) {}
+    }
+}
+
 data class Story(val name: String, val url: String, val isAdd: Boolean = false)
 
 data class Post(

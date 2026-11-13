@@ -222,7 +222,10 @@ fun ChatsScreen(onOpenChat: (String) -> Unit, go: (String) -> Unit = {}) {
 fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit = {}) {
     val chat = Mock.chats.firstOrNull { it.id == chatId } ?: Mock.chats.first()
     val isGroup = chat.kind == "group" || chat.kind == "work"
-    val msgs = remember { (if (isGroup) Mock.groupMessages else Mock.messages).toMutableStateList() }
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val msgs = remember {
+        ((if (isGroup) Mock.groupMessages else Mock.messages) + Store.loadChat(ctx, chatId)).toMutableStateList()
+    }
     var input by remember { mutableStateOf("") }
     var typing by remember { mutableStateOf(false) }
     var replyTo by remember { mutableStateOf<Message?>(null) }
@@ -253,6 +256,7 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
 
     fun send(msg: Message) {
         msgs.add(msg)
+        if (msg.mine && msg.text != null) Store.appendChat(ctx, chatId, msg.text)
         replyTo = null
         showAttach = false
         sendCount++
