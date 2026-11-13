@@ -1,4 +1,0 @@
-41:> Task :app:compileDebugKotlin FAILED
-42:e: file:///home/runner/work/My-love/My-love/app/src/main/java/com/amora/app/Screens2.kt:640:36 Unresolved reference 'comments'.
-45:FAILURE: Build failed with an exception.
-47:* What went wrong:
