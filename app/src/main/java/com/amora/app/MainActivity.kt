@@ -72,7 +72,7 @@ fun AmoraApp() {
             MatchScreen(onHello = { nav.navigate("chat/1") { popUpTo("main") } }, onBack = back)
         }
         composable("story") { StoryScreen(onBack = back) }
-        composable("reels") { ReelsScreen(onBack = back) }
+        composable("reels") { ReelsScreen(onBack = back, go = go) }
         composable("call") { VideoCallScreen("1", onBack = back) }
         composable("video/{id}") { bs ->
             VideoCallScreen(bs.arguments?.getString("id") ?: "1", onBack = back)
@@ -130,8 +130,8 @@ fun AmoraApp() {
         composable("creategroup") {
             CreateGroupScreen(onBack = back, onCreated = { nav.navigate("chat/4") { popUpTo("main") } })
         }
-        composable("safety") { SafetyScreen(onBack = back) }
-        composable("calendar") { CalendarScreen(onBack = back) }
+        composable("safety") { SafetyScreen(onBack = back, go = go) }
+        composable("calendar") { CalendarScreen(onBack = back, go = go) }
         composable("board") { BoardScreen(onBack = back) }
         composable("upload") { UploadScreen(onBack = back, go = go) }
     }

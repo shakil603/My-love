@@ -20,17 +20,29 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Emergency
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.UploadFile
@@ -51,9 +63,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,8 +111,9 @@ fun WhiteCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
 }
 
 @Composable
-fun ToggleRow(emoji: String, title: String, sub: String, initial: Boolean) {
-    var on by remember { mutableStateOf(initial) }
+fun ToggleRow(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, sub: String, initial: Boolean) {
+    val tctx = androidx.compose.ui.platform.LocalContext.current
+    var on by remember { mutableStateOf(Store.get(tctx, "tgl_" + title, initial.toString()) == "true") }
     Row(
         Modifier
             .fillMaxWidth()
@@ -111,13 +126,13 @@ fun ToggleRow(emoji: String, title: String, sub: String, initial: Boolean) {
                 .clip(RoundedCornerShape(12.dp))
                 .background(Cloud),
             contentAlignment = Alignment.Center
-        ) { Text(emoji, fontSize = 15.sp) }
+        ) { Icon(icon, null, tint = Orchid, modifier = Modifier.size(17.dp)) }
         Spacer(Modifier.width(11.dp))
         Column(Modifier.weight(1f)) {
             Text(title, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
             Text(sub, fontSize = 10.sp, color = Txt3)
         }
-        Switch(checked = on, onCheckedChange = { on = it })
+        Switch(checked = on, onCheckedChange = { on = it; Store.set(tctx, "tgl_" + title, it.toString()) })
     }
 }
 
@@ -125,6 +140,7 @@ fun ToggleRow(emoji: String, title: String, sub: String, initial: Boolean) {
 
 @Composable
 fun SignupScreen(onNext: () -> Unit, onBack: () -> Unit) {
+    var phone by remember { mutableStateOf("") }
     Column(
         Modifier
             .fillMaxSize()
@@ -166,7 +182,20 @@ fun SignupScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     .background(Mist)
             )
             Spacer(Modifier.width(10.dp))
-            Text("17 1234 5678", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            BasicTextField(
+                value = phone,
+                onValueChange = { v -> if (v.length <= 11 && v.all { it.isDigit() || it == ' ' }) phone = v },
+                textStyle = androidx.compose.ui.text.TextStyle(fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Ink),
+                keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone),
+                singleLine = true,
+                decorationBox = { inner ->
+                    Box {
+                        if (phone.isEmpty()) Text("17 1234 5678", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Txt3)
+                        inner()
+                    }
+                },
+                modifier = Modifier.weight(1f)
+            )
         }
         Spacer(Modifier.height(14.dp))
         GradientButton("Continue", Modifier.fillMaxWidth(), onClick = onNext)
@@ -195,7 +224,13 @@ fun SignupScreen(onNext: () -> Unit, onBack: () -> Unit) {
                     .clickable(onClick = onNext)
                     .padding(vertical = 14.dp),
                 contentAlignment = Alignment.Center
-            ) { Text("✉️  Email", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp) }
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.Email, null, tint = Ink, modifier = Modifier.size(14.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text("Email", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                }
+            }
         }
         Spacer(Modifier.weight(1f))
         Text(
@@ -208,6 +243,13 @@ fun SignupScreen(onNext: () -> Unit, onBack: () -> Unit) {
 
 @Composable
 fun OtpScreen(onNext: () -> Unit, onBack: () -> Unit) {
+    var code by remember { mutableStateOf("") }
+    var resendKey by remember { mutableIntStateOf(0) }
+    var secs by remember { mutableIntStateOf(24) }
+    LaunchedEffect(resendKey) {
+        secs = 24
+        while (secs > 0) { kotlinx.coroutines.delay(1000); secs-- }
+    }
     Column(
         Modifier
             .fillMaxSize()
@@ -223,31 +265,49 @@ fun OtpScreen(onNext: () -> Unit, onBack: () -> Unit) {
         Spacer(Modifier.height(8.dp))
         Text("We sent a 6-digit code to +880 17•• ••• 678", fontSize = 13.sp, color = Txt2)
         Spacer(Modifier.height(26.dp))
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
-        ) {
-            listOf("7", "3", "9", "", "", "").forEachIndexed { i, d ->
-                Box(
-                    Modifier
-                        .size(width = 44.dp, height = 54.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .then(
-                            if (i == 3) Modifier.border(1.8.dp, Orchid, RoundedCornerShape(14.dp))
-                            else Modifier.background(Cloud)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) { Text(d, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold) }
-            }
-        }
-        Spacer(Modifier.height(18.dp))
-        Text(
-            "Resend code in 00:24",
-            fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Txt3,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+        BasicTextField(
+            value = code,
+            onValueChange = { v -> if (v.length <= 6 && v.all { it.isDigit() }) code = v },
+            keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword),
+            singleLine = true,
+            decorationBox = { inner ->
+                Box {
+                    Box(Modifier.size(1.dp)) { inner() }
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+                    ) {
+                        repeat(6) { i ->
+                            Box(
+                                Modifier
+                                    .size(width = 44.dp, height = 54.dp)
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .then(
+                                        if (i == code.length) Modifier.border(1.8.dp, Orchid, RoundedCornerShape(14.dp))
+                                        else Modifier.background(Cloud)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(code.getOrNull(i)?.toString() ?: "", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                            }
+                        }
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(18.dp))
-        GradientButton("Verify", Modifier.fillMaxWidth(), onClick = onNext)
+        Text(
+            if (secs > 0) "Resend code in 00:%02d".format(secs) else "Resend code ↻",
+            fontSize = 12.sp, fontWeight = FontWeight.ExtraBold,
+            color = if (secs > 0) Txt3 else Orchid,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .clickable { if (secs <= 0) resendKey++ }
+                .padding(6.dp)
+        )
+        Spacer(Modifier.height(18.dp))
+        GradientButton(if (code.length == 6) "Verify" else "Verify (${code.length}/6)", Modifier.fillMaxWidth(), onClick = onNext)
     }
 }
 
@@ -323,6 +383,9 @@ fun MatchScreen(onHello: () -> Unit, onBack: () -> Unit) {
 
 @Composable
 fun StoryScreen(onBack: () -> Unit) {
+    val stctx = androidx.compose.ui.platform.LocalContext.current
+    var reply by remember { mutableStateOf("") }
+    var sent by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         AsyncImage(
             model = "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700",
@@ -373,21 +436,55 @@ fun StoryScreen(onBack: () -> Unit) {
                         .clip(RoundedCornerShape(50))
                         .border(1.5.dp, Color.White.copy(alpha = 0.45f), RoundedCornerShape(50))
                         .padding(horizontal = 16.dp, vertical = 13.dp)
-                ) { Text("Reply privately…", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp) }
+                ) {
+                    BasicTextField(
+                        value = reply,
+                        onValueChange = { reply = it; sent = false },
+                        textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold),
+                        singleLine = true,
+                        decorationBox = { inner ->
+                            Box {
+                                if (reply.isEmpty()) Text(
+                                    if (sent) "Sent \u2713 — reply again…" else "Reply privately…",
+                                    color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp
+                                )
+                                inner()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
                 Box(
                     Modifier
                         .size(46.dp)
                         .clip(CircleShape)
                         .background(Color.White.copy(alpha = 0.16f)),
                     contentAlignment = Alignment.Center
-                ) { Icon(Icons.Filled.Favorite, null, tint = Rose, modifier = Modifier.size(20.dp)) }
+                ) {
+                    var loved by remember { mutableStateOf(false) }
+                    Icon(
+                        if (loved) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder, "Love",
+                        tint = Rose, modifier = Modifier.size(20.dp).clickable { loved = !loved }
+                    )
+                }
                 Box(
                     Modifier
                         .size(46.dp)
                         .clip(CircleShape)
                         .background(Color.White.copy(alpha = 0.16f)),
                     contentAlignment = Alignment.Center
-                ) { Icon(Icons.Filled.Send, null, tint = Color.White, modifier = Modifier.size(18.dp)) }
+                ) {
+                    Icon(
+                        Icons.Filled.Send, "Send reply", tint = Color.White,
+                        modifier = Modifier.size(18.dp).clickable {
+                            if (reply.isNotBlank()) {
+                                Store.appendChat(stctx, "1", reply.trim())
+                                reply = ""
+                                sent = true
+                            }
+                        }
+                    )
+                }
             }
             Spacer(Modifier.height(12.dp))
         }
@@ -395,7 +492,7 @@ fun StoryScreen(onBack: () -> Unit) {
 }
 
 @Composable
-fun ReelsScreen(onBack: () -> Unit) {
+fun ReelsScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     val rctx = androidx.compose.ui.platform.LocalContext.current
     var rliked by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize().background(Color.Black)) {
@@ -462,7 +559,10 @@ fun ReelsScreen(onBack: () -> Unit) {
                         Text(if (rliked) "12.5k" else "12.4k", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Filled.Email, null, tint = Color.White, modifier = Modifier.size(26.dp))
+                        Icon(
+                            Icons.Filled.ChatBubbleOutline, "Comments", tint = Color.White,
+                            modifier = Modifier.size(25.dp).clickable { go("comments") }
+                        )
                         Text("482", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -580,13 +680,16 @@ fun SearchScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
             Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(7.dp)
         ) {
-            listOf("All" to true, "People" to false, "Posts" to false, "Files" to false, "Groups" to false).forEach { (c, on) ->
+            var selCat by remember { mutableStateOf("All") }
+            listOf("All", "People", "Posts", "Files", "Groups").forEach { c ->
+                val on = c == selCat
                 Text(
                     c, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold,
                     color = if (on) Color.White else Txt2,
                     modifier = Modifier
                         .clip(RoundedCornerShape(50))
                         .background(if (on) Ink else Cloud)
+                        .clickable { selCat = c }
                         .padding(horizontal = 14.dp, vertical = 8.dp)
                 )
             }
@@ -773,9 +876,9 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                 Text("PRIVACY & SECURITY", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3, letterSpacing = 2.sp)
                 Spacer(Modifier.height(7.dp))
                 WhiteCard {
-                    ToggleRow("\uD83D\uDD12", "End-to-end encryption", "Default for all chats & calls", true)
-                    ToggleRow("\uD83D\uDC98", "Dating visibility", "Hidden from contacts & coworkers", true)
-                    ToggleRow("\uD83D\uDC41", "Read receipts", "Off for non-contacts", false)
+                    ToggleRow(Icons.Filled.Lock, "End-to-end encryption", "Default for all chats & calls", true)
+                    ToggleRow(Icons.Filled.Favorite, "Dating visibility", "Hidden from contacts & coworkers", true)
+                    ToggleRow(Icons.Filled.Visibility, "Read receipts", "Off for non-contacts", false)
                     Row(
                         Modifier.fillMaxWidth().clickable(onClick = onSafety).padding(vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -783,7 +886,7 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                         Box(
                             Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(Cloud),
                             contentAlignment = Alignment.Center
-                        ) { Text("\uD83D\uDEE1", fontSize = 15.sp) }
+                        ) { Icon(Icons.Filled.Shield, null, tint = Orchid, modifier = Modifier.size(17.dp)) }
                         Spacer(Modifier.width(11.dp))
                         Column(Modifier.weight(1f)) {
                             Text("Safety center", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
@@ -807,28 +910,47 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                         Spacer(Modifier.width(11.dp))
                         Column(Modifier.weight(1f)) {
                             Text("Language · ভাষা", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                            Text("14 languages · also in Android Settings", fontSize = 10.sp, color = Txt3)
+                            Text("53 languages · also in Android Settings", fontSize = 10.sp, color = Txt3)
                         }
                         Text("›", color = Txt3, fontSize = 18.sp)
                     }
                     Row(Modifier.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        var appearance by remember { mutableStateOf("Auto") }
                         Box(
                             Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(Ink),
                             contentAlignment = Alignment.Center
-                        ) { Text("\uD83C\uDF19", fontSize = 15.sp) }
+                        ) { Icon(Icons.Filled.DarkMode, null, tint = Color.White, modifier = Modifier.size(17.dp)) }
                         Spacer(Modifier.width(11.dp))
                         Text("Appearance", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, modifier = Modifier.weight(1f))
-                        Text("Auto ›", color = Txt2, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                        Text(
+                            "$appearance ›", color = Orchid, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp,
+                            modifier = Modifier
+                                .clickable {
+                                    appearance = when (appearance) { "Auto" -> "Light"; "Light" -> "Dark"; else -> "Auto" }
+                                }
+                                .padding(6.dp)
+                        )
                     }
                     Row(Modifier.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(Cloud),
                             contentAlignment = Alignment.Center
-                        ) { Text("☁️", fontSize = 15.sp) }
+                        ) { Icon(Icons.Filled.Cloud, null, tint = Orchid, modifier = Modifier.size(17.dp)) }
                         Spacer(Modifier.width(11.dp))
-                        Column(Modifier.weight(1f)) {
+                        Column(
+                            Modifier.weight(1f).clickable {
+                                try {
+                                    sctx.startActivity(
+                                        android.content.Intent(
+                                            android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                            android.net.Uri.parse("package:" + sctx.packageName)
+                                        )
+                                    )
+                                } catch (_: Exception) {}
+                            }
+                        ) {
                             Text("Storage & sync", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                            Text("Auto-backup on this device", fontSize = 10.sp, color = Txt3)
+                            Text("Tap to open app storage in Android Settings", fontSize = 10.sp, color = Txt3)
                         }
                         Text("›", color = Txt3, fontSize = 18.sp)
                     }
@@ -849,7 +971,8 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
 }
 
 @Composable
-fun SafetyScreen(onBack: () -> Unit) {
+fun SafetyScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
+    val fctx = androidx.compose.ui.platform.LocalContext.current
     LazyColumn(Modifier.fillMaxSize().background(Cloud).statusBarsPadding(), contentPadding = PaddingValues(bottom = 24.dp)) {
         item { ScreenHeader("Safety center", onBack) }
         item {
@@ -881,14 +1004,14 @@ fun SafetyScreen(onBack: () -> Unit) {
                             Text("Verified · badge active", fontSize = 10.sp, color = Color(0xFF047857), fontWeight = FontWeight.Bold)
                         }
                     }
-                    ToggleRow("\uD83D\uDD76", "Incognito mode", "Only people you like can see you", true)
+                    ToggleRow(Icons.Filled.VisibilityOff, "Incognito mode", "Only people you like can see you", true)
                     Row(Modifier.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(Cloud),
                             contentAlignment = Alignment.Center
-                        ) { Text("\uD83E\uDEE5", fontSize = 15.sp) }
+                        ) { Icon(Icons.Filled.Block, null, tint = Orchid, modifier = Modifier.size(17.dp)) }
                         Spacer(Modifier.width(11.dp))
-                        Column(Modifier.weight(1f)) {
+                        Column(Modifier.weight(1f).clickable { go("followers") }) {
                             Text("Block list", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
                             Text("3 blocked · also hides from contacts", fontSize = 10.sp, color = Txt3)
                         }
@@ -898,11 +1021,22 @@ fun SafetyScreen(onBack: () -> Unit) {
                         Box(
                             Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(Cloud),
                             contentAlignment = Alignment.Center
-                        ) { Text("\uD83D\uDEA8", fontSize = 15.sp) }
+                        ) { Icon(Icons.Filled.Emergency, null, tint = Rose, modifier = Modifier.size(17.dp)) }
                         Spacer(Modifier.width(11.dp))
-                        Column(Modifier.weight(1f)) {
+                        Column(
+                            Modifier.weight(1f).clickable {
+                                try {
+                                    fctx.startActivity(
+                                        android.content.Intent(
+                                            android.content.Intent.ACTION_DIAL,
+                                            android.net.Uri.parse("tel:999")
+                                        )
+                                    )
+                                } catch (_: Exception) {}
+                            }
+                        ) {
                             Text("Emergency contacts", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                            Text("Share live location on a date · 2 added", fontSize = 10.sp, color = Txt3)
+                            Text("Tap to open dialer · 999 · share live location", fontSize = 10.sp, color = Txt3)
                         }
                         Text("›", color = Txt3, fontSize = 18.sp)
                     }
@@ -917,17 +1051,20 @@ fun SafetyScreen(onBack: () -> Unit) {
                         .padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("\uD83D\uDEA9", fontSize = 17.sp)
+                    Icon(Icons.Filled.Flag, null, tint = Rose, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(10.dp))
                     Column(Modifier.weight(1f)) {
                         Text("Report someone", color = Color(0xFFBE123C), fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
                         Text("Anonymous · reviewed within 24 h", color = Color(0xFFE11D48), fontSize = 10.sp)
                     }
+                    var reported by remember { mutableStateOf(false) }
                     Text(
-                        "Report", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold,
+                        if (reported) "Sent \u2713" else "Report",
+                        color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold,
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
-                            .background(Color(0xFFF43F5E))
+                            .background(if (reported) Color(0xFF10B981) else Color(0xFFF43F5E))
+                            .clickable { reported = !reported }
                             .padding(horizontal = 14.dp, vertical = 9.dp)
                     )
                 }
@@ -950,25 +1087,40 @@ fun SafetyScreen(onBack: () -> Unit) {
 /* ---------- Calendar & Board ---------- */
 
 @Composable
-fun CalendarScreen(onBack: () -> Unit) {
+fun CalendarScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
+    val today = remember { java.time.LocalDate.now() }
+    val monday = remember { today.minusDays((today.dayOfWeek.value - 1).toLong()) }
+    val week = remember {
+        (0..4).map { off ->
+            val d = monday.plusDays(off.toLong())
+            d.dayOfWeek.name.take(3) to d.dayOfMonth.toString()
+        }
+    }
+    var selDay by remember {
+        mutableIntStateOf((today.dayOfWeek.value - 1).coerceIn(0, 4))
+    }
+    val monthTitle = remember {
+        today.month.getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.getDefault()) + " " + today.year
+    }
     LazyColumn(Modifier.fillMaxSize().background(Color.White).statusBarsPadding(), contentPadding = PaddingValues(bottom = 24.dp)) {
-        item { ScreenHeader("November", onBack) }
+        item { ScreenHeader(monthTitle, onBack) }
         item {
             Row(
                 Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                listOf("MON" to "10", "TUE" to "11", "WED" to "12", "THU" to "13", "FRI" to "14").forEachIndexed { i, (d, n) ->
+                week.forEachIndexed { i, (d, n) ->
                     Column(
                         Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(14.dp))
-                            .then(if (i == 1) Modifier.background(AuroraGradient) else Modifier)
+                            .then(if (i == selDay) Modifier.background(AuroraGradient) else Modifier)
+                            .clickable { selDay = i }
                             .padding(vertical = 10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(d, fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = if (i == 1) Color.White.copy(alpha = 0.85f) else Txt3)
-                        Text(n, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = if (i == 1) Color.White else Ink)
+                        Text(d, fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = if (i == selDay) Color.White.copy(alpha = 0.85f) else Txt3)
+                        Text(n, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = if (i == selDay) Color.White else Ink)
                     }
                 }
             }
@@ -993,6 +1145,7 @@ fun CalendarScreen(onBack: () -> Unit) {
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
                                 .background(Color.White)
+                                .clickable { go("video/phoenix") }
                                 .padding(horizontal = 18.dp, vertical = 9.dp)
                         )
                     }
@@ -1027,8 +1180,22 @@ fun CalendarScreen(onBack: () -> Unit) {
 
 @Composable
 fun BoardScreen(onBack: () -> Unit) {
+    data class Task(val id: Int, val tag: String, val tagColor: Color, val tagBg: Color, val title: String, val col: Int)
+    var tasks by remember {
+        mutableStateOf(
+            listOf(
+                Task(1, "HIGH", Color(0xFFBE123C), Color(0xFFFFE4E6), "Final pricing page copy", 0),
+                Task(2, "DESIGN", Indigo, Color(0xFFE0E7FF), "Empty-state illustrations", 0),
+                Task(3, "COPY", Color(0xFF047857), Color(0xFFD1FAE5), "Release notes v2.0", 0),
+                Task(4, "SPRINT 4", Color(0xFFA21CAF), Color(0xFFFAE8FF), "Q3 forecast deck", 1),
+                Task(5, "REVIEW", Color(0xFF92400E), Color(0xFFFEF3C7), "Onboarding flow v2", 1),
+                Task(6, "BRAND", Color(0xFF7B2CFF), Color(0xFFEDE9FE), "Brand refresh", 2)
+            )
+        )
+    }
+    var newTask by remember { mutableStateOf("") }
     Column(Modifier.fillMaxSize().background(Cloud).statusBarsPadding()) {
-        ScreenHeader("Project Phoenix", onBack, sub = "Office space · 6 members · due Nov 28")
+        ScreenHeader("Project Phoenix", onBack, sub = "Tap a card to move it forward · long tasks welcome")
         Row(
             Modifier
                 .fillMaxSize()
@@ -1036,79 +1203,85 @@ fun BoardScreen(onBack: () -> Unit) {
                 .padding(14.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Column(
-                Modifier
-                    .width(240.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(Color(0xFFEFEDF6))
-                    .padding(10.dp)
-            ) {
-                Text("To do · 4", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, modifier = Modifier.padding(bottom = 8.dp))
-                WhiteCard {
-                    Text("HIGH", fontSize = 8.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFFBE123C),
-                        modifier = Modifier.clip(RoundedCornerShape(50)).background(Color(0xFFFFE4E6)).padding(horizontal = 8.dp, vertical = 3.dp))
-                    Spacer(Modifier.height(6.dp))
-                    Text("Final pricing page copy", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                    Spacer(Modifier.height(7.dp))
-                    Text("\uD83D\uDCCE 2 · \uD83D\uDCAC 5", fontSize = 9.sp, color = Txt3, fontWeight = FontWeight.Bold)
-                }
-                Spacer(Modifier.height(8.dp))
-                WhiteCard {
-                    Text("DESIGN", fontSize = 8.sp, fontWeight = FontWeight.ExtraBold, color = Indigo,
-                        modifier = Modifier.clip(RoundedCornerShape(50)).background(Color(0xFFE0E7FF)).padding(horizontal = 8.dp, vertical = 3.dp))
-                    Spacer(Modifier.height(6.dp))
-                    Text("Empty-state illustrations", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                    Spacer(Modifier.height(7.dp))
-                    AsyncImage(
-                        model = "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=300",
-                        contentDescription = null, contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxWidth().height(50.dp).clip(RoundedCornerShape(9.dp))
+            listOf("To do", "In progress", "Done \u2713").forEachIndexed { col, colName ->
+                val colTasks = tasks.filter { it.col == col }
+                Column(
+                    Modifier
+                        .width(240.dp)
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(Color(0xFFEFEDF6))
+                        .padding(10.dp)
+                ) {
+                    Text(
+                        "$colName · ${colTasks.size}",
+                        fontWeight = FontWeight.ExtraBold, fontSize = 12.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
+                    colTasks.forEach { t ->
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color.White)
+                                .clickable {
+                                    tasks = tasks.map { x -> if (x.id == t.id) x.copy(col = (x.col + 1) % 3) else x }
+                                }
+                                .padding(12.dp)
+                        ) {
+                            Text(
+                                t.tag, fontSize = 8.sp, fontWeight = FontWeight.ExtraBold, color = t.tagColor,
+                                modifier = Modifier.clip(RoundedCornerShape(50)).background(t.tagBg).padding(horizontal = 8.dp, vertical = 3.dp)
+                            )
+                            Spacer(Modifier.height(6.dp))
+                            Text(t.title, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            Spacer(Modifier.height(7.dp))
+                            Text(
+                                if (col < 2) "Tap \u2192 move to ${if (col == 0) "In progress" else "Done"}" else "Tap \u2192 back to To do",
+                                fontSize = 9.sp, color = Txt3, fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                    if (col == 0) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(Color.White.copy(alpha = 0.7f))
+                                .padding(horizontal = 10.dp, vertical = 9.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            BasicTextField(
+                                value = newTask,
+                                onValueChange = { newTask = it },
+                                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Ink),
+                                singleLine = true,
+                                decorationBox = { inner ->
+                                    Box {
+                                        if (newTask.isEmpty()) Text("+ Add task…", fontSize = 11.sp, color = Txt3, fontWeight = FontWeight.Bold)
+                                        inner()
+                                    }
+                                },
+                                modifier = Modifier.weight(1f)
+                            )
+                            if (newTask.isNotBlank()) {
+                                Icon(
+                                    Icons.Filled.Add, "Add",
+                                    tint = Orchid,
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                        .clickable {
+                                            tasks = tasks + Task(
+                                                (tasks.maxOfOrNull { it.id } ?: 0) + 1,
+                                                "NEW", Color(0xFF0369A1), Color(0xFFE0F2FE), newTask.trim(), 0
+                                            )
+                                            newTask = ""
+                                        }
+                                )
+                            }
+                        }
+                    }
                 }
-            }
-            Column(
-                Modifier
-                    .width(240.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(Color(0xFFEFEDF6))
-                    .padding(10.dp)
-            ) {
-                Text("In progress · 3", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, modifier = Modifier.padding(bottom = 8.dp))
-                WhiteCard {
-                    Text("SPRINT 4", fontSize = 8.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFFA21CAF),
-                        modifier = Modifier.clip(RoundedCornerShape(50)).background(Color(0xFFFAE8FF)).padding(horizontal = 8.dp, vertical = 3.dp))
-                    Spacer(Modifier.height(6.dp))
-                    Text("Q3 forecast deck", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                    Spacer(Modifier.height(7.dp))
-                    FileChip("Q3-Forecast.xlsx", "2.1 MB · live preview")
-                    Spacer(Modifier.height(8.dp))
-                    LinearProgressIndicator(
-                        progress = { 0.7f },
-                        modifier = Modifier.fillMaxWidth().height(5.dp).clip(RoundedCornerShape(4.dp)),
-                        color = Orchid, trackColor = Mist
-                    )
-                    Spacer(Modifier.height(5.dp))
-                    Text("70% · today", fontSize = 9.sp, color = Txt3, fontWeight = FontWeight.Bold)
-                }
-                Spacer(Modifier.height(8.dp))
-                WhiteCard {
-                    Text("REVIEW", fontSize = 8.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF92400E),
-                        modifier = Modifier.clip(RoundedCornerShape(50)).background(Color(0xFFFEF3C7)).padding(horizontal = 8.dp, vertical = 3.dp))
-                    Spacer(Modifier.height(6.dp))
-                    Text("Onboarding flow v2", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                    Spacer(Modifier.height(7.dp))
-                    Text("\uD83D\uDCAC 12", fontSize = 9.sp, color = Txt3, fontWeight = FontWeight.Bold)
-                }
-            }
-            Column(
-                Modifier
-                    .width(160.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(Color(0xFFEFEDF6))
-                    .padding(10.dp)
-            ) {
-                Text("Done ✓", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, modifier = Modifier.padding(bottom = 8.dp))
-                WhiteCard { Text("Brand refresh", fontSize = 11.sp, color = Txt3, fontWeight = FontWeight.Bold) }
             }
         }
     }
