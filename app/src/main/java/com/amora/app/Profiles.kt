@@ -175,6 +175,7 @@ fun UserProfileScreen(userId: String, onBack: () -> Unit, go: (String) -> Unit =
                             AsyncImage(
                                 model = url, contentDescription = null, contentScale = ContentScale.Crop,
                                 modifier = Modifier.weight(1f).height(110.dp).clip(RoundedCornerShape(12.dp))
+                                    .clickable { go("story") }
                             )
                         }
                         repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }

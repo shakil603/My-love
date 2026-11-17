@@ -33,6 +33,9 @@ import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -160,7 +163,7 @@ fun GroupInfoScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit = {
                 Text("${members.size + 1} members · End-to-end encrypted", fontSize = 11.sp, color = Txt2, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(16.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    GroupAction(Icons.Filled.PersonAdd, "Add") {}
+                    GroupAction(Icons.Filled.PersonAdd, "Add") { go("creategroup") }
                     GroupAction(Icons.Filled.Search, "Search") { go("search") }
                     GroupAction(Icons.Filled.NotificationsOff, "Mute") {}
                     GroupAction(Icons.Filled.Event, "Events") { go("events") }
@@ -279,6 +282,7 @@ fun EventsScreen(onBack: () -> Unit) {
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp)) {
             items(events.size) { i ->
                 val e = events[i]
+                var joined by remember { androidx.compose.runtime.mutableStateOf(false) }
                 Row(
                     Modifier.fillMaxWidth().padding(bottom = 10.dp).clip(RoundedCornerShape(18.dp))
                         .background(Color.White).border(1.dp, Color(0xFFEFEBF8), RoundedCornerShape(18.dp))
@@ -300,9 +304,13 @@ fun EventsScreen(onBack: () -> Unit) {
                         Text(e.going, fontSize = 10.sp, color = Orchid, fontWeight = FontWeight.ExtraBold)
                     }
                     Text(
-                        "Join", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold,
-                        modifier = Modifier.clip(RoundedCornerShape(50)).background(Ink)
-                            .clickable {}.padding(horizontal = 15.dp, vertical = 8.dp)
+                        if (joined) "Going ✓" else "Join",
+                        color = if (joined) Color(0xFF047857) else Color.White,
+                        fontSize = 11.sp, fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.clip(RoundedCornerShape(50))
+                            .background(if (joined) Color(0xFFE9FBF3) else Ink)
+                            .clickable { joined = !joined }
+                            .padding(horizontal = 15.dp, vertical = 8.dp)
                     )
                 }
             }

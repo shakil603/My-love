@@ -100,15 +100,16 @@ fun AmoraApp() {
         composable("nearby") { NearbyScreen(onBack = back, go = go) }
         composable("saved") { SavedPostsScreen(onBack = back) }
         composable("events") { EventsScreen(onBack = back) }
-        composable("notifications") { NotificationsScreen(onBack = back) }
-        composable("search") { SearchScreen(onBack = back) }
+        composable("notifications") { NotificationsScreen(onBack = back, go = go) }
+        composable("search") { SearchScreen(onBack = back, go = go) }
         composable("comments") { CommentsScreen(onBack = back) }
         composable("settings") {
             SettingsScreen(
                 onBack = back,
                 onSafety = { nav.navigate("safety") },
                 onLanguage = { nav.navigate("language") },
-                onSignOut = { nav.navigate("onboarding") { popUpTo(0) { inclusive = true } } }
+                onSignOut = { nav.navigate("onboarding") { popUpTo(0) { inclusive = true } } },
+                onEdit = { nav.navigate("editprofile") }
             )
         }
         composable("language") { LanguageScreen(onBack = back) }
@@ -132,7 +133,7 @@ fun AmoraApp() {
         composable("safety") { SafetyScreen(onBack = back) }
         composable("calendar") { CalendarScreen(onBack = back) }
         composable("board") { BoardScreen(onBack = back) }
-        composable("upload") { UploadScreen(onBack = back) }
+        composable("upload") { UploadScreen(onBack = back, go = go) }
     }
 }
 

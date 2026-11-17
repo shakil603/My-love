@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,9 +29,14 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.InsertDriveFile
+import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -390,6 +396,8 @@ fun StoryScreen(onBack: () -> Unit) {
 
 @Composable
 fun ReelsScreen(onBack: () -> Unit) {
+    val rctx = androidx.compose.ui.platform.LocalContext.current
+    var rliked by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         AsyncImage(
             model = "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=700",
@@ -446,15 +454,28 @@ fun ReelsScreen(onBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Filled.Favorite, null, tint = Rose, modifier = Modifier.size(28.dp))
-                        Text("12.4k", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
+                        Icon(
+                            if (rliked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder, "Like",
+                            tint = if (rliked) Rose else Color.White,
+                            modifier = Modifier.size(28.dp).clickable { rliked = !rliked }
+                        )
+                        Text(if (rliked) "12.5k" else "12.4k", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(Icons.Filled.Email, null, tint = Color.White, modifier = Modifier.size(26.dp))
                         Text("482", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Filled.Share, null, tint = Color.White, modifier = Modifier.size(24.dp))
+                        Icon(
+                            Icons.Filled.Share, "Share", tint = Color.White,
+                            modifier = Modifier.size(24.dp).clickable {
+                                val it2 = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(android.content.Intent.EXTRA_TEXT, "Watch this on Amora \uD83D\uDC9C https://github.com/shakil603/My-love/releases/latest")
+                                }
+                                rctx.startActivity(android.content.Intent.createChooser(it2, "Share"))
+                            }
+                        )
                         Text("Share", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
                     }
                 }
@@ -474,7 +495,7 @@ fun ReelsScreen(onBack: () -> Unit) {
 private data class Notif(val emoji: String, val title: String, val sub: String, val action: String?)
 
 @Composable
-fun NotificationsScreen(onBack: () -> Unit) {
+fun NotificationsScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     val notifs = listOf(
         Notif("\uD83D\uDC98", "Amara matched with you — 94% compatible", "8 min ago", "Say hi"),
         Notif("❤️", "Sofia and 213 others liked your post", "26 min ago", null),
@@ -513,6 +534,14 @@ fun NotificationsScreen(onBack: () -> Unit) {
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
                                 .background(AuroraGradient)
+                                .clickable {
+                                    when (it) {
+                                        "Say hi" -> go("chat/1")
+                                        "Play" -> go("chat/3")
+                                        "Join" -> go("calendar")
+                                        else -> {}
+                                    }
+                                }
                                 .padding(horizontal = 13.dp, vertical = 8.dp)
                         )
                     }
@@ -525,7 +554,7 @@ fun NotificationsScreen(onBack: () -> Unit) {
 /* ---------- Search ---------- */
 
 @Composable
-fun SearchScreen(onBack: () -> Unit) {
+fun SearchScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     var q by remember { mutableStateOf("design workshop") }
     Column(Modifier.fillMaxSize().background(Color.White).statusBarsPadding()) {
         Row(
@@ -566,7 +595,10 @@ fun SearchScreen(onBack: () -> Unit) {
             item {
                 Text("PEOPLE", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3, letterSpacing = 2.sp)
                 Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 8.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { go("user/1") }.padding(vertical = 8.dp)
+                ) {
                     Avatar("https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200", 44)
                     Spacer(Modifier.width(11.dp))
                     Column(Modifier.weight(1f)) {
@@ -578,10 +610,14 @@ fun SearchScreen(onBack: () -> Unit) {
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
                             .background(Cloud)
+                            .clickable { go("chat/1") }
                             .padding(horizontal = 14.dp, vertical = 9.dp)
                     )
                 }
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 8.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { go("user/8") }.padding(vertical = 8.dp)
+                ) {
                     Avatar("https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200", 44)
                     Spacer(Modifier.width(11.dp))
                     Column(Modifier.weight(1f)) {
@@ -593,6 +629,7 @@ fun SearchScreen(onBack: () -> Unit) {
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
                             .background(AuroraGradient)
+                            .clickable { go("user/8") }
                             .padding(horizontal = 14.dp, vertical = 9.dp)
                     )
                 }
@@ -603,26 +640,24 @@ fun SearchScreen(onBack: () -> Unit) {
                 Spacer(Modifier.height(8.dp))
                 FileChip("brand-refresh.fig", "In: Personal vault · Figma · preview ready ✓")
                 Spacer(Modifier.height(12.dp))
-                Text("SHOPS", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3, letterSpacing = 2.sp)
+                Text("GROUPS", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3, letterSpacing = 2.sp)
                 Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 6.dp)) {
-                    Box(
-                        Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(15.dp))
-                            .background(Brush.linearGradient(listOf(Color(0xFF10B981), Color(0xFF047857)))),
-                        contentAlignment = Alignment.Center
-                    ) { Text("\uD83D\uDCF7", fontSize = 18.sp) }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { go("chat/2") }.padding(vertical = 6.dp)
+                ) {
+                    Avatar("https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=200", 44)
                     Spacer(Modifier.width(11.dp))
                     Column(Modifier.weight(1f)) {
-                        Text("Shakil Prints & Presets", fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
-                        Text("⭐ 4.9 · prints & design assets", fontSize = 10.sp, color = Txt3)
+                        Text("Project Phoenix \uD83D\uDCBC", fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
+                        Text("6 members · files, tasks & stand-ups", fontSize = 10.sp, color = Txt3)
                     }
                     Text(
-                        "Visit", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Ink,
+                        "Open", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Ink,
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
                             .background(Cloud)
+                            .clickable { go("chat/2") }
                             .padding(horizontal = 14.dp, vertical = 9.dp)
                     )
                 }
@@ -715,7 +750,7 @@ fun CommentsScreen(onBack: () -> Unit) {
 /* ---------- Settings & Safety ---------- */
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> Unit = {}, onSignOut: () -> Unit = {}) {
+fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> Unit = {}, onSignOut: () -> Unit = {}, onEdit: () -> Unit = {}) {
     val sctx = androidx.compose.ui.platform.LocalContext.current
     val sname = remember { Store.get(sctx, "pname", "Shakil Rahman") }
     val shandle = remember { Store.get(sctx, "phandle", "@shakil") }
@@ -731,7 +766,7 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                             Text(sname, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
                             Text("$shandle · amora.id", fontSize = 11.sp, color = Txt3)
                         }
-                        Text("Edit", color = Orchid, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                        Text("Edit", color = Orchid, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, modifier = Modifier.clickable(onClick = onEdit).padding(6.dp))
                     }
                 }
                 Spacer(Modifier.height(14.dp))
@@ -1079,10 +1114,34 @@ fun BoardScreen(onBack: () -> Unit) {
     }
 }
 
-/* ---------- Upload ---------- */
+/* ---------- Upload (real system file picker) ---------- */
 
 @Composable
-fun UploadScreen(onBack: () -> Unit) {
+fun UploadScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val picked = remember { androidx.compose.runtime.mutableStateListOf<Pair<String, String>>() }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            var name = "file"
+            var size = 0L
+            try {
+                ctx.contentResolver.query(uri, null, null, null, null)?.use { c ->
+                    if (c.moveToFirst()) {
+                        val ni = c.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                        val si = c.getColumnIndex(android.provider.OpenableColumns.SIZE)
+                        if (ni >= 0) name = c.getString(ni) ?: "file"
+                        if (si >= 0) size = c.getLong(si)
+                    }
+                }
+            } catch (_: Exception) {}
+            val meta = when {
+                size >= 1048576L -> "%.1f MB · preview ready".format(size / 1048576.0)
+                size > 0L -> "${size / 1024} KB · preview ready"
+                else -> "preview ready"
+            }
+            picked.add(name to meta)
+        }
+    }
     Column(
         Modifier
             .fillMaxSize()
@@ -1090,29 +1149,26 @@ fun UploadScreen(onBack: () -> Unit) {
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
-        ScreenHeader("Share anything", onBack, sub = "Any file type · previews before sending")
-        Column(Modifier.padding(horizontal = 18.dp)) {
+        ScreenHeader("Share anything", onBack, sub = "Pick real files from your device · any type")
+        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
             val cats = listOf(
-                Triple("Gallery", Rose, Color(0xFFFF8E53)),
-                Triple("Camera", Violet, Orchid),
-                Triple("Document", Indigo, Sky),
-                Triple("Audio", Color(0xFF10B981), Mint),
-                Triple("Video", Color(0xFFF59E0B), Color(0xFFF97316)),
-                Triple("Code", Color(0xFF64748B), Color(0xFF334155)),
-                Triple("Archive", Color(0xFFEC4899), Color(0xFFD946EF)),
-                Triple("Any file", Ink, Txt2)
+                listOf(Triple("Photos", "image/*", Rose), Triple("Videos", "video/*", Color(0xFFF59E0B)), Triple("Audio", "audio/*", Color(0xFF10B981)), Triple("PDF", "application/pdf", Indigo)),
+                listOf(Triple("Docs", "text/*", Sky), Triple("Archives", "application/zip", Color(0xFFEC4899)), Triple("APK", "application/vnd.android.package-archive", Violet), Triple("Any file", "*/*", Ink))
             )
-            for (row in cats.chunked(4)) {
+            cats.forEach { rowCats ->
                 Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    row.forEach { (label, c1, c2) ->
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    rowCats.forEach { (label, mime, c1) ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.clip(RoundedCornerShape(16.dp)).clickable { launcher.launch(mime) }.padding(4.dp)
+                        ) {
                             Box(
                                 Modifier
                                     .size(54.dp)
                                     .clip(RoundedCornerShape(18.dp))
-                                    .background(Brush.linearGradient(listOf(c1, c2))),
+                                    .background(Brush.linearGradient(listOf(c1, Orchid))),
                                 contentAlignment = Alignment.Center
-                            ) { Icon(Icons.Filled.Add, null, tint = Color.White, modifier = Modifier.size(20.dp)) }
+                            ) { Icon(Icons.Filled.UploadFile, label, tint = Color.White, modifier = Modifier.size(20.dp)) }
                             Spacer(Modifier.height(6.dp))
                             Text(label, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Txt2)
                         }
@@ -1121,34 +1177,43 @@ fun UploadScreen(onBack: () -> Unit) {
             }
             Spacer(Modifier.height(14.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Ready to send · 4 items", fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, modifier = Modifier.weight(1f))
-                Text("All previews ✓", fontSize = 10.sp, color = Txt3, fontWeight = FontWeight.Bold)
+                Text(
+                    if (picked.isEmpty()) "No files picked yet" else "Ready to send · ${picked.size} file${if (picked.size > 1) "s" else ""}",
+                    fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, modifier = Modifier.weight(1f)
+                )
+                if (picked.isNotEmpty()) Text("All previews ✓", fontSize = 10.sp, color = Txt3, fontWeight = FontWeight.Bold)
             }
             Spacer(Modifier.height(10.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                AsyncImage(
-                    model = "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=200",
-                    contentDescription = null, contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(64.dp).clip(RoundedCornerShape(14.dp))
-                )
-                Box(
-                    Modifier.size(64.dp).clip(RoundedCornerShape(14.dp)).background(Ink),
-                    contentAlignment = Alignment.Center
-                ) { Icon(Icons.Filled.PlayArrow, null, tint = Color.White) }
-                Box(
-                    Modifier
-                        .size(64.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(Brush.linearGradient(listOf(Color(0xFFF43F5E), Color(0xFFC2185B)))),
-                    contentAlignment = Alignment.Center
-                ) { Text("PDF\n12p", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.ExtraBold) }
-                Box(
-                    Modifier.size(64.dp).clip(RoundedCornerShape(14.dp)).background(Cloud),
-                    contentAlignment = Alignment.Center
-                ) { Text("ZIP\n48", color = Txt2, fontSize = 9.sp, fontWeight = FontWeight.ExtraBold) }
+            if (picked.isEmpty()) {
+                Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Cloud).padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Filled.InsertDriveFile, null, tint = Txt3, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(10.dp))
+                    Text(
+                        "Tap a category above — the real Android file picker opens and your pick appears here.",
+                        fontSize = 11.sp, color = Txt2, fontWeight = FontWeight.Medium, lineHeight = 16.sp
+                    )
+                }
+            } else {
+                picked.forEach { (n, m) ->
+                    FileChip(n, m)
+                    Spacer(Modifier.height(6.dp))
+                }
             }
-            Spacer(Modifier.height(16.dp))
-            GradientButton("Send 4 files", Modifier.fillMaxWidth(), onClick = onBack)
+            Spacer(Modifier.height(12.dp))
+        }
+        Box(Modifier.padding(18.dp)) {
+            GradientButton(
+                if (picked.isEmpty()) "Pick a file to send" else "Send ${picked.size} to Amara",
+                Modifier.fillMaxWidth()
+            ) {
+                if (picked.isNotEmpty()) {
+                    picked.forEach { (n, m) -> Store.appendChat(ctx, "1", "\uD83D\uDCCE $n · $m") }
+                    go("chat/1")
+                }
+            }
         }
     }
 }
