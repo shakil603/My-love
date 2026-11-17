@@ -704,6 +704,16 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                             .clip(RoundedCornerShape(17.dp))
                             .border(1.5.dp, Mist, RoundedCornerShape(17.dp))
                             .background(Color.White)
+                            .clickable {
+                                val share = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(
+                                        android.content.Intent.EXTRA_TEXT,
+                                        "Join me on Amora \uD83D\uDC9C — messaging, dating & social in one app: https://github.com/shakil603/My-love/releases/latest"
+                                    )
+                                }
+                                ctx.startActivity(android.content.Intent.createChooser(share, "Share Amora"))
+                            }
                             .padding(vertical = 15.dp),
                         contentAlignment = Alignment.Center
                     ) {
@@ -751,6 +761,7 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                                     .weight(1f)
                                     .height(110.dp)
                                     .clip(RoundedCornerShape(12.dp))
+                                    .clickable { go("story") }
                             )
                         }
                     }
