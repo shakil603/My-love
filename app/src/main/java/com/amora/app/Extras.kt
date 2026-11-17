@@ -121,7 +121,7 @@ fun LanguageScreen(onBack: () -> Unit) {
     var current by remember {
         mutableStateOf(AppCompatDelegate.getApplicationLocales().toLanguageTags().ifBlank { "en" })
     }
-    Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
+    Column(Modifier.fillMaxSize().background(Paper)) {
         ScreenHeader(
             androidx.compose.ui.res.stringResource(R.string.language) + " · " + LANGS.size + " languages",
             onBack, sub = "Tap a language — the whole app changes instantly"
@@ -224,7 +224,7 @@ fun PermissionsScreen(onDone: () -> Unit) {
     }
 
     Column(
-        Modifier.fillMaxSize().background(Color(0xFFFBFAFE)).padding(horizontal = 22.dp),
+        Modifier.fillMaxSize().background(Paper).padding(horizontal = 22.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(60.dp))
@@ -246,7 +246,7 @@ fun PermissionsScreen(onDone: () -> Unit) {
                 val ok = granted(p)
                 Row(
                     Modifier.fillMaxWidth().padding(bottom = 10.dp)
-                        .clip(RoundedCornerShape(18.dp)).background(Color.White)
+                        .clip(RoundedCornerShape(18.dp)).background(Paper)
                         .border(1.dp, if (ok) Mint else Color(0xFFEFEBF8), RoundedCornerShape(18.dp))
                         .clickable { launcher.launch(p.perms.toTypedArray()) }
                         .padding(14.dp),
@@ -289,7 +289,7 @@ fun PermissionsScreen(onDone: () -> Unit) {
 fun CreateGroupScreen(onBack: () -> Unit, onCreated: () -> Unit) {
     var name by remember { mutableStateOf("") }
     var selected by remember { mutableStateOf(setOf<String>()) }
-    Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
+    Column(Modifier.fillMaxSize().background(Paper)) {
         ScreenHeader(androidx.compose.ui.res.stringResource(R.string.create_group), onBack, sub = "Unlimited groups · unlimited members")
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
             TextField(

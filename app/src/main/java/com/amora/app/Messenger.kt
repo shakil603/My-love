@@ -179,7 +179,7 @@ fun ChatsScreen(onOpenChat: (String) -> Unit, go: (String) -> Unit = {}) {
                                 .align(Alignment.BottomEnd)
                                 .size(13.dp)
                                 .clip(CircleShape)
-                                .background(Color.White),
+                                .background(Paper),
                             contentAlignment = Alignment.Center
                         ) { Box(Modifier.size(9.dp).clip(CircleShape).background(Mint)) }
                     }
@@ -262,10 +262,19 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
         sendCount++
     }
 
+    Box(Modifier.fillMaxSize().background(Paper)) {
+        if (ThemeX.wallpaper.value.isNotEmpty()) {
+            AsyncImage(
+                model = ThemeX.wallpaper.value,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                alpha = if (ThemeX.dark) 0.45f else 0.8f,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     Column(
         Modifier
             .fillMaxSize()
-            .background(Color(0xFFFBFAFE))
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
@@ -273,7 +282,7 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
         Row(
             Modifier
                 .fillMaxWidth()
-                .background(Color.White)
+                .background(Paper)
                 .padding(horizontal = 8.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -367,7 +376,7 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .background(Paper)
                     .padding(horizontal = 14.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
@@ -406,7 +415,7 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .background(Paper)
                     .padding(horizontal = 16.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -438,7 +447,7 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .background(Paper)
                     .padding(horizontal = 14.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
@@ -461,7 +470,7 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
         Row(
             Modifier
                 .fillMaxWidth()
-                .background(Color.White)
+                .background(Paper)
                 .padding(horizontal = 18.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -473,7 +482,7 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
         Row(
             Modifier
                 .fillMaxWidth()
-                .background(Color.White)
+                .background(Paper)
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -533,6 +542,7 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
             }
         }
     }
+    }
 }
 
 @Composable
@@ -567,7 +577,7 @@ fun TypingBubble() {
     Row(
         Modifier
             .clip(RoundedCornerShape(19.dp, 19.dp, 19.dp, 6.dp))
-            .background(Color.White)
+            .background(Paper)
             .border(1.dp, Color(0xFFEFEBF8), RoundedCornerShape(19.dp, 19.dp, 19.dp, 6.dp))
             .padding(horizontal = 16.dp, vertical = 13.dp),
         horizontalArrangement = Arrangement.spacedBy(5.dp)
@@ -608,7 +618,7 @@ fun MessageBubble(msg: Message, onLongPress: () -> Unit = {}) {
                                 .background(AuroraGradient)
                             else Modifier
                                 .clip(shape)
-                                .background(Color.White)
+                                .background(Paper)
                                 .border(1.dp, Color(0xFFEFEBF8), shape)
                         )
                         .combinedClickable(onClick = {}, onLongClick = onLongPress)
@@ -684,7 +694,7 @@ fun MessageBubble(msg: Message, onLongPress: () -> Unit = {}) {
                             .offset(y = (-7).dp)
                             .padding(horizontal = 8.dp)
                             .clip(RoundedCornerShape(50))
-                            .background(Color.White)
+                            .background(Paper)
                             .border(1.dp, Mist, RoundedCornerShape(50))
                             .padding(horizontal = 7.dp, vertical = 2.dp)
                     )
@@ -703,7 +713,7 @@ private fun VoiceBubbleContent(msg: Message) {
             Modifier
                 .size(32.dp)
                 .clip(CircleShape)
-                .then(if (msg.mine) Modifier.background(Color.White) else Modifier.background(AuroraGradient))
+                .then(if (msg.mine) Modifier.background(Paper) else Modifier.background(AuroraGradient))
                 .clickable { playing = !playing },
             contentAlignment = Alignment.Center
         ) {

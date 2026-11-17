@@ -59,7 +59,7 @@ import coil.compose.AsyncImage
 @Composable
 fun UserProfileScreen(userId: String, onBack: () -> Unit, go: (String) -> Unit = {}) {
     val u = Mock.user(userId)
-    LazyColumn(Modifier.fillMaxSize().background(Color(0xFFFBFAFE)), contentPadding = PaddingValues(bottom = 24.dp)) {
+    LazyColumn(Modifier.fillMaxSize().background(Paper), contentPadding = PaddingValues(bottom = 24.dp)) {
         item {
             Box(Modifier.fillMaxWidth()) {
                 AsyncImage(
@@ -85,13 +85,13 @@ fun UserProfileScreen(userId: String, onBack: () -> Unit, go: (String) -> Unit =
             ) {
                 Box {
                     Box(
-                        Modifier.size(104.dp).clip(CircleShape).background(Color.White),
+                        Modifier.size(104.dp).clip(CircleShape).background(Paper),
                         contentAlignment = Alignment.Center
                     ) { Avatar(u.avatar, 96, ringed = true) }
                     if (u.online) {
                         Box(
                             Modifier.align(Alignment.BottomEnd).padding(6.dp).size(16.dp)
-                                .clip(CircleShape).background(Color.White),
+                                .clip(CircleShape).background(Paper),
                             contentAlignment = Alignment.Center
                         ) { Box(Modifier.size(11.dp).clip(CircleShape).background(Mint)) }
                     }
@@ -148,7 +148,7 @@ fun UserProfileScreen(userId: String, onBack: () -> Unit, go: (String) -> Unit =
         item {
             Column(Modifier.offset(y = (-28).dp).padding(horizontal = 16.dp)) {
                 Row(
-                    Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(Color.White)
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(Paper)
                         .border(1.dp, Color(0xFFEFEBF8), RoundedCornerShape(18.dp)).padding(14.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
@@ -191,7 +191,7 @@ fun UserProfileScreen(userId: String, onBack: () -> Unit, go: (String) -> Unit =
 private fun ProfileIconAction(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, tint: Color = Ink, onClick: () -> Unit) {
     Box(
         Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).border(1.5.dp, Mist, RoundedCornerShape(16.dp))
-            .background(Color.White).clickable(onClick = onClick),
+            .background(Paper).clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) { Icon(icon, label, tint = tint, modifier = Modifier.size(20.dp)) }
 }
@@ -215,7 +215,7 @@ fun EditProfileScreen(onBack: () -> Unit) {
     var bio by remember { mutableStateOf(Store.get(ctx, "pbio", "Builder of Amora · dreaming big from Mymensingh \uD83C\uDF0C")) }
     var work by remember { mutableStateOf(Store.get(ctx, "pwork", "Founder · Amora")) }
     var location by remember { mutableStateOf(Store.get(ctx, "ploc", "Mymensingh, Bangladesh")) }
-    Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
+    Column(Modifier.fillMaxSize().background(Paper)) {
         ScreenHeader(androidx.compose.ui.res.stringResource(R.string.edit_profile), onBack)
         Column(
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp),
@@ -274,7 +274,7 @@ private fun EditField(label: String, value: String, minLines: Int = 1, onChange:
 fun FollowersScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     var tab by remember { mutableStateOf(0) }
     val following = remember { mutableStateOf(setOf("3", "5")) }
-    Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
+    Column(Modifier.fillMaxSize().background(Paper)) {
         ScreenHeader("Connections", onBack)
         Row(Modifier.padding(horizontal = 18.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("Followers · 48.2k", "Following · 1,284").forEachIndexed { i, t ->
