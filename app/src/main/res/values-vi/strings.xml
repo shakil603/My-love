@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Trang chủ</string>
+    <string name="tab_discover">Khám phá</string>
+    <string name="tab_chats">Trò chuyện</string>
+    <string name="tab_spaces">Không gian</string>
+    <string name="tab_profile">Hồ sơ</string>
+    <string name="onboard_create">Tạo tài khoản</string>
+    <string name="onboard_login">Đăng nhập</string>
+    <string name="language">Ngôn ngữ</string>
+    <string name="spaces_title">Không gian</string>
+    <string name="create_group">Tạo nhóm</string>
+    <string name="search_hint">Tìm kiếm</string>
+    <string name="message_hint">Tin nhắn…</string>
+    <string name="settings">Cài đặt</string>
+    <string name="notifications">Thông báo</string>
+    <string name="events">Sự kiện</string>
+    <string name="saved">Đã lưu</string>
+    <string name="edit_profile">Sửa hồ sơ</string>
+    <string name="sign_out">Đăng xuất</string>
+    <string name="liked_you">Đã thích bạn</string>
+    <string name="nearby">Người gần đây</string>
+</resources>

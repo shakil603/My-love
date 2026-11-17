@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Home</string>
+    <string name="tab_discover">Ontdekken</string>
+    <string name="tab_chats">Chats</string>
+    <string name="tab_spaces">Ruimtes</string>
+    <string name="tab_profile">Profiel</string>
+    <string name="onboard_create">Account maken</string>
+    <string name="onboard_login">Inloggen</string>
+    <string name="language">Taal</string>
+    <string name="spaces_title">Ruimtes</string>
+    <string name="create_group">Groep maken</string>
+    <string name="search_hint">Zoeken</string>
+    <string name="message_hint">Bericht…</string>
+    <string name="settings">Instellingen</string>
+    <string name="notifications">Meldingen</string>
+    <string name="events">Evenementen</string>
+    <string name="saved">Opgeslagen</string>
+    <string name="edit_profile">Profiel bewerken</string>
+    <string name="sign_out">Uitloggen</string>
+    <string name="liked_you">Vinden jou leuk</string>
+    <string name="nearby">Mensen dichtbij</string>
+</resources>

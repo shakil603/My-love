@@ -65,7 +65,8 @@ private val LANGS = listOf(
     Lang("ar", "العربية", "Arabic"),
     Lang("es", "Español", "Spanish"),
     Lang("hi", "हिन्दी", "Hindi"),
-    Lang("zh", "中文", "Chinese"),
+    Lang("zh", "中文 (简体)", "Chinese Simplified"),
+    Lang("zh-TW", "中文 (繁體)", "Chinese Traditional"),
     Lang("fr", "Français", "French"),
     Lang("pt", "Português", "Portuguese"),
     Lang("ru", "Русский", "Russian"),
@@ -73,26 +74,84 @@ private val LANGS = listOf(
     Lang("de", "Deutsch", "German"),
     Lang("tr", "Türkçe", "Turkish"),
     Lang("ur", "اردو", "Urdu"),
-    Lang("id", "Bahasa Indonesia", "Indonesian")
+    Lang("id", "Bahasa Indonesia", "Indonesian"),
+    Lang("ko", "한국어", "Korean"),
+    Lang("it", "Italiano", "Italian"),
+    Lang("vi", "Tiếng Việt", "Vietnamese"),
+    Lang("th", "ไทย", "Thai"),
+    Lang("fa", "فارسی", "Persian"),
+    Lang("nl", "Nederlands", "Dutch"),
+    Lang("pl", "Polski", "Polish"),
+    Lang("uk", "Українська", "Ukrainian"),
+    Lang("sw", "Kiswahili", "Swahili"),
+    Lang("ta", "தமிழ்", "Tamil"),
+    Lang("ms", "Bahasa Melayu", "Malay"),
+    Lang("te", "తెలుగు", "Telugu"),
+    Lang("mr", "मराठी", "Marathi"),
+    Lang("gu", "ગુજરાતી", "Gujarati"),
+    Lang("kn", "ಕನ್ನಡ", "Kannada"),
+    Lang("ml", "മലയാളം", "Malayalam"),
+    Lang("pa", "ਪੰਜਾਬੀ", "Punjabi"),
+    Lang("my", "မြန်မာ", "Burmese"),
+    Lang("km", "ខ្មែរ", "Khmer"),
+    Lang("ne", "नेपाली", "Nepali"),
+    Lang("si", "සිංහල", "Sinhala"),
+    Lang("am", "አማርኛ", "Amharic"),
+    Lang("ha", "Hausa", "Hausa"),
+    Lang("yo", "Yorùbá", "Yoruba"),
+    Lang("ig", "Igbo", "Igbo"),
+    Lang("az", "Azərbaycanca", "Azerbaijani"),
+    Lang("kk", "Қазақша", "Kazakh"),
+    Lang("uz", "Oʻzbekcha", "Uzbek"),
+    Lang("ro", "Română", "Romanian"),
+    Lang("el", "Ελληνικά", "Greek"),
+    Lang("cs", "Čeština", "Czech"),
+    Lang("hu", "Magyar", "Hungarian"),
+    Lang("sv", "Svenska", "Swedish"),
+    Lang("fi", "Suomi", "Finnish"),
+    Lang("da", "Dansk", "Danish"),
+    Lang("no", "Norsk", "Norwegian"),
+    Lang("he", "עברית", "Hebrew"),
+    Lang("fil", "Filipino", "Filipino")
 )
 
 @Composable
 fun LanguageScreen(onBack: () -> Unit) {
+    val lctx = LocalContext.current
     var current by remember {
         mutableStateOf(AppCompatDelegate.getApplicationLocales().toLanguageTags().ifBlank { "en" })
     }
     Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
-        ScreenHeader("Language · ভাষা", onBack, sub = "Applies across the whole app, instantly")
+        ScreenHeader(
+            androidx.compose.ui.res.stringResource(R.string.language) + " · " + LANGS.size + " languages",
+            onBack, sub = "Tap a language — the whole app changes instantly"
+        )
         Row(
             Modifier.padding(horizontal = 18.dp).fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp)).background(Color(0xFFF6E7FF)).padding(12.dp),
+                .clip(RoundedCornerShape(14.dp)).background(Color(0xFFF6E7FF))
+                .clickable {
+                    try {
+                        val intent = if (Build.VERSION.SDK_INT >= 33)
+                            android.content.Intent(
+                                android.provider.Settings.ACTION_APP_LOCALE_SETTINGS,
+                                android.net.Uri.parse("package:" + lctx.packageName)
+                            )
+                        else
+                            android.content.Intent(
+                                android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                android.net.Uri.parse("package:" + lctx.packageName)
+                            )
+                        lctx.startActivity(intent)
+                    } catch (_: Exception) {}
+                }
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(Icons.Filled.Public, null, tint = Orchid, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(8.dp))
             Text(
-                "Also available in Android Settings → Apps → Amora → Language",
-                fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA21CAF), lineHeight = 14.sp
+                "Open Android Settings → App language (tap here)",
+                fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFFA21CAF), lineHeight = 15.sp
             )
         }
         Spacer(Modifier.height(6.dp))
@@ -231,7 +290,7 @@ fun CreateGroupScreen(onBack: () -> Unit, onCreated: () -> Unit) {
     var name by remember { mutableStateOf("") }
     var selected by remember { mutableStateOf(setOf<String>()) }
     Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
-        ScreenHeader("New group", onBack, sub = "Unlimited groups · unlimited members")
+        ScreenHeader(androidx.compose.ui.res.stringResource(R.string.create_group), onBack, sub = "Unlimited groups · unlimited members")
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
             TextField(
                 value = name, onValueChange = { name = it },

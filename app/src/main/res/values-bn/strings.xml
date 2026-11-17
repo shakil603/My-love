@@ -10,4 +10,14 @@
     <string name="language">ভাষা</string>
     <string name="spaces_title">স্পেস</string>
     <string name="create_group">গ্রুপ তৈরি করুন</string>
+    <string name="search_hint">খুঁজুন</string>
+    <string name="message_hint">মেসেজ…</string>
+    <string name="settings">সেটিংস</string>
+    <string name="notifications">নোটিফিকেশন</string>
+    <string name="events">ইভেন্ট</string>
+    <string name="saved">সংরক্ষিত</string>
+    <string name="edit_profile">প্রোফাইল সম্পাদনা</string>
+    <string name="sign_out">সাইন আউট</string>
+    <string name="liked_you">আপনাকে পছন্দ করেছে</string>
+    <string name="nearby">কাছের মানুষ</string>
 </resources>

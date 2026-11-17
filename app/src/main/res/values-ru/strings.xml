@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Главная</string>
+    <string name="tab_discover">Поиск пары</string>
+    <string name="tab_chats">Чаты</string>
+    <string name="tab_spaces">Пространства</string>
+    <string name="tab_profile">Профиль</string>
+    <string name="onboard_create">Создать аккаунт</string>
+    <string name="onboard_login">Войти</string>
+    <string name="language">Язык</string>
+    <string name="spaces_title">Пространства</string>
+    <string name="create_group">Создать группу</string>
+    <string name="search_hint">Поиск</string>
+    <string name="message_hint">Сообщение…</string>
+    <string name="settings">Настройки</string>
+    <string name="notifications">Уведомления</string>
+    <string name="events">События</string>
+    <string name="saved">Сохранённое</string>
+    <string name="edit_profile">Изменить профиль</string>
+    <string name="sign_out">Выйти</string>
+    <string name="liked_you">Вы понравились</string>
+    <string name="nearby">Люди рядом</string>
+</resources>

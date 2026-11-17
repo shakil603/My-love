@@ -10,4 +10,14 @@
     <string name="language">Idioma</string>
     <string name="spaces_title">Espacios</string>
     <string name="create_group">Crear grupo</string>
+    <string name="search_hint">Buscar</string>
+    <string name="message_hint">Mensaje…</string>
+    <string name="settings">Ajustes</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="events">Eventos</string>
+    <string name="saved">Guardado</string>
+    <string name="edit_profile">Editar perfil</string>
+    <string name="sign_out">Cerrar sesión</string>
+    <string name="liked_you">Les gustas</string>
+    <string name="nearby">Personas cerca</string>
 </resources>

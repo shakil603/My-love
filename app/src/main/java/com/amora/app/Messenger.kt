@@ -101,7 +101,7 @@ fun ChatsScreen(onOpenChat: (String) -> Unit, go: (String) -> Unit = {}) {
                     .padding(horizontal = 20.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Chats", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
+                Text(androidx.compose.ui.res.stringResource(R.string.tab_chats), fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
                 Spacer(Modifier.weight(1f))
                 IconButton(onClick = { go("incoming/1") }) { Icon(Icons.Filled.Videocam, "New call", tint = Ink) }
                 IconButton(onClick = { go("creategroup") }) { Icon(Icons.Filled.Add, "New group", tint = Ink) }
@@ -110,7 +110,7 @@ fun ChatsScreen(onOpenChat: (String) -> Unit, go: (String) -> Unit = {}) {
         item {
             TextField(
                 value = query, onValueChange = { query = it },
-                placeholder = { Text("Search chats…", fontSize = 12.sp, color = Txt3) },
+                placeholder = { Text(androidx.compose.ui.res.stringResource(R.string.search_hint) + "…", fontSize = 12.sp, color = Txt3) },
                 leadingIcon = { Icon(Icons.Filled.Search, null, tint = Txt3) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -495,7 +495,7 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
             TextField(
                 value = input,
                 onValueChange = { input = it },
-                placeholder = { Text("Message…", fontSize = 13.sp, color = Txt3) },
+                placeholder = { Text(androidx.compose.ui.res.stringResource(R.string.message_hint), fontSize = 13.sp, color = Txt3) },
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(50)),

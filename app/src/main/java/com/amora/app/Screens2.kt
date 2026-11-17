@@ -505,7 +505,7 @@ fun NotificationsScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
         Notif("\uD83C\uDF93", "UX course — module 7 unlocked", "68% complete · keep going!", null)
     )
     Column(Modifier.fillMaxSize().background(Color.White).statusBarsPadding()) {
-        ScreenHeader("Activity", onBack)
+        ScreenHeader(androidx.compose.ui.res.stringResource(R.string.notifications), onBack)
         LazyColumn(contentPadding = PaddingValues(16.dp)) {
             items(notifs.size) { i ->
                 val n = notifs[i]
@@ -755,7 +755,7 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
     val sname = remember { Store.get(sctx, "pname", "Shakil Rahman") }
     val shandle = remember { Store.get(sctx, "phandle", "@shakil") }
     LazyColumn(Modifier.fillMaxSize().background(Cloud).statusBarsPadding(), contentPadding = PaddingValues(bottom = 24.dp)) {
-        item { ScreenHeader("Settings", onBack) }
+        item { ScreenHeader(androidx.compose.ui.res.stringResource(R.string.settings), onBack) }
         item {
             Column(Modifier.padding(horizontal = 16.dp)) {
                 WhiteCard {
@@ -836,7 +836,7 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                 Spacer(Modifier.height(14.dp))
                 WhiteCard {
                     Text(
-                        "Sign out", color = Color(0xFFF43F5E), fontWeight = FontWeight.ExtraBold, fontSize = 13.sp,
+                        androidx.compose.ui.res.stringResource(R.string.sign_out), color = Color(0xFFF43F5E), fontWeight = FontWeight.ExtraBold, fontSize = 13.sp,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .clickable(onClick = onSignOut)

@@ -10,4 +10,14 @@
     <string name="language">语言</string>
     <string name="spaces_title">空间</string>
     <string name="create_group">创建群组</string>
+    <string name="search_hint">搜索</string>
+    <string name="message_hint">消息…</string>
+    <string name="settings">设置</string>
+    <string name="notifications">通知</string>
+    <string name="events">活动</string>
+    <string name="saved">收藏</string>
+    <string name="edit_profile">编辑资料</string>
+    <string name="sign_out">退出登录</string>
+    <string name="liked_you">喜欢你的人</string>
+    <string name="nearby">附近的人</string>
 </resources>

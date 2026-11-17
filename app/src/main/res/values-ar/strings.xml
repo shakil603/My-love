@@ -10,4 +10,14 @@
     <string name="language">اللغة</string>
     <string name="spaces_title">المساحات</string>
     <string name="create_group">إنشاء مجموعة</string>
+    <string name="search_hint">بحث</string>
+    <string name="message_hint">رسالة…</string>
+    <string name="settings">الإعدادات</string>
+    <string name="notifications">الإشعارات</string>
+    <string name="events">الفعاليات</string>
+    <string name="saved">المحفوظات</string>
+    <string name="edit_profile">تعديل الملف الشخصي</string>
+    <string name="sign_out">تسجيل الخروج</string>
+    <string name="liked_you">أعجبوا بك</string>
+    <string name="nearby">أشخاص قريبون</string>
 </resources>

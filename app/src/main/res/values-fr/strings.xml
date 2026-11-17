@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Accueil</string>
+    <string name="tab_discover">Découvrir</string>
+    <string name="tab_chats">Discussions</string>
+    <string name="tab_spaces">Espaces</string>
+    <string name="tab_profile">Profil</string>
+    <string name="onboard_create">Créer un compte</string>
+    <string name="onboard_login">Se connecter</string>
+    <string name="language">Langue</string>
+    <string name="spaces_title">Espaces</string>
+    <string name="create_group">Créer un groupe</string>
+    <string name="search_hint">Rechercher</string>
+    <string name="message_hint">Message…</string>
+    <string name="settings">Réglages</string>
+    <string name="notifications">Notifications</string>
+    <string name="events">Événements</string>
+    <string name="saved">Enregistrés</string>
+    <string name="edit_profile">Modifier le profil</string>
+    <string name="sign_out">Se déconnecter</string>
+    <string name="liked_you">Vous ont aimé</string>
+    <string name="nearby">Personnes à proximité</string>
+</resources>

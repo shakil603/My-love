@@ -52,7 +52,7 @@ import coil.compose.AsyncImage
 @Composable
 fun LikedYouScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
-        ScreenHeader("Liked you", onBack, sub = "27 people liked your profile")
+        ScreenHeader(androidx.compose.ui.res.stringResource(R.string.liked_you), onBack, sub = "27 people liked your profile")
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
             for (row in Mock.users.chunked(2)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -102,7 +102,7 @@ fun LikedYouScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
 @Composable
 fun NearbyScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
-        ScreenHeader("People nearby", onBack, sub = "Sharing approximate location only")
+        ScreenHeader(androidx.compose.ui.res.stringResource(R.string.nearby), onBack, sub = "Sharing approximate location only")
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 6.dp)) {
             items(Mock.users.size) { i ->
                 val u = Mock.users[i]
@@ -242,7 +242,7 @@ private fun GroupAction(icon: androidx.compose.ui.graphics.vector.ImageVector, l
 @Composable
 fun SavedPostsScreen(onBack: () -> Unit) {
     Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
-        ScreenHeader("Saved", onBack, sub = "Only you can see what you save")
+        ScreenHeader(androidx.compose.ui.res.stringResource(R.string.saved), onBack, sub = "Only you can see what you save")
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
             for (row in (Mock.user("1").photos + Mock.user("5").photos).take(9).chunked(3)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -278,7 +278,7 @@ fun EventsScreen(onBack: () -> Unit) {
         Evt("05", "DEC", "Open-source sprint · Phoenix", "Hub71 cowork · all day", "16 going")
     )
     Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
-        ScreenHeader("Events", onBack, sub = "From your groups and interests")
+        ScreenHeader(androidx.compose.ui.res.stringResource(R.string.events), onBack, sub = "From your groups and interests")
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp)) {
             items(events.size) { i ->
                 val e = events[i]
