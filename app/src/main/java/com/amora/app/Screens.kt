@@ -106,11 +106,17 @@ fun GradientButton(text: String, modifier: Modifier = Modifier, onClick: () -> U
 
 @Composable
 fun FileChip(name: String, meta: String, light: Boolean = false) {
+    val fcx = androidx.compose.ui.platform.LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
             .background(if (light) Color.White.copy(alpha = 0.95f) else Cloud)
+            .clickable {
+                try {
+                    fcx.startActivity(android.content.Intent(android.app.DownloadManager.ACTION_VIEW_DOWNLOADS))
+                } catch (_: Exception) {}
+            }
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
