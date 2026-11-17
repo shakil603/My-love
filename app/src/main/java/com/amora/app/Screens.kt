@@ -182,7 +182,7 @@ fun OnboardingScreen(onCreate: () -> Unit, onLogin: () -> Unit, onLanguage: () -
                 Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(19.dp))
-                    .background(Color.White)
+                    .background(Paper)
                     .clickable(onClick = onCreate)
                     .padding(vertical = 16.dp),
                 contentAlignment = Alignment.Center
@@ -283,7 +283,7 @@ fun PostCard(post: Post, go: (String) -> Unit = {}) {
             .fillMaxWidth()
             .padding(horizontal = 14.dp),
         shape = RoundedCornerShape(24.dp),
-        color = Color.White,
+        color = Paper,
         shadowElevation = 1.dp
     ) {
         Column {
@@ -374,7 +374,7 @@ fun DiscoverScreen(go: (String) -> Unit = {}) {
                     Modifier
                         .size(38.dp)
                         .clip(CircleShape)
-                        .background(Color.White)
+                        .background(Paper)
                         .border(1.dp, Mist, CircleShape)
                         .clickable { go("nearby") },
                     contentAlignment = Alignment.Center
@@ -543,7 +543,7 @@ fun SpacesScreen(go: (String) -> Unit = {}) {
                             .fillMaxWidth()
                             .padding(bottom = 8.dp)
                             .clip(RoundedCornerShape(18.dp))
-                            .background(Color.White)
+                            .background(Paper)
                             .border(1.dp, Color(0xFFEFEBF8), RoundedCornerShape(18.dp))
                             .clickable { go("chat/${c.id}") }
                             .padding(12.dp),
@@ -588,7 +588,7 @@ fun SpacesScreen(go: (String) -> Unit = {}) {
                                 Modifier
                                     .weight(1f)
                                     .clip(RoundedCornerShape(20.dp))
-                                    .background(Color.White)
+                                    .background(Paper)
                                     .border(1.dp, Color(0xFFEFEBF8), RoundedCornerShape(20.dp))
                                     .clickable { go(route) }
                                     .padding(16.dp)
@@ -652,7 +652,7 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                         Modifier
                             .size(96.dp)
                             .clip(CircleShape)
-                            .background(Color.White),
+                            .background(Paper),
                         contentAlignment = Alignment.Center
                     ) {
                         Avatar("https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300", 88)
@@ -697,7 +697,7 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                         Modifier
                             .clip(RoundedCornerShape(17.dp))
                             .border(1.5.dp, Mist, RoundedCornerShape(17.dp))
-                            .background(Color.White)
+                            .background(Paper)
                             .clickable { go("settings") }
                             .padding(15.dp),
                         contentAlignment = Alignment.Center
@@ -709,7 +709,7 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                             .weight(1f)
                             .clip(RoundedCornerShape(17.dp))
                             .border(1.5.dp, Mist, RoundedCornerShape(17.dp))
-                            .background(Color.White)
+                            .background(Paper)
                             .clickable {
                                 val share = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                                     type = "text/plain"
@@ -741,7 +741,7 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                             modifier = Modifier
                                 .weight(1f)
                                 .clip(RoundedCornerShape(14.dp))
-                                .background(Color.White)
+                                .background(Paper)
                                 .border(1.dp, Mist, RoundedCornerShape(14.dp))
                                 .clickable { go(route) }
                                 .padding(vertical = 11.dp),

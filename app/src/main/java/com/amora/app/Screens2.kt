@@ -105,7 +105,7 @@ fun WhiteCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
         modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(18.dp))
-            .background(Color.White)
+            .background(Paper)
             .padding(14.dp)
     ) { content() }
 }
@@ -140,11 +140,12 @@ fun ToggleRow(icon: androidx.compose.ui.graphics.vector.ImageVector, title: Stri
 
 @Composable
 fun SignupScreen(onNext: () -> Unit, onBack: () -> Unit) {
-    var phone by remember { mutableStateOf("") }
+    val sgctx = androidx.compose.ui.platform.LocalContext.current
+    var phone by remember { mutableStateOf(Store.get(sgctx, "phone", "")) }
     Column(
         Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Paper)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = 24.dp)
@@ -198,7 +199,10 @@ fun SignupScreen(onNext: () -> Unit, onBack: () -> Unit) {
             )
         }
         Spacer(Modifier.height(14.dp))
-        GradientButton("Continue", Modifier.fillMaxWidth(), onClick = onNext)
+        GradientButton("Continue", Modifier.fillMaxWidth(), onClick = {
+            Store.set(sgctx, "phone", phone.trim())
+            onNext()
+        })
         Spacer(Modifier.height(18.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.weight(1f).height(1.dp).background(Mist))
@@ -243,17 +247,54 @@ fun SignupScreen(onNext: () -> Unit, onBack: () -> Unit) {
 
 @Composable
 fun OtpScreen(onNext: () -> Unit, onBack: () -> Unit) {
+    val octx = androidx.compose.ui.platform.LocalContext.current
+    val phone = remember { Store.get(octx, "phone", "") }
     var code by remember { mutableStateOf("") }
+    var expected by remember { mutableStateOf("") }
+    var err by remember { mutableStateOf(false) }
+    var reveal by remember { mutableStateOf(false) }
     var resendKey by remember { mutableIntStateOf(0) }
-    var secs by remember { mutableIntStateOf(24) }
+    var secs by remember { mutableIntStateOf(30) }
+    val permLauncher = rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+    ) { granted -> if (granted) resendKey++ }
+    fun sendCode(): String {
+        val c = (100000..999999).random().toString()
+        try {
+            val nm = octx.getSystemService(android.app.NotificationManager::class.java)
+            nm.createNotificationChannel(
+                android.app.NotificationChannel("amora_otp", "Verification codes", android.app.NotificationManager.IMPORTANCE_HIGH)
+            )
+            val n = androidx.core.app.NotificationCompat.Builder(octx, "amora_otp")
+                .setSmallIcon(android.R.drawable.ic_lock_idle_lock)
+                .setContentTitle("Amora verification code")
+                .setContentText("Your code is $c")
+                .setStyle(androidx.core.app.NotificationCompat.BigTextStyle().bigText("Your code is $c — enter it in Amora to verify this phone."))
+                .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .build()
+            nm.notify(7001, n)
+        } catch (_: Exception) {}
+        return c
+    }
     LaunchedEffect(resendKey) {
-        secs = 24
+        if (android.os.Build.VERSION.SDK_INT >= 33 &&
+            octx.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) !=
+            android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            permLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+        expected = sendCode()
+        err = false
+        reveal = false
+        code = ""
+        secs = 30
         while (secs > 0) { kotlinx.coroutines.delay(1000); secs-- }
     }
     Column(
         Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Paper)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = 24.dp)
@@ -263,11 +304,16 @@ fun OtpScreen(onNext: () -> Unit, onBack: () -> Unit) {
         Spacer(Modifier.height(10.dp))
         Text("Enter the code", fontSize = 25.sp, fontWeight = FontWeight.ExtraBold)
         Spacer(Modifier.height(8.dp))
-        Text("We sent a 6-digit code to +880 17•• ••• 678", fontSize = 13.sp, color = Txt2)
+        Text(
+            "A real 6-digit code was just sent to this phone as a notification" +
+                (if (phone.isBlank()) "." else " for +880 $phone.") +
+                " Pull down your notification shade to read it.",
+            fontSize = 13.sp, color = Txt2, lineHeight = 19.sp
+        )
         Spacer(Modifier.height(26.dp))
         BasicTextField(
             value = code,
-            onValueChange = { v -> if (v.length <= 6 && v.all { it.isDigit() }) code = v },
+            onValueChange = { v -> if (v.length <= 6 && v.all { it.isDigit() }) { code = v; err = false } },
             keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.NumberPassword),
             singleLine = true,
             decorationBox = { inner ->
@@ -283,7 +329,8 @@ fun OtpScreen(onNext: () -> Unit, onBack: () -> Unit) {
                                     .size(width = 44.dp, height = 54.dp)
                                     .clip(RoundedCornerShape(14.dp))
                                     .then(
-                                        if (i == code.length) Modifier.border(1.8.dp, Orchid, RoundedCornerShape(14.dp))
+                                        if (err) Modifier.border(1.8.dp, Color(0xFFF43F5E), RoundedCornerShape(14.dp))
+                                        else if (i == code.length) Modifier.border(1.8.dp, Orchid, RoundedCornerShape(14.dp))
                                         else Modifier.background(Cloud)
                                     ),
                                 contentAlignment = Alignment.Center
@@ -296,7 +343,15 @@ fun OtpScreen(onNext: () -> Unit, onBack: () -> Unit) {
             },
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(Modifier.height(18.dp))
+        if (err) {
+            Spacer(Modifier.height(10.dp))
+            Text(
+                "Wrong code — check the notification and try again.",
+                fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFFF43F5E),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }
+        Spacer(Modifier.height(16.dp))
         Text(
             if (secs > 0) "Resend code in 00:%02d".format(secs) else "Resend code ↻",
             fontSize = 12.sp, fontWeight = FontWeight.ExtraBold,
@@ -306,8 +361,26 @@ fun OtpScreen(onNext: () -> Unit, onBack: () -> Unit) {
                 .clickable { if (secs <= 0) resendKey++ }
                 .padding(6.dp)
         )
-        Spacer(Modifier.height(18.dp))
-        GradientButton(if (code.length == 6) "Verify" else "Verify (${code.length}/6)", Modifier.fillMaxWidth(), onClick = onNext)
+        Text(
+            if (reveal) "Your code: $expected" else "Notification blocked? Show code here",
+            fontSize = 11.sp, fontWeight = FontWeight.ExtraBold,
+            color = if (reveal) Ink else Txt3,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .clickable { reveal = true }
+                .padding(6.dp)
+        )
+        Spacer(Modifier.height(14.dp))
+        GradientButton(
+            if (code.length == 6) "Verify" else "Verify (${code.length}/6)",
+            Modifier.fillMaxWidth(),
+            onClick = {
+                if (code.length == 6 && code == expected) {
+                    Store.set(octx, "verified", "true")
+                    onNext()
+                } else err = true
+            }
+        )
     }
 }
 
@@ -413,7 +486,7 @@ fun StoryScreen(onBack: () -> Unit) {
                             Modifier
                                 .fillMaxWidth(p)
                                 .height(4.dp)
-                                .background(Color.White)
+                                .background(Paper)
                         )
                     }
                 }
@@ -604,7 +677,7 @@ fun NotificationsScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
         Notif("\uD83D\uDCC4", "Daniel shared Launch-Playbook-2026.pdf with you", "2 h ago · preview ready ✓", null),
         Notif("\uD83C\uDF93", "UX course — module 7 unlocked", "68% complete · keep going!", null)
     )
-    Column(Modifier.fillMaxSize().background(Color.White).statusBarsPadding()) {
+    Column(Modifier.fillMaxSize().background(Paper).statusBarsPadding()) {
         ScreenHeader(androidx.compose.ui.res.stringResource(R.string.notifications), onBack)
         LazyColumn(contentPadding = PaddingValues(16.dp)) {
             items(notifs.size) { i ->
@@ -656,7 +729,7 @@ fun NotificationsScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
 @Composable
 fun SearchScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     var q by remember { mutableStateOf("design workshop") }
-    Column(Modifier.fillMaxSize().background(Color.White).statusBarsPadding()) {
+    Column(Modifier.fillMaxSize().background(Paper).statusBarsPadding()) {
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -774,7 +847,7 @@ fun SearchScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
 @Composable
 fun CommentsScreen(onBack: () -> Unit) {
     var input by remember { mutableStateOf("") }
-    Column(Modifier.fillMaxSize().background(Color.White).statusBarsPadding().navigationBarsPadding()) {
+    Column(Modifier.fillMaxSize().background(Paper).statusBarsPadding().navigationBarsPadding()) {
         val ctx = androidx.compose.ui.platform.LocalContext.current
         val myName = remember { Store.get(ctx, "pname", "Shakil Rahman") }
         val comments = remember { androidx.compose.runtime.mutableStateListOf(
@@ -816,7 +889,7 @@ fun CommentsScreen(onBack: () -> Unit) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .background(Color.White)
+                .background(Paper)
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -853,7 +926,7 @@ fun CommentsScreen(onBack: () -> Unit) {
 /* ---------- Settings & Safety ---------- */
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> Unit = {}, onSignOut: () -> Unit = {}, onEdit: () -> Unit = {}) {
+fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> Unit = {}, onSignOut: () -> Unit = {}, onEdit: () -> Unit = {}, onTheme: () -> Unit = {}) {
     val sctx = androidx.compose.ui.platform.LocalContext.current
     val sname = remember { Store.get(sctx, "pname", "Shakil Rahman") }
     val shandle = remember { Store.get(sctx, "phandle", "@shakil") }
@@ -909,27 +982,25 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                         ) { Icon(Icons.Filled.Public, null, tint = Orchid, modifier = Modifier.size(17.dp)) }
                         Spacer(Modifier.width(11.dp))
                         Column(Modifier.weight(1f)) {
-                            Text("Language · ভাষা", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                            Text(androidx.compose.ui.res.stringResource(R.string.language), fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
                             Text("53 languages · also in Android Settings", fontSize = 10.sp, color = Txt3)
                         }
                         Text("›", color = Txt3, fontSize = 18.sp)
                     }
-                    Row(Modifier.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                        var appearance by remember { mutableStateOf("Auto") }
+                    Row(
+                        Modifier.fillMaxWidth().clickable(onClick = onTheme).padding(vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Box(
                             Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(Ink),
                             contentAlignment = Alignment.Center
-                        ) { Icon(Icons.Filled.DarkMode, null, tint = Color.White, modifier = Modifier.size(17.dp)) }
+                        ) { Icon(Icons.Filled.DarkMode, null, tint = Paper, modifier = Modifier.size(17.dp)) }
                         Spacer(Modifier.width(11.dp))
-                        Text("Appearance", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, modifier = Modifier.weight(1f))
-                        Text(
-                            "$appearance ›", color = Orchid, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp,
-                            modifier = Modifier
-                                .clickable {
-                                    appearance = when (appearance) { "Auto" -> "Light"; "Light" -> "Dark"; else -> "Auto" }
-                                }
-                                .padding(6.dp)
-                        )
+                        Column(Modifier.weight(1f)) {
+                            Text("Appearance & colors", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                            Text("Dark mode · edit any color · wallpaper", fontSize = 10.sp, color = Txt3)
+                        }
+                        Text("${ThemeX.mode.value} ›", color = Orchid, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
                     }
                     Row(Modifier.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(
@@ -1102,7 +1173,7 @@ fun CalendarScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     val monthTitle = remember {
         today.month.getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.getDefault()) + " " + today.year
     }
-    LazyColumn(Modifier.fillMaxSize().background(Color.White).statusBarsPadding(), contentPadding = PaddingValues(bottom = 24.dp)) {
+    LazyColumn(Modifier.fillMaxSize().background(Paper).statusBarsPadding(), contentPadding = PaddingValues(bottom = 24.dp)) {
         item { ScreenHeader(monthTitle, onBack) }
         item {
             Row(
@@ -1144,7 +1215,7 @@ fun CalendarScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
                             "Join call", color = Indigo, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .background(Color.White)
+                                .background(Paper)
                                 .clickable { go("video/phoenix") }
                                 .padding(horizontal = 18.dp, vertical = 9.dp)
                         )
@@ -1209,7 +1280,7 @@ fun BoardScreen(onBack: () -> Unit) {
                     Modifier
                         .width(240.dp)
                         .clip(RoundedCornerShape(18.dp))
-                        .background(Color(0xFFEFEDF6))
+                        .background(if (ThemeX.dark) Color(0xFF221D33) else Color(0xFFEFEDF6))
                         .padding(10.dp)
                 ) {
                     Text(
@@ -1223,7 +1294,7 @@ fun BoardScreen(onBack: () -> Unit) {
                                 .fillMaxWidth()
                                 .padding(bottom = 8.dp)
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(Color.White)
+                                .background(Paper)
                                 .clickable {
                                     tasks = tasks.map { x -> if (x.id == t.id) x.copy(col = (x.col + 1) % 3) else x }
                                 }
@@ -1318,7 +1389,7 @@ fun UploadScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     Column(
         Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Paper)
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {

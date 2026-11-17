@@ -51,7 +51,7 @@ import coil.compose.AsyncImage
 
 @Composable
 fun LikedYouScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
-    Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
+    Column(Modifier.fillMaxSize().background(Paper)) {
         ScreenHeader(androidx.compose.ui.res.stringResource(R.string.liked_you), onBack, sub = "27 people liked your profile")
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
             for (row in Mock.users.chunked(2)) {
@@ -101,7 +101,7 @@ fun LikedYouScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
 
 @Composable
 fun NearbyScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
-    Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
+    Column(Modifier.fillMaxSize().background(Paper)) {
         ScreenHeader(androidx.compose.ui.res.stringResource(R.string.nearby), onBack, sub = "Sharing approximate location only")
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 6.dp)) {
             items(Mock.users.size) { i ->
@@ -116,7 +116,7 @@ fun NearbyScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
                         Avatar(u.avatar, 52, ringed = u.match > 0)
                         if (u.online) {
                             Box(
-                                Modifier.align(Alignment.BottomEnd).size(14.dp).clip(CircleShape).background(Color.White),
+                                Modifier.align(Alignment.BottomEnd).size(14.dp).clip(CircleShape).background(Paper),
                                 contentAlignment = Alignment.Center
                             ) { Box(Modifier.size(10.dp).clip(CircleShape).background(Mint)) }
                         }
@@ -153,7 +153,7 @@ fun NearbyScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
 fun GroupInfoScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit = {}) {
     val chat = Mock.chats.firstOrNull { it.id == chatId } ?: Mock.chats[1]
     val members = Mock.users.take(5)
-    LazyColumn(Modifier.fillMaxSize().background(Color(0xFFFBFAFE)), contentPadding = PaddingValues(bottom = 24.dp)) {
+    LazyColumn(Modifier.fillMaxSize().background(Paper), contentPadding = PaddingValues(bottom = 24.dp)) {
         item {
             ScreenHeader("Group info", onBack)
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -228,7 +228,7 @@ fun GroupInfoScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit = {
 private fun GroupAction(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
-            Modifier.size(50.dp).clip(RoundedCornerShape(16.dp)).background(Color.White)
+            Modifier.size(50.dp).clip(RoundedCornerShape(16.dp)).background(Paper)
                 .border(1.dp, Mist, RoundedCornerShape(16.dp)).clickable(onClick = onClick),
             contentAlignment = Alignment.Center
         ) { Icon(icon, label, tint = Orchid, modifier = Modifier.size(20.dp)) }
@@ -241,7 +241,7 @@ private fun GroupAction(icon: androidx.compose.ui.graphics.vector.ImageVector, l
 
 @Composable
 fun SavedPostsScreen(onBack: () -> Unit) {
-    Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
+    Column(Modifier.fillMaxSize().background(Paper)) {
         ScreenHeader(androidx.compose.ui.res.stringResource(R.string.saved), onBack, sub = "Only you can see what you save")
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
             for (row in (Mock.user("1").photos + Mock.user("5").photos).take(9).chunked(3)) {
@@ -277,7 +277,7 @@ fun EventsScreen(onBack: () -> Unit) {
         Evt("28", "NOV", "Weekend hiking — Sajek trail", "Meet at Khagrachari point", "23 going"),
         Evt("05", "DEC", "Open-source sprint · Phoenix", "Hub71 cowork · all day", "16 going")
     )
-    Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
+    Column(Modifier.fillMaxSize().background(Paper)) {
         ScreenHeader(androidx.compose.ui.res.stringResource(R.string.events), onBack, sub = "From your groups and interests")
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp)) {
             items(events.size) { i ->
@@ -285,7 +285,7 @@ fun EventsScreen(onBack: () -> Unit) {
                 var joined by remember { androidx.compose.runtime.mutableStateOf(false) }
                 Row(
                     Modifier.fillMaxWidth().padding(bottom = 10.dp).clip(RoundedCornerShape(18.dp))
-                        .background(Color.White).border(1.dp, Color(0xFFEFEBF8), RoundedCornerShape(18.dp))
+                        .background(Paper).border(1.dp, Color(0xFFEFEBF8), RoundedCornerShape(18.dp))
                         .padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {

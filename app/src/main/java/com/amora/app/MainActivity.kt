@@ -34,6 +34,13 @@ import androidx.navigation.compose.rememberNavController
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ThemeX.load(this)
+        coil.Coil.setImageLoader(
+            coil.ImageLoader.Builder(this).components {
+                if (android.os.Build.VERSION.SDK_INT >= 28) add(coil.decode.ImageDecoderDecoder.Factory())
+                else add(coil.decode.GifDecoder.Factory())
+            }.build()
+        )
         enableEdgeToEdge()
         setContent {
             AmoraTheme {
@@ -109,9 +116,11 @@ fun AmoraApp() {
                 onSafety = { nav.navigate("safety") },
                 onLanguage = { nav.navigate("language") },
                 onSignOut = { nav.navigate("onboarding") { popUpTo(0) { inclusive = true } } },
-                onEdit = { nav.navigate("editprofile") }
+                onEdit = { nav.navigate("editprofile") },
+                onTheme = { nav.navigate("theme") }
             )
         }
+        composable("theme") { ThemeScreen(onBack = back) }
         composable("language") { LanguageScreen(onBack = back) }
         composable("livehub") { LiveHubScreen(onBack = back, go = go) }
         composable("live/{room}") { bs ->
@@ -152,7 +161,7 @@ fun MainScreen(go: (String) -> Unit) {
     Scaffold(
         containerColor = Cloud,
         bottomBar = {
-            NavigationBar(containerColor = Color.White) {
+            NavigationBar(containerColor = Paper) {
                 tabs.forEachIndexed { i, tab ->
                     NavigationBarItem(
                         selected = selected == i,

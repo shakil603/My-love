@@ -142,7 +142,7 @@ fun LiveHubScreen(onBack: () -> Unit, go: (String) -> Unit) {
     val ctx = LocalContext.current
     var nick by remember { mutableStateOf(LivePrefs.nick(ctx)) }
     var code by remember { mutableStateOf("") }
-    Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
+    Column(Modifier.fillMaxSize().background(Paper)) {
         ScreenHeader("Live messaging", onBack, sub = "Real messages · E2E encrypted · worldwide")
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
             Text("YOUR NAME IN LIVE ROOMS", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3)
@@ -180,7 +180,7 @@ fun LiveHubScreen(onBack: () -> Unit, go: (String) -> Unit) {
             }
             Spacer(Modifier.height(14.dp))
             Column(
-                Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Color.White)
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Paper)
                     .border(1.dp, Color(0xFFEFEBF8), RoundedCornerShape(22.dp)).padding(16.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -321,11 +321,11 @@ fun LiveChatScreen(room: String, onBack: () -> Unit, go: (String) -> Unit = {}) 
     }
 
     Column(
-        Modifier.fillMaxSize().background(Color(0xFFFBFAFE)).statusBarsPadding().navigationBarsPadding()
+        Modifier.fillMaxSize().background(Paper).statusBarsPadding().navigationBarsPadding()
     ) {
         /* header */
         Row(
-            Modifier.fillMaxWidth().background(Color.White).padding(horizontal = 8.dp, vertical = 10.dp),
+            Modifier.fillMaxWidth().background(Paper).padding(horizontal = 8.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "Back", tint = Ink) }
@@ -418,7 +418,7 @@ fun LiveChatScreen(room: String, onBack: () -> Unit, go: (String) -> Unit = {}) 
         }
         /* input */
         Row(
-            Modifier.fillMaxWidth().background(Color.White).padding(horizontal = 12.dp, vertical = 8.dp),
+            Modifier.fillMaxWidth().background(Paper).padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(

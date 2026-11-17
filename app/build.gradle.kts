@@ -12,8 +12,8 @@ android {
         applicationId = "com.amora.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 11
-        versionName = "1.3.0"
+        versionCode = 12
+        versionName = "1.5.0"
     }
 
     buildTypes {
@@ -49,6 +49,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.navigation:navigation-compose:2.8.0")
     implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-gif:2.6.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
