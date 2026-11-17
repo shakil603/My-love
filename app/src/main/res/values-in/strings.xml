@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Beranda</string>
+    <string name="tab_discover">Jelajahi</string>
+    <string name="tab_chats">Obrolan</string>
+    <string name="tab_spaces">Ruang</string>
+    <string name="tab_profile">Profil</string>
+    <string name="onboard_create">Buat akun</string>
+    <string name="onboard_login">Masuk</string>
+    <string name="language">Bahasa</string>
+    <string name="spaces_title">Ruang</string>
+    <string name="create_group">Buat grup</string>
+    <string name="search_hint">Cari</string>
+    <string name="message_hint">Pesan…</string>
+    <string name="settings">Pengaturan</string>
+    <string name="notifications">Notifikasi</string>
+    <string name="events">Acara</string>
+    <string name="saved">Tersimpan</string>
+    <string name="edit_profile">Edit profil</string>
+    <string name="sign_out">Keluar</string>
+    <string name="liked_you">Menyukaimu</string>
+    <string name="nearby">Orang terdekat</string>
+</resources>

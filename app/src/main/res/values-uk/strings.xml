@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Головна</string>
+    <string name="tab_discover">Відкривати</string>
+    <string name="tab_chats">Чати</string>
+    <string name="tab_spaces">Простори</string>
+    <string name="tab_profile">Профіль</string>
+    <string name="onboard_create">Створити акаунт</string>
+    <string name="onboard_login">Увійти</string>
+    <string name="language">Мова</string>
+    <string name="spaces_title">Простори</string>
+    <string name="create_group">Створити групу</string>
+    <string name="search_hint">Пошук</string>
+    <string name="message_hint">Повідомлення…</string>
+    <string name="settings">Налаштування</string>
+    <string name="notifications">Сповіщення</string>
+    <string name="events">Події</string>
+    <string name="saved">Збережене</string>
+    <string name="edit_profile">Редагувати профіль</string>
+    <string name="sign_out">Вийти</string>
+    <string name="liked_you">Ви сподобались</string>
+    <string name="nearby">Люди поруч</string>
+</resources>

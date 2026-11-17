@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Nyumbani</string>
+    <string name="tab_discover">Gundua</string>
+    <string name="tab_chats">Soga</string>
+    <string name="tab_spaces">Nafasi</string>
+    <string name="tab_profile">Wasifu</string>
+    <string name="onboard_create">Fungua akaunti</string>
+    <string name="onboard_login">Ingia</string>
+    <string name="language">Lugha</string>
+    <string name="spaces_title">Nafasi</string>
+    <string name="create_group">Unda kikundi</string>
+    <string name="search_hint">Tafuta</string>
+    <string name="message_hint">Ujumbe…</string>
+    <string name="settings">Mipangilio</string>
+    <string name="notifications">Arifa</string>
+    <string name="events">Matukio</string>
+    <string name="saved">Zilizohifadhiwa</string>
+    <string name="edit_profile">Hariri wasifu</string>
+    <string name="sign_out">Ondoka</string>
+    <string name="liked_you">Wamekupenda</string>
+    <string name="nearby">Watu karibu</string>
+</resources>

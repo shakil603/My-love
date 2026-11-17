@@ -193,7 +193,7 @@ fun OnboardingScreen(onCreate: () -> Unit, onLogin: () -> Unit, onLanguage: () -
                     .padding(vertical = 15.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text("I already have an account", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text(androidx.compose.ui.res.stringResource(R.string.onboard_login), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
             }
             Spacer(Modifier.height(18.dp))
             Text(
@@ -361,7 +361,7 @@ fun DiscoverScreen(go: (String) -> Unit = {}) {
                 .padding(horizontal = 20.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Discover", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
+            Text(androidx.compose.ui.res.stringResource(R.string.tab_discover), fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
             Spacer(Modifier.weight(1f))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(
@@ -686,7 +686,7 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                     Modifier.padding(horizontal = 18.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    GradientButton("Edit profile", Modifier.weight(1f)) { go("editprofile") }
+                    GradientButton(androidx.compose.ui.res.stringResource(R.string.edit_profile), Modifier.weight(1f)) { go("editprofile") }
                     Box(
                         Modifier
                             .clip(RoundedCornerShape(17.dp))
@@ -726,9 +726,9 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     listOf(
-                        Triple(Icons.Filled.BookmarkBorder, "Saved", "saved"),
-                        Triple(Icons.Filled.Event, "Events", "events"),
-                        Triple(Icons.Filled.Favorite, "Liked you", "likedyou")
+                        Triple(Icons.Filled.BookmarkBorder, androidx.compose.ui.res.stringResource(R.string.saved), "saved"),
+                        Triple(Icons.Filled.Event, androidx.compose.ui.res.stringResource(R.string.events), "events"),
+                        Triple(Icons.Filled.Favorite, androidx.compose.ui.res.stringResource(R.string.liked_you), "likedyou")
                     ).forEach { (icon, label, route) ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,

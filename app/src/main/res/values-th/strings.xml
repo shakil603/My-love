@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">หน้าหลัก</string>
+    <string name="tab_discover">ค้นพบ</string>
+    <string name="tab_chats">แชท</string>
+    <string name="tab_spaces">สเปซ</string>
+    <string name="tab_profile">โปรไฟล์</string>
+    <string name="onboard_create">สร้างบัญชี</string>
+    <string name="onboard_login">เข้าสู่ระบบ</string>
+    <string name="language">ภาษา</string>
+    <string name="spaces_title">สเปซ</string>
+    <string name="create_group">สร้างกลุ่ม</string>
+    <string name="search_hint">ค้นหา</string>
+    <string name="message_hint">ข้อความ…</string>
+    <string name="settings">การตั้งค่า</string>
+    <string name="notifications">การแจ้งเตือน</string>
+    <string name="events">กิจกรรม</string>
+    <string name="saved">บันทึกแล้ว</string>
+    <string name="edit_profile">แก้ไขโปรไฟล์</string>
+    <string name="sign_out">ออกจากระบบ</string>
+    <string name="liked_you">ถูกใจคุณ</string>
+    <string name="nearby">คนใกล้เคียง</string>
+</resources>

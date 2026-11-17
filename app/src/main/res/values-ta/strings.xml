@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">முகப்பு</string>
+    <string name="tab_discover">கண்டறி</string>
+    <string name="tab_chats">அரட்டைகள்</string>
+    <string name="tab_spaces">இடங்கள்</string>
+    <string name="tab_profile">சுயவிவரம்</string>
+    <string name="onboard_create">கணக்கு உருவாக்கு</string>
+    <string name="onboard_login">உள்நுழை</string>
+    <string name="language">மொழி</string>
+    <string name="spaces_title">இடங்கள்</string>
+    <string name="create_group">குழு உருவாக்கு</string>
+    <string name="search_hint">தேடு</string>
+    <string name="message_hint">செய்தி…</string>
+    <string name="settings">அமைப்புகள்</string>
+    <string name="notifications">அறிவிப்புகள்</string>
+    <string name="events">நிகழ்வுகள்</string>
+    <string name="saved">சேமித்தவை</string>
+    <string name="edit_profile">சுயவிவரம் திருத்து</string>
+    <string name="sign_out">வெளியேறு</string>
+    <string name="liked_you">உங்களை விரும்பியவர்கள்</string>
+    <string name="nearby">அருகிலுள்ளவர்கள்</string>
+</resources>

@@ -216,7 +216,7 @@ fun EditProfileScreen(onBack: () -> Unit) {
     var work by remember { mutableStateOf(Store.get(ctx, "pwork", "Founder · Amora")) }
     var location by remember { mutableStateOf(Store.get(ctx, "ploc", "Mymensingh, Bangladesh")) }
     Column(Modifier.fillMaxSize().background(Color(0xFFFBFAFE))) {
-        ScreenHeader("Edit profile", onBack)
+        ScreenHeader(androidx.compose.ui.res.stringResource(R.string.edit_profile), onBack)
         Column(
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally

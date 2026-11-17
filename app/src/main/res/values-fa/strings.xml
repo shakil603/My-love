@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">خانه</string>
+    <string name="tab_discover">کشف</string>
+    <string name="tab_chats">گفتگوها</string>
+    <string name="tab_spaces">فضاها</string>
+    <string name="tab_profile">پروفایل</string>
+    <string name="onboard_create">ساخت حساب</string>
+    <string name="onboard_login">ورود</string>
+    <string name="language">زبان</string>
+    <string name="spaces_title">فضاها</string>
+    <string name="create_group">ساخت گروه</string>
+    <string name="search_hint">جستجو</string>
+    <string name="message_hint">پیام…</string>
+    <string name="settings">تنظیمات</string>
+    <string name="notifications">اعلان‌ها</string>
+    <string name="events">رویدادها</string>
+    <string name="saved">ذخیره‌شده</string>
+    <string name="edit_profile">ویرایش پروفایل</string>
+    <string name="sign_out">خروج</string>
+    <string name="liked_you">شما را پسندیدند</string>
+    <string name="nearby">افراد نزدیک</string>
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Ana sayfa</string>
+    <string name="tab_discover">Keşfet</string>
+    <string name="tab_chats">Sohbetler</string>
+    <string name="tab_spaces">Alanlar</string>
+    <string name="tab_profile">Profil</string>
+    <string name="onboard_create">Hesap oluştur</string>
+    <string name="onboard_login">Giriş yap</string>
+    <string name="language">Dil</string>
+    <string name="spaces_title">Alanlar</string>
+    <string name="create_group">Grup oluştur</string>
+    <string name="search_hint">Ara</string>
+    <string name="message_hint">Mesaj…</string>
+    <string name="settings">Ayarlar</string>
+    <string name="notifications">Bildirimler</string>
+    <string name="events">Etkinlikler</string>
+    <string name="saved">Kaydedilenler</string>
+    <string name="edit_profile">Profili düzenle</string>
+    <string name="sign_out">Çıkış yap</string>
+    <string name="liked_you">Seni beğenenler</string>
+    <string name="nearby">Yakındaki kişiler</string>
+</resources>
