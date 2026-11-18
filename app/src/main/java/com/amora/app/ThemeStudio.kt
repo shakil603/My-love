@@ -72,7 +72,15 @@ fun ThemeScreen(onBack: () -> Unit) {
                     uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
             } catch (_: Exception) {}
-            ThemeX.setWallpaper(ctx, uri.toString())
+            val mime = try { ctx.contentResolver.getType(uri) ?: "" } catch (_: Exception) { "" }
+            if (mime.startsWith("image/") || mime.isBlank()) {
+                ThemeX.setWallpaper(ctx, uri.toString())
+            } else {
+                Store.addFile(ctx, uri.lastPathSegment ?: "file", uri.toString(), mime, "")
+                android.widget.Toast.makeText(
+                    ctx, "Saved to My files — only a photo or GIF can be the wallpaper", android.widget.Toast.LENGTH_LONG
+                ).show()
+            }
         }
     }
 
@@ -260,7 +268,7 @@ fun ThemeScreen(onBack: () -> Unit) {
                                 .weight(1f)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(AuroraGradient)
-                                .clickable { picker.launch(arrayOf("image/*")) }
+                                .clickable { picker.launch(arrayOf("*/*")) }
                                 .padding(vertical = 12.dp),
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
@@ -268,7 +276,7 @@ fun ThemeScreen(onBack: () -> Unit) {
                             Icon(Icons.Filled.Image, null, tint = Color.White, modifier = Modifier.size(15.dp))
                             Spacer(Modifier.width(6.dp))
                             Text(
-                                if (ThemeX.wallpaper.value.isEmpty()) "Upload photo / GIF" else "Change",
+                                if (ThemeX.wallpaper.value.isEmpty()) "Upload any file" else "Change",
                                 color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold
                             )
                         }
@@ -288,7 +296,7 @@ fun ThemeScreen(onBack: () -> Unit) {
                         }
                     }
                     Spacer(Modifier.height(8.dp))
-                    Text("Shown behind all your chats. Animated GIFs play live.", fontSize = 10.sp, color = Txt3)
+                    Text("Any file accepted — photos and animated GIFs become your chat skin; other files go to My files.", fontSize = 10.sp, color = Txt3)
                 }
                 Spacer(Modifier.height(18.dp))
             }

@@ -1,5 +1,6 @@
 package com.amora.app
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -210,6 +212,20 @@ private fun InfoCell(icon: androidx.compose.ui.graphics.vector.ImageVector, text
 @Composable
 fun EditProfileScreen(onBack: () -> Unit) {
     val ctx = androidx.compose.ui.platform.LocalContext.current
+    var avatar by remember { mutableStateOf(Store.avatar(ctx)) }
+    val avatarPicker = rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            try {
+                ctx.contentResolver.takePersistableUriPermission(
+                    uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: Exception) {}
+            avatar = uri.toString()
+            Store.set(ctx, "pavatar", avatar)
+        }
+    }
     var name by remember { mutableStateOf(Store.get(ctx, "pname", "Shakil Rahman")) }
     var handle by remember { mutableStateOf(Store.get(ctx, "phandle", "@shakil")) }
     var bio by remember { mutableStateOf(Store.get(ctx, "pbio", "Builder of Amora · dreaming big from Mymensingh \uD83C\uDF0C")) }
@@ -222,14 +238,16 @@ fun EditProfileScreen(onBack: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.height(10.dp))
-            Box {
-                Avatar("https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300", 96, ringed = true)
+            Box(Modifier.clickable { avatarPicker.launch(arrayOf("image/*")) }) {
+                Avatar(avatar, 96, ringed = true)
                 Box(
                     Modifier.align(Alignment.BottomEnd).size(32.dp).clip(CircleShape)
-                        .background(AuroraGradient).border(2.dp, Color.White, CircleShape),
+                        .background(AuroraGradient).border(2.dp, Paper, CircleShape),
                     contentAlignment = Alignment.Center
                 ) { Icon(Icons.Filled.PhotoCamera, "Change photo", tint = Color.White, modifier = Modifier.size(15.dp)) }
             }
+            Spacer(Modifier.height(6.dp))
+            Text("Tap to upload a new photo", fontSize = 10.sp, color = Txt3, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(18.dp))
             EditField("Name", name) { name = it }
             EditField("Username", handle) { handle = it }
@@ -324,6 +342,141 @@ fun FollowersScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
                             }
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
+                }
+            }
+        }
+    }
+}
+
+/* ---------- Full profile setup for new accounts ---------- */
+@Composable
+fun ProfileSetupScreen(onDone: () -> Unit, onBack: () -> Unit) {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    var avatar by remember { mutableStateOf(Store.get(ctx, "pavatar", "")) }
+    var name by remember { mutableStateOf(Store.get(ctx, "pname", "")) }
+    var handle by remember { mutableStateOf(Store.get(ctx, "phandle", "")) }
+    var bio by remember { mutableStateOf(Store.get(ctx, "pbio", "")) }
+    var work by remember { mutableStateOf(Store.get(ctx, "pwork", "")) }
+    var location by remember { mutableStateOf(Store.get(ctx, "ploc", "")) }
+    var gender by remember { mutableStateOf(Store.get(ctx, "pgender", "")) }
+    var bday by remember { mutableStateOf(Store.get(ctx, "pbday", "")) }
+    var interests by remember { mutableStateOf(Store.get(ctx, "pinterests", "")) }
+    val picker = rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            try {
+                ctx.contentResolver.takePersistableUriPermission(
+                    uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: Exception) {}
+            avatar = uri.toString()
+        }
+    }
+    val allInterests = listOf(
+        "Travel", "Music", "Coding", "Photography", "Food", "Movies",
+        "Books", "Fitness", "Art", "Gaming", "Nature", "Business"
+    )
+    val selInterests = interests.split(",").filter { it.isNotBlank() }.toSet()
+    Column(Modifier.fillMaxSize().background(Paper).statusBarsPadding().navigationBarsPadding()) {
+        ScreenHeader("Create your profile", onBack, sub = "All your info · photo · interests")
+        Column(
+            Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.height(8.dp))
+            Box(Modifier.clickable { picker.launch(arrayOf("image/*")) }) {
+                if (avatar.isNotBlank()) {
+                    Avatar(avatar, 104, ringed = true)
+                } else {
+                    Box(
+                        Modifier.size(104.dp).clip(CircleShape).background(Cloud)
+                            .border(2.dp, Mist, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) { Icon(Icons.Filled.PhotoCamera, "Upload photo", tint = Txt3, modifier = Modifier.size(30.dp)) }
+                }
+                Box(
+                    Modifier.align(Alignment.BottomEnd).size(32.dp).clip(CircleShape)
+                        .background(AuroraGradient).border(2.dp, Paper, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) { Icon(Icons.Filled.PhotoCamera, null, tint = Color.White, modifier = Modifier.size(15.dp)) }
+            }
+            Spacer(Modifier.height(6.dp))
+            Text(
+                if (avatar.isBlank()) "Tap to upload your photo" else "Photo added ✓ · tap to change",
+                fontSize = 10.sp, color = if (avatar.isBlank()) Txt3 else Mint, fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.height(16.dp))
+            EditField("Name", name) { name = it }
+            EditField("Username", handle) { handle = it }
+            EditField("Bio", bio, minLines = 3) { bio = it }
+            EditField("Work", work) { work = it }
+            EditField("Location", location) { location = it }
+            EditField("Birthday (DD/MM/YYYY)", bday) { bday = it }
+            Column(Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
+                Text("GENDER", fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = Txt3)
+                Spacer(Modifier.height(6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf("Female", "Male", "Other").forEach { g ->
+                        val on = gender == g
+                        Box(
+                            Modifier.weight(1f).clip(RoundedCornerShape(12.dp))
+                                .background(if (on) Ink else Cloud)
+                                .clickable { gender = g }
+                                .padding(vertical = 11.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                g, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold,
+                                color = if (on) Paper else Ink
+                            )
+                        }
+                    }
+                }
+            }
+            Column(Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
+                Text("INTERESTS — PICK ANY", fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = Txt3)
+                Spacer(Modifier.height(6.dp))
+                allInterests.chunked(3).forEach { rowI ->
+                    Row(Modifier.fillMaxWidth().padding(bottom = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        rowI.forEach { tag ->
+                            val on = tag in selInterests
+                            Box(
+                                Modifier.weight(1f).clip(RoundedCornerShape(50))
+                                    .background(if (on) AuroraGradient else androidx.compose.ui.graphics.SolidColor(Cloud))
+                                    .clickable {
+                                        val next = if (on) selInterests - tag else selInterests + tag
+                                        interests = next.joinToString(",")
+                                    }
+                                    .padding(vertical = 9.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    tag, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold,
+                                    color = if (on) Color.White else Txt2
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(4.dp))
+        }
+        Box(Modifier.padding(18.dp)) {
+            GradientButton(
+                if (name.isBlank()) "Add your name to continue" else "Create my profile", Modifier.fillMaxWidth()
+            ) {
+                if (name.isNotBlank()) {
+                    if (avatar.isNotBlank()) Store.set(ctx, "pavatar", avatar)
+                    Store.set(ctx, "pname", name.trim())
+                    Store.set(ctx, "phandle", if (handle.isBlank()) "@" + name.trim().lowercase().replace(" ", "") else handle.trim())
+                    Store.set(ctx, "pbio", bio.trim())
+                    Store.set(ctx, "pwork", work.trim())
+                    Store.set(ctx, "ploc", location.trim())
+                    Store.set(ctx, "pgender", gender)
+                    Store.set(ctx, "pbday", bday.trim())
+                    Store.set(ctx, "pinterests", interests)
+                    onDone()
                 }
             }
         }

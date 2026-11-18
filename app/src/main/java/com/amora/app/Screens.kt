@@ -655,7 +655,7 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                             .background(Paper),
                         contentAlignment = Alignment.Center
                     ) {
-                        Avatar("https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300", 88)
+                        Avatar(Store.avatar(ctx), 88)
                     }
                 }
             }
@@ -672,6 +672,24 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                     Icon(Icons.Filled.Verified, null, tint = Sky, modifier = Modifier.size(17.dp))
                 }
                 Text("$phandle · $ploc", fontSize = 12.sp, color = Txt2, fontWeight = FontWeight.Medium)
+                val pints = remember { Store.get(ctx, "pinterests", "") }
+                if (pints.isNotBlank()) {
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        Modifier.padding(horizontal = 20.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        pints.split(",").filter { it.isNotBlank() }.take(4).forEach { tag ->
+                            Text(
+                                tag, fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = Orchid,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(50))
+                                    .background(AuroraSoft)
+                                    .padding(horizontal = 10.dp, vertical = 5.dp)
+                            )
+                        }
+                    }
+                }
                 Spacer(Modifier.height(14.dp))
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(28.dp),
