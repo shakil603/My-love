@@ -29,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Emergency
 import androidx.compose.material.icons.filled.Flag
@@ -67,6 +68,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -911,7 +913,7 @@ fun CommentsScreen(onBack: () -> Unit) {
                             comments.add(
                                 Triple(
                                     myName, input.trim(),
-                                    "now · ❤ 0" to "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200"
+                                    "now · ❤ 0" to Store.avatar(ctx)
                                 )
                             )
                             input = ""
@@ -936,7 +938,7 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
             Column(Modifier.padding(horizontal = 16.dp)) {
                 WhiteCard {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Avatar("https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200", 50)
+                        Avatar(Store.avatar(sctx), 50)
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
                             Text(sname, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
@@ -1363,27 +1365,39 @@ fun BoardScreen(onBack: () -> Unit) {
 @Composable
 fun UploadScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     val ctx = androidx.compose.ui.platform.LocalContext.current
-    val picked = remember { androidx.compose.runtime.mutableStateListOf<Pair<String, String>>() }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) {
-            var name = "file"
-            var size = 0L
-            try {
-                ctx.contentResolver.query(uri, null, null, null, null)?.use { c ->
-                    if (c.moveToFirst()) {
-                        val ni = c.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
-                        val si = c.getColumnIndex(android.provider.OpenableColumns.SIZE)
-                        if (ni >= 0) name = c.getString(ni) ?: "file"
-                        if (si >= 0) size = c.getLong(si)
-                    }
+    val files = remember { Store.loadFiles(ctx).toMutableStateList() }
+    fun fileMeta(uri: android.net.Uri): Array<String> {
+        var name = "file"; var size = 0L
+        try {
+            ctx.contentResolver.query(uri, null, null, null, null)?.use { c ->
+                if (c.moveToFirst()) {
+                    val ni = c.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                    val si = c.getColumnIndex(android.provider.OpenableColumns.SIZE)
+                    if (ni >= 0) name = c.getString(ni) ?: "file"
+                    if (si >= 0) size = c.getLong(si)
                 }
-            } catch (_: Exception) {}
-            val meta = when {
-                size >= 1048576L -> "%.1f MB · preview ready".format(size / 1048576.0)
-                size > 0L -> "${size / 1024} KB · preview ready"
-                else -> "preview ready"
             }
-            picked.add(name to meta)
+        } catch (_: Exception) {}
+        val mime = try { ctx.contentResolver.getType(uri) ?: "" } catch (_: Exception) { "" }
+        val sz = when {
+            size >= 1048576L -> "%.1f MB".format(size / 1048576.0)
+            size > 0L -> "${size / 1024} KB"
+            else -> ""
+        }
+        return arrayOf(name, uri.toString(), mime, sz)
+    }
+    val launcher = rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris ->
+        uris.forEach { uri ->
+            try {
+                ctx.contentResolver.takePersistableUriPermission(
+                    uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: Exception) {}
+            val f = fileMeta(uri)
+            Store.addFile(ctx, f[0], f[1], f[2], f[3])
+            files.add(f)
         }
     }
     Column(
@@ -1393,18 +1407,18 @@ fun UploadScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
-        ScreenHeader("Share anything", onBack, sub = "Pick real files from your device · any type")
+        ScreenHeader("My files", onBack, sub = "Upload anything — code, projects, images, archives · live preview")
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
             val cats = listOf(
-                listOf(Triple("Photos", "image/*", Rose), Triple("Videos", "video/*", Color(0xFFF59E0B)), Triple("Audio", "audio/*", Color(0xFF10B981)), Triple("PDF", "application/pdf", Indigo)),
-                listOf(Triple("Docs", "text/*", Sky), Triple("Archives", "application/zip", Color(0xFFEC4899)), Triple("APK", "application/vnd.android.package-archive", Violet), Triple("Any file", "*/*", Ink))
+                listOf(Triple("Photos", arrayOf("image/*"), Rose), Triple("Videos", arrayOf("video/*"), Color(0xFFF59E0B)), Triple("Audio", arrayOf("audio/*"), Color(0xFF10B981)), Triple("PDF", arrayOf("application/pdf"), Indigo)),
+                listOf(Triple("Code", arrayOf("text/*", "application/json", "application/xml", "application/octet-stream"), Sky), Triple("Archives", arrayOf("application/zip", "application/x-zip-compressed", "application/gzip"), Color(0xFFEC4899)), Triple("APK", arrayOf("application/vnd.android.package-archive"), Violet), Triple("Any file", arrayOf("*/*"), Ink))
             )
             cats.forEach { rowCats ->
                 Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    rowCats.forEach { (label, mime, c1) ->
+                    rowCats.forEach { (label, mimes, c1) ->
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.clip(RoundedCornerShape(16.dp)).clickable { launcher.launch(mime) }.padding(4.dp)
+                            modifier = Modifier.clip(RoundedCornerShape(16.dp)).clickable { launcher.launch(mimes) }.padding(4.dp)
                         ) {
                             Box(
                                 Modifier
@@ -1412,7 +1426,12 @@ fun UploadScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
                                     .clip(RoundedCornerShape(18.dp))
                                     .background(Brush.linearGradient(listOf(c1, Orchid))),
                                 contentAlignment = Alignment.Center
-                            ) { Icon(Icons.Filled.UploadFile, label, tint = Color.White, modifier = Modifier.size(20.dp)) }
+                            ) {
+                                Icon(
+                                    if (label == "Code") Icons.Filled.Code else Icons.Filled.UploadFile,
+                                    label, tint = Color.White, modifier = Modifier.size(20.dp)
+                                )
+                            }
                             Spacer(Modifier.height(6.dp))
                             Text(label, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Txt2)
                         }
@@ -1422,13 +1441,13 @@ fun UploadScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
             Spacer(Modifier.height(14.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    if (picked.isEmpty()) "No files picked yet" else "Ready to send · ${picked.size} file${if (picked.size > 1) "s" else ""}",
+                    if (files.isEmpty()) "No files yet" else "${files.size} file${if (files.size > 1) "s" else ""} · saved on device",
                     fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, modifier = Modifier.weight(1f)
                 )
-                if (picked.isNotEmpty()) Text("All previews ✓", fontSize = 10.sp, color = Txt3, fontWeight = FontWeight.Bold)
+                if (files.isNotEmpty()) Text("Previews live ✓", fontSize = 10.sp, color = Mint, fontWeight = FontWeight.Bold)
             }
             Spacer(Modifier.height(10.dp))
-            if (picked.isEmpty()) {
+            if (files.isEmpty()) {
                 Row(
                     Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Cloud).padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -1436,27 +1455,122 @@ fun UploadScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
                     Icon(Icons.Filled.InsertDriveFile, null, tint = Txt3, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(10.dp))
                     Text(
-                        "Tap a category above — the real Android file picker opens and your pick appears here.",
+                        "Tap a category — pick one or many files of ANY type. They stay here with previews until you remove them.",
                         fontSize = 11.sp, color = Txt2, fontWeight = FontWeight.Medium, lineHeight = 16.sp
                     )
                 }
             } else {
-                picked.forEach { (n, m) ->
-                    FileChip(n, m)
-                    Spacer(Modifier.height(6.dp))
+                files.forEachIndexed { idx, f ->
+                    FilePreviewCard(
+                        name = f[0], uri = f[1], mime = f[2], size = f[3],
+                        onRemove = {
+                            Store.removeFile(ctx, idx)
+                            files.removeAt(idx)
+                        },
+                        onReplace = { launcher.launch(arrayOf("*/*")) }
+                    )
+                    Spacer(Modifier.height(8.dp))
                 }
             }
             Spacer(Modifier.height(12.dp))
         }
         Box(Modifier.padding(18.dp)) {
             GradientButton(
-                if (picked.isEmpty()) "Pick a file to send" else "Send ${picked.size} to Amara",
+                if (files.isEmpty()) "Upload your first file" else "Send ${files.size} to chat",
                 Modifier.fillMaxWidth()
             ) {
-                if (picked.isNotEmpty()) {
-                    picked.forEach { (n, m) -> Store.appendChat(ctx, "1", "\uD83D\uDCCE $n · $m") }
+                if (files.isEmpty()) launcher.launch(arrayOf("*/*"))
+                else {
+                    files.forEach { f -> Store.appendChat(ctx, "1", "\uD83D\uDCCE ${f[0]}${if (f[3].isNotBlank()) " · " + f[3] else ""}") }
                     go("chat/1")
                 }
+            }
+        }
+    }
+}
+
+private val CodeExts = setOf(
+    "kt", "kts", "java", "py", "js", "ts", "jsx", "tsx", "c", "cpp", "h", "hpp", "cs", "go", "rs",
+    "rb", "php", "swift", "dart", "html", "css", "scss", "json", "xml", "yml", "yaml", "md", "txt",
+    "sh", "bat", "sql", "gradle", "toml", "ini", "csv", "log", "properties"
+)
+
+@Composable
+fun FilePreviewCard(name: String, uri: String, mime: String, size: String, onRemove: () -> Unit, onReplace: () -> Unit) {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val ext = name.substringAfterLast('.', "").lowercase()
+    val isImage = mime.startsWith("image/") || ext in setOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
+    val isCode = !isImage && (ext in CodeExts || mime.startsWith("text/"))
+    var expanded by remember { mutableStateOf(false) }
+    val codeHead = remember(uri, expanded) {
+        if (isCode) try {
+            ctx.contentResolver.openInputStream(android.net.Uri.parse(uri))?.use { ins ->
+                val buf = ByteArray(if (expanded) 4000 else 400)
+                val n = ins.read(buf)
+                if (n > 0) String(buf, 0, n) else ""
+            } ?: ""
+        } catch (_: Exception) { "(preview unavailable)" } else ""
+    }
+    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Cloud).padding(10.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier.size(width = 38.dp, height = 46.dp).clip(RoundedCornerShape(9.dp))
+                    .background(
+                        Brush.linearGradient(
+                            if (isCode) listOf(Sky, Indigo)
+                            else if (isImage) listOf(Rose, Orchid)
+                            else listOf(Color(0xFFF43F5E), Color(0xFFC2185B))
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    (if (ext.isNotBlank()) ext else "file").uppercase().take(4),
+                    color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.ExtraBold
+                )
+            }
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text(name, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, maxLines = 1)
+                Text(
+                    listOf(size, mime).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { "ready" },
+                    fontSize = 10.sp, color = Txt3, maxLines = 1
+                )
+            }
+            Icon(
+                Icons.Filled.Refresh, "Replace", tint = Txt3,
+                modifier = Modifier.size(18.dp).clickable(onClick = onReplace)
+            )
+            Spacer(Modifier.width(12.dp))
+            Icon(
+                Icons.Filled.Close, "Remove", tint = Rose,
+                modifier = Modifier.size(18.dp).clickable(onClick = onRemove)
+            )
+        }
+        if (isImage) {
+            Spacer(Modifier.height(8.dp))
+            AsyncImage(
+                model = uri, contentDescription = name, contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth().height(150.dp).clip(RoundedCornerShape(12.dp))
+            )
+        }
+        if (isCode && codeHead.isNotBlank()) {
+            Spacer(Modifier.height(8.dp))
+            Column(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color(0xFF14121F))
+                    .clickable { expanded = !expanded }.padding(10.dp)
+            ) {
+                Text(
+                    codeHead,
+                    color = Color(0xFFA7F3D0), fontSize = 10.sp, lineHeight = 14.sp,
+                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                    maxLines = if (expanded) 60 else 8
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    if (expanded) "Tap to collapse" else "Tap to expand preview",
+                    color = Color(0xFF8C85A6), fontSize = 9.sp, fontWeight = FontWeight.Bold
+                )
             }
         }
     }

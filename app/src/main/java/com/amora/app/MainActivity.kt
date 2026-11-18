@@ -66,7 +66,7 @@ fun AmoraApp() {
         composable("signup") { SignupScreen(onNext = { nav.navigate("otp") }, onBack = back) }
         composable("otp") {
             OtpScreen(
-                onNext = { nav.navigate("permissions") },
+                onNext = { nav.navigate("setup") },
                 onBack = back
             )
         }
@@ -132,6 +132,9 @@ fun AmoraApp() {
                 video = bs.arguments?.getString("mode") != "audio",
                 onBack = back
             )
+        }
+        composable("setup") {
+            ProfileSetupScreen(onDone = { nav.navigate("permissions") }, onBack = back)
         }
         composable("permissions") {
             PermissionsScreen(onDone = { nav.navigate("main") { popUpTo("onboarding") { inclusive = true } } })

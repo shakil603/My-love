@@ -22,6 +22,34 @@ object Store {
         }
     } catch (e: Exception) { emptyList() }
 
+    fun avatar(ctx: Context): String =
+        get(ctx, "pavatar", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300")
+
+    fun loadFiles(ctx: Context): List<Array<String>> = try {
+        val arr = JSONArray(p(ctx).getString("files", "[]") ?: "[]")
+        (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            arrayOf(o.optString("n"), o.optString("u"), o.optString("m"), o.optString("s"))
+        }
+    } catch (_: Exception) { emptyList() }
+
+    fun addFile(ctx: Context, name: String, uri: String, mime: String, size: String) {
+        try {
+            val arr = JSONArray(p(ctx).getString("files", "[]") ?: "[]")
+            arr.put(JSONObject().put("n", name).put("u", uri).put("m", mime).put("s", size))
+            p(ctx).edit().putString("files", arr.toString()).apply()
+        } catch (_: Exception) {}
+    }
+
+    fun removeFile(ctx: Context, index: Int) {
+        try {
+            val arr = JSONArray(p(ctx).getString("files", "[]") ?: "[]")
+            val out = JSONArray()
+            for (i in 0 until arr.length()) if (i != index) out.put(arr.getJSONObject(i))
+            p(ctx).edit().putString("files", out.toString()).apply()
+        } catch (_: Exception) {}
+    }
+
     fun appendChat(ctx: Context, chatId: String, text: String) {
         try {
             val key = "chat_" + chatId
