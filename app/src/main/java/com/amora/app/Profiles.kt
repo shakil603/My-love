@@ -548,6 +548,11 @@ fun ProfileSetupScreen(onDone: () -> Unit, onBack: () -> Unit) {
                 color = if (email.isNotBlank() && recovery.isNotBlank() && pin.length >= 4) Mint else Txt3,
                 modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
             )
+            Text("PRIVACY — PROFILE & MESSAGES", fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = Txt3, modifier = Modifier.fillMaxWidth())
+            Spacer(Modifier.height(6.dp))
+            PrivacyPicker("Profile visibility", "Who can see your profile", "priv_profile", Icons.Filled.Verified)
+            PrivacyPicker("Messages", "Who can message you", "priv_msg", Icons.Filled.Favorite)
+            Spacer(Modifier.height(4.dp))
             Column(Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
                 Text("GENDER", fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = Txt3)
                 Spacer(Modifier.height(6.dp))

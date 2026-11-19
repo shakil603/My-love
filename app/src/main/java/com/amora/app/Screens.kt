@@ -711,6 +711,22 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                     Icon(Icons.Filled.Verified, null, tint = Sky, modifier = Modifier.size(17.dp))
                 }
                 Text("$phandle · $ploc", fontSize = 12.sp, color = Txt2, fontWeight = FontWeight.Medium)
+                Spacer(Modifier.height(6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    val privP = Store.get(ctx, "priv_profile", "Public")
+                    val privM = Store.get(ctx, "priv_msg", "Public")
+                    listOf("Profile: $privP", "Messages: $privM").forEach { lbl ->
+                        Text(
+                            lbl, fontSize = 9.sp, fontWeight = FontWeight.ExtraBold,
+                            color = if (lbl.endsWith("Public")) Color(0xFF047857) else if (lbl.endsWith("Friends")) Indigo else Rose,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(Cloud)
+                                .clickable { go("settings") }
+                                .padding(horizontal = 10.dp, vertical = 5.dp)
+                        )
+                    }
+                }
                 val pints = remember { Store.get(ctx, "pinterests", "") }
                 if (pints.isNotBlank()) {
                     Spacer(Modifier.height(8.dp))

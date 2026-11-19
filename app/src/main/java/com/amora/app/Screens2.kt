@@ -113,6 +113,52 @@ fun WhiteCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
 }
 
 @Composable
+fun PrivacyPicker(title: String, sub: String, storeKey: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    val pctx = androidx.compose.ui.platform.LocalContext.current
+    var sel by remember { mutableStateOf(Store.get(pctx, storeKey, "Public")) }
+    Column(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(Cloud),
+                contentAlignment = Alignment.Center
+            ) { Icon(icon, null, tint = Orchid, modifier = Modifier.size(17.dp)) }
+            Spacer(Modifier.width(11.dp))
+            Column(Modifier.weight(1f)) {
+                Text(title, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                Text(
+                    when (sel) {
+                        "Private" -> "$sub · only you"
+                        "Friends" -> "$sub · friends only"
+                        else -> "$sub · everyone"
+                    },
+                    fontSize = 10.sp, color = Txt3
+                )
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            listOf("Public", "Friends", "Private").forEach { opt ->
+                val on = sel == opt
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(if (on) Ink else Cloud)
+                        .clickable { sel = opt; Store.set(pctx, storeKey, opt) }
+                        .padding(vertical = 9.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        opt, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold,
+                        color = if (on) Paper else Txt2
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun ToggleRow(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, sub: String, initial: Boolean) {
     val tctx = androidx.compose.ui.platform.LocalContext.current
     var on by remember { mutableStateOf(Store.get(tctx, "tgl_" + title, initial.toString()) == "true") }
@@ -951,6 +997,8 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                 Text("PRIVACY & SECURITY", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3, letterSpacing = 2.sp)
                 Spacer(Modifier.height(7.dp))
                 WhiteCard {
+                    PrivacyPicker("Profile visibility", "Who can see your profile", "priv_profile", Icons.Filled.Public)
+                    PrivacyPicker("Messages", "Who can message you", "priv_msg", Icons.Filled.Email)
                     ToggleRow(Icons.Filled.Lock, "End-to-end encryption", "Default for all chats & calls", true)
                     ToggleRow(Icons.Filled.Favorite, "Dating visibility", "Hidden from contacts & coworkers", true)
                     ToggleRow(Icons.Filled.Visibility, "Read receipts", "Off for non-contacts", false)
