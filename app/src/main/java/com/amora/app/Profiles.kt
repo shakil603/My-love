@@ -213,6 +213,23 @@ private fun InfoCell(icon: androidx.compose.ui.graphics.vector.ImageVector, text
 fun EditProfileScreen(onBack: () -> Unit) {
     val ctx = androidx.compose.ui.platform.LocalContext.current
     var avatar by remember { mutableStateOf(Store.avatar(ctx)) }
+    var banner by remember { mutableStateOf(Store.get(ctx, "pbanner", "")) }
+    var email by remember { mutableStateOf(Store.get(ctx, "pemail", "")) }
+    var recovery by remember { mutableStateOf(Store.get(ctx, "precovery", "")) }
+    var pin by remember { mutableStateOf(Store.get(ctx, "ppin", "")) }
+    val bannerPicker = rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            try {
+                ctx.contentResolver.takePersistableUriPermission(
+                    uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: Exception) {}
+            banner = uri.toString()
+            Store.set(ctx, "pbanner", banner)
+        }
+    }
     val avatarPicker = rememberLauncherForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
     ) { uri ->
@@ -238,6 +255,36 @@ fun EditProfileScreen(onBack: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.height(10.dp))
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(110.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(AuroraGradient)
+                    .clickable { bannerPicker.launch(arrayOf("image/*")) }
+            ) {
+                if (banner.isNotBlank()) {
+                    coil.compose.AsyncImage(
+                        model = banner, contentDescription = "Banner",
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                Row(
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(Color.Black.copy(alpha = 0.35f))
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Filled.PhotoCamera, "Change banner", tint = Color.White, modifier = Modifier.size(12.dp))
+                    Spacer(Modifier.width(5.dp))
+                    Text("Change banner", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
+                }
+            }
+            Spacer(Modifier.height(14.dp))
             Box(Modifier.clickable { avatarPicker.launch(arrayOf("image/*")) }) {
                 Avatar(avatar, 96, ringed = true)
                 Box(
@@ -254,6 +301,26 @@ fun EditProfileScreen(onBack: () -> Unit) {
             EditField("Bio", bio, minLines = 3) { bio = it }
             EditField("Work", work) { work = it }
             EditField("Location", location) { location = it }
+            Spacer(Modifier.height(6.dp))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Verified, null, tint = Mint, modifier = Modifier.size(14.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("SECURE YOUR PROFILE", fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = Txt3)
+            }
+            Spacer(Modifier.height(8.dp))
+            EditField("Email (account recovery)", email) { email = it }
+            EditField("Recovery phone", recovery) { v -> if (v.all { it.isDigit() || it == ' ' || it == '+' }) recovery = v }
+            EditField("Security PIN (4–6 digits)", pin) { v -> if (v.length <= 6 && v.all { it.isDigit() }) pin = v }
+            Text(
+                when {
+                    email.isNotBlank() && recovery.isNotBlank() && pin.length >= 4 -> "Profile fully secured ✓"
+                    email.isNotBlank() || recovery.isNotBlank() || pin.isNotBlank() -> "Almost there — fill all three to fully secure"
+                    else -> "Add these so you never lose your account"
+                },
+                fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                color = if (email.isNotBlank() && recovery.isNotBlank() && pin.length >= 4) Mint else Txt3,
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(Modifier.height(8.dp))
         }
         Box(Modifier.padding(18.dp)) {
@@ -263,6 +330,9 @@ fun EditProfileScreen(onBack: () -> Unit) {
                 Store.set(ctx, "pbio", bio.trim())
                 Store.set(ctx, "pwork", work.trim())
                 Store.set(ctx, "ploc", location.trim())
+                Store.set(ctx, "pemail", email.trim())
+                Store.set(ctx, "precovery", recovery.trim())
+                Store.set(ctx, "ppin", pin)
                 onBack()
             }
         }
@@ -361,6 +431,22 @@ fun ProfileSetupScreen(onDone: () -> Unit, onBack: () -> Unit) {
     var gender by remember { mutableStateOf(Store.get(ctx, "pgender", "")) }
     var bday by remember { mutableStateOf(Store.get(ctx, "pbday", "")) }
     var interests by remember { mutableStateOf(Store.get(ctx, "pinterests", "")) }
+    var banner by remember { mutableStateOf(Store.get(ctx, "pbanner", "")) }
+    var email by remember { mutableStateOf(Store.get(ctx, "pemail", "")) }
+    var recovery by remember { mutableStateOf(Store.get(ctx, "precovery", "")) }
+    var pin by remember { mutableStateOf(Store.get(ctx, "ppin", "")) }
+    val bannerPicker = rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            try {
+                ctx.contentResolver.takePersistableUriPermission(
+                    uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: Exception) {}
+            banner = uri.toString()
+        }
+    }
     val picker = rememberLauncherForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
     ) { uri ->
@@ -406,6 +492,37 @@ fun ProfileSetupScreen(onDone: () -> Unit, onBack: () -> Unit) {
                 if (avatar.isBlank()) "Tap to upload your photo" else "Photo added ✓ · tap to change",
                 fontSize = 10.sp, color = if (avatar.isBlank()) Txt3 else Mint, fontWeight = FontWeight.Bold
             )
+            Spacer(Modifier.height(12.dp))
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(90.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(AuroraGradient)
+                    .clickable { bannerPicker.launch(arrayOf("image/*")) }
+            ) {
+                if (banner.isNotBlank()) {
+                    coil.compose.AsyncImage(
+                        model = banner, contentDescription = "Banner",
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                Row(
+                    Modifier.align(Alignment.Center)
+                        .clip(RoundedCornerShape(50))
+                        .background(Color.Black.copy(alpha = 0.35f))
+                        .padding(horizontal = 12.dp, vertical = 7.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Filled.PhotoCamera, null, tint = Color.White, modifier = Modifier.size(13.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        if (banner.isBlank()) "Upload profile banner" else "Banner added ✓ · tap to change",
+                        color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold
+                    )
+                }
+            }
             Spacer(Modifier.height(16.dp))
             EditField("Name", name) { name = it }
             EditField("Username", handle) { handle = it }
@@ -413,6 +530,24 @@ fun ProfileSetupScreen(onDone: () -> Unit, onBack: () -> Unit) {
             EditField("Work", work) { work = it }
             EditField("Location", location) { location = it }
             EditField("Birthday (DD/MM/YYYY)", bday) { bday = it }
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Verified, null, tint = Mint, modifier = Modifier.size(14.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("SECURE YOUR PROFILE", fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = Txt3)
+            }
+            Spacer(Modifier.height(8.dp))
+            EditField("Email (account recovery)", email) { email = it }
+            EditField("Recovery phone", recovery) { v -> if (v.all { it.isDigit() || it == ' ' || it == '+' }) recovery = v }
+            EditField("Security PIN (4–6 digits)", pin) { v -> if (v.length <= 6 && v.all { it.isDigit() }) pin = v }
+            Text(
+                when {
+                    email.isNotBlank() && recovery.isNotBlank() && pin.length >= 4 -> "Profile fully secured ✓"
+                    else -> "Email + recovery phone + PIN keep your account safe"
+                },
+                fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                color = if (email.isNotBlank() && recovery.isNotBlank() && pin.length >= 4) Mint else Txt3,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+            )
             Column(Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
                 Text("GENDER", fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = Txt3)
                 Spacer(Modifier.height(6.dp))
@@ -476,6 +611,10 @@ fun ProfileSetupScreen(onDone: () -> Unit, onBack: () -> Unit) {
                     Store.set(ctx, "pgender", gender)
                     Store.set(ctx, "pbday", bday.trim())
                     Store.set(ctx, "pinterests", interests)
+                    if (banner.isNotBlank()) Store.set(ctx, "pbanner", banner)
+                    Store.set(ctx, "pemail", email.trim())
+                    Store.set(ctx, "precovery", recovery.trim())
+                    Store.set(ctx, "ppin", pin)
                     onDone()
                 }
             }
