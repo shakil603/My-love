@@ -1077,6 +1077,28 @@ fun SafetyScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
                             Text("Verified · badge active", fontSize = 10.sp, color = Color(0xFF047857), fontWeight = FontWeight.Bold)
                         }
                     }
+                    Row(Modifier.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        val semail = Store.get(fctx, "pemail", "")
+                        val srec = Store.get(fctx, "precovery", "")
+                        val spin = Store.get(fctx, "ppin", "")
+                        val secured = semail.isNotBlank() && srec.isNotBlank() && spin.length >= 4
+                        Box(
+                            Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(Cloud),
+                            contentAlignment = Alignment.Center
+                        ) { Icon(Icons.Filled.Lock, null, tint = if (secured) Mint else Amber, modifier = Modifier.size(17.dp)) }
+                        Spacer(Modifier.width(11.dp))
+                        Column(Modifier.weight(1f).clickable { go("editprofile") }) {
+                            Text("Account security", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                            Text(
+                                if (secured) "Secured ✓ · email + recovery phone + PIN set"
+                                else "Add email, recovery phone & PIN — tap to complete",
+                                fontSize = 10.sp,
+                                color = if (secured) Color(0xFF047857) else Color(0xFFB45309),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Text("›", color = Txt3, fontSize = 18.sp)
+                    }
                     ToggleRow(Icons.Filled.VisibilityOff, "Incognito mode", "Only people you like can see you", true)
                     Row(Modifier.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(

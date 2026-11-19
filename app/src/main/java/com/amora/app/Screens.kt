@@ -1,5 +1,6 @@
 package com.amora.app
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ChatBubbleOutline
@@ -636,13 +638,50 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
     val ploc = remember { Store.get(ctx, "ploc", "Mymensingh, Bangladesh") }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 20.dp)) {
         item {
+            var banner by remember { androidx.compose.runtime.mutableStateOf(Store.get(ctx, "pbanner", "")) }
+            val bannerPicker = rememberLauncherForActivityResult(
+                androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+            ) { uri ->
+                if (uri != null) {
+                    try {
+                        ctx.contentResolver.takePersistableUriPermission(
+                            uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        )
+                    } catch (_: Exception) {}
+                    banner = uri.toString()
+                    Store.set(ctx, "pbanner", banner)
+                }
+            }
             Box(Modifier.fillMaxWidth()) {
                 Box(
                     Modifier
                         .fillMaxWidth()
                         .height(150.dp)
                         .background(AuroraGradient)
-                )
+                        .clickable { bannerPicker.launch(arrayOf("image/*")) }
+                ) {
+                    if (banner.isNotBlank()) {
+                        AsyncImage(
+                            model = banner, contentDescription = "Banner",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+                Row(
+                    Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(10.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(Color.Black.copy(alpha = 0.35f))
+                        .clickable { bannerPicker.launch(arrayOf("image/*")) }
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Filled.PhotoCamera, "Change banner", tint = Color.White, modifier = Modifier.size(13.dp))
+                    Spacer(Modifier.width(5.dp))
+                    Text("Banner", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
+                }
                 Box(
                     Modifier
                         .align(Alignment.BottomCenter)
