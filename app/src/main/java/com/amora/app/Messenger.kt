@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PhotoCamera
@@ -82,6 +83,8 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun ChatsScreen(onOpenChat: (String) -> Unit, go: (String) -> Unit = {}) {
+    val mctx = androidx.compose.ui.platform.LocalContext.current
+    var msgPriv by remember { mutableStateOf(Store.get(mctx, "priv_msg", "Public")) }
     var query by remember { mutableStateOf("") }
     var filter by remember { mutableStateOf("All") }
     val filtered = Mock.chats.filter { c ->
@@ -105,6 +108,46 @@ fun ChatsScreen(onOpenChat: (String) -> Unit, go: (String) -> Unit = {}) {
                 Spacer(Modifier.weight(1f))
                 IconButton(onClick = { go("incoming/1") }) { Icon(Icons.Filled.Videocam, "New call", tint = Ink) }
                 IconButton(onClick = { go("creategroup") }) { Icon(Icons.Filled.Add, "New group", tint = Ink) }
+            }
+        }
+        item {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 8.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(
+                        when (msgPriv) {
+                            "Private" -> Color(0xFFFFF1F2)
+                            "Friends" -> Color(0xFFEEF2FF)
+                            else -> Color(0xFFECFDF5)
+                        }
+                    )
+                    .clickable {
+                        msgPriv = when (msgPriv) { "Public" -> "Friends"; "Friends" -> "Private"; else -> "Public" }
+                        Store.set(mctx, "priv_msg", msgPriv)
+                    }
+                    .padding(horizontal = 12.dp, vertical = 9.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Filled.Lock, null,
+                    tint = when (msgPriv) { "Private" -> Rose; "Friends" -> Indigo; else -> Mint },
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    when (msgPriv) {
+                        "Private" -> "Messages: Private — nobody new can message you"
+                        "Friends" -> "Messages: Friends — only friends can message you"
+                        else -> "Messages: Public — anyone can message you"
+                    },
+                    fontSize = 10.sp, fontWeight = FontWeight.ExtraBold,
+                    color = when (msgPriv) { "Private" -> Color(0xFFBE123C); "Friends" -> Indigo; else -> Color(0xFF047857) },
+                    modifier = Modifier.weight(1f)
+                )
+                Text("tap to change", fontSize = 9.sp, color = Txt3, fontWeight = FontWeight.Bold)
             }
         }
         item {
