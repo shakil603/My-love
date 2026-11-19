@@ -1553,6 +1553,21 @@ fun FilePreviewCard(name: String, uri: String, mime: String, size: String, onRem
                 model = uri, contentDescription = name, contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth().height(150.dp).clip(RoundedCornerShape(12.dp))
             )
+            Spacer(Modifier.height(8.dp))
+            Box(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(AuroraGradient)
+                    .clickable {
+                        ThemeX.setWallpaper(ctx, uri)
+                        ThemeX.themeFromImage(ctx, uri)
+                        android.widget.Toast.makeText(
+                            ctx, "App background + button colors updated", android.widget.Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    .padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Set as app background + theme", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
+            }
         }
         if (isCode && codeHead.isNotBlank()) {
             Spacer(Modifier.height(8.dp))

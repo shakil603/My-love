@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -161,8 +163,23 @@ fun MainScreen(go: (String) -> Unit) {
         Tab(androidx.compose.ui.res.stringResource(R.string.tab_spaces), Icons.Filled.Menu),
         Tab(androidx.compose.ui.res.stringResource(R.string.tab_profile), Icons.Filled.Person)
     )
+    val hasWp = ThemeX.wallpaper.value.isNotEmpty()
+    Box(Modifier.fillMaxSize().background(Cloud)) {
+        if (hasWp) {
+            coil.compose.AsyncImage(
+                model = ThemeX.wallpaper.value,
+                contentDescription = null,
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            Box(
+                Modifier.fillMaxSize().background(
+                    Cloud.copy(alpha = if (ThemeX.dark) 0.78f else 0.6f)
+                )
+            )
+        }
     Scaffold(
-        containerColor = Cloud,
+        containerColor = if (hasWp) Color.Transparent else Cloud,
         bottomBar = {
             NavigationBar(containerColor = Paper) {
                 tabs.forEachIndexed { i, tab ->
@@ -174,7 +191,7 @@ fun MainScreen(go: (String) -> Unit) {
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Orchid,
                             selectedTextColor = Orchid,
-                            indicatorColor = Color(0xFFF6E7FF),
+                            indicatorColor = Orchid.copy(alpha = 0.14f),
                             unselectedIconColor = Txt3,
                             unselectedTextColor = Txt3
                         )
@@ -192,5 +209,6 @@ fun MainScreen(go: (String) -> Unit) {
                 else -> ProfileScreen(go = go)
             }
         }
+    }
     }
 }
