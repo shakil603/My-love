@@ -75,6 +75,10 @@ fun ThemeScreen(onBack: () -> Unit) {
             val mime = try { ctx.contentResolver.getType(uri) ?: "" } catch (_: Exception) { "" }
             if (mime.startsWith("image/") || mime.isBlank()) {
                 ThemeX.setWallpaper(ctx, uri.toString())
+                ThemeX.themeFromImage(ctx, uri.toString())
+                android.widget.Toast.makeText(
+                    ctx, "Background + button colors updated from your upload", android.widget.Toast.LENGTH_LONG
+                ).show()
             } else {
                 Store.addFile(ctx, uri.lastPathSegment ?: "file", uri.toString(), mime, "")
                 android.widget.Toast.makeText(
@@ -250,7 +254,7 @@ fun ThemeScreen(onBack: () -> Unit) {
         /* ---- Wallpaper ---- */
         item {
             Column(Modifier.padding(horizontal = 16.dp)) {
-                Text("CHAT WALLPAPER — PHOTO OR GIF", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3, letterSpacing = 2.sp)
+                Text("APP BACKGROUND — PHOTO OR GIF", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3, letterSpacing = 2.sp)
                 Spacer(Modifier.height(8.dp))
                 Column(Modifier.clip(RoundedCornerShape(18.dp)).background(Paper).padding(14.dp)) {
                     if (ThemeX.wallpaper.value.isNotEmpty()) {
@@ -295,8 +299,30 @@ fun ThemeScreen(onBack: () -> Unit) {
                             }
                         }
                     }
+                    if (ThemeX.wallpaper.value.isNotEmpty()) {
+                        Spacer(Modifier.height(8.dp))
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .border(1.5.dp, Mist, RoundedCornerShape(12.dp))
+                                .clickable {
+                                    ThemeX.themeFromImage(ctx, ThemeX.wallpaper.value)
+                                    android.widget.Toast.makeText(
+                                        ctx, "Buttons re-colored from your wallpaper", android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                                .padding(vertical = 11.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Filled.Check, null, tint = Orchid, modifier = Modifier.size(14.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text("Match button colors to this wallpaper", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Orchid)
+                        }
+                    }
                     Spacer(Modifier.height(8.dp))
-                    Text("Any file accepted — photos and animated GIFs become your chat skin; other files go to My files.", fontSize = 10.sp, color = Txt3)
+                    Text("Uploads change the WHOLE app — background behind every tab, chat skin, and all button/gradient colors (auto-matched from your photo).", fontSize = 10.sp, color = Txt3)
                 }
                 Spacer(Modifier.height(18.dp))
             }

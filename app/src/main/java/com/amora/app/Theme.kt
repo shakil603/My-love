@@ -51,6 +51,33 @@ object ThemeX {
 
     fun setWallpaper(ctx: Context, uri: String) { wallpaper.value = uri; Store.set(ctx, "wallpaper", uri) }
 
+    /* Extract dominant colors from an uploaded image and re-theme buttons/gradients app-wide */
+    fun themeFromImage(ctx: Context, uri: String) {
+        Thread {
+            try {
+                val src = android.net.Uri.parse(uri)
+                val bmp = if (android.os.Build.VERSION.SDK_INT >= 28) {
+                    val d = android.graphics.ImageDecoder.createSource(ctx.contentResolver, src)
+                    android.graphics.ImageDecoder.decodeBitmap(d) { dec, _, _ ->
+                        dec.setTargetSize(220, 220)
+                        dec.allocator = android.graphics.ImageDecoder.ALLOCATOR_SOFTWARE
+                    }
+                } else {
+                    ctx.contentResolver.openInputStream(src)?.use {
+                        android.graphics.BitmapFactory.decodeStream(it)
+                    }
+                } ?: return@Thread
+                val p = androidx.palette.graphics.Palette.from(bmp).maximumColorCount(24).generate()
+                val c1 = p.getVibrantColor(p.getLightVibrantColor(DefRose.toArgb()))
+                val c2 = p.getLightVibrantColor(p.getMutedColor(DefOrchid.toArgb()))
+                val c3 = p.getDarkVibrantColor(p.getDarkMutedColor(DefViolet.toArgb()))
+                setColor(ctx, "rose", Color(c1))
+                setColor(ctx, "orchid", Color(c2))
+                setColor(ctx, "violet", Color(c3))
+            } catch (_: Exception) {}
+        }.start()
+    }
+
     fun reset(ctx: Context) {
         setColor(ctx, "rose", DefRose); setColor(ctx, "orchid", DefOrchid); setColor(ctx, "violet", DefViolet)
         setMode(ctx, "Auto"); setWallpaper(ctx, "")
