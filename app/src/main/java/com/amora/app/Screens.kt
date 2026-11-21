@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.PhotoCamera
@@ -351,6 +352,35 @@ fun PostCard(post: Post, go: (String) -> Unit = {}) {
                 }
                 Spacer(Modifier.weight(1f))
                 Icon(Icons.Filled.Send, "Share", tint = Txt2, modifier = Modifier.size(18.dp).clickable { go("upload") })
+                Spacer(Modifier.width(16.dp))
+                val dctx = androidx.compose.ui.platform.LocalContext.current
+                Icon(
+                    Icons.Filled.Download, "Download",
+                    tint = if (post.allowDl) Txt2 else Mist,
+                    modifier = Modifier.size(18.dp).clickable {
+                        if (post.allowDl) {
+                            try {
+                                if (post.image != null) {
+                                    val dm = dctx.getSystemService(android.app.DownloadManager::class.java)
+                                    val req = android.app.DownloadManager.Request(android.net.Uri.parse(post.image))
+                                        .setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                                        .setDestinationInExternalPublicDir(
+                                            android.os.Environment.DIRECTORY_DOWNLOADS,
+                                            "amora-${post.author.replace(" ", "-").lowercase()}.jpg"
+                                        )
+                                    dm.enqueue(req)
+                                    android.widget.Toast.makeText(dctx, "Downloading to Downloads folder…", android.widget.Toast.LENGTH_SHORT).show()
+                                } else {
+                                    val cb = dctx.getSystemService(android.content.ClipboardManager::class.java)
+                                    cb.setPrimaryClip(android.content.ClipData.newPlainText("Amora post", post.text))
+                                    android.widget.Toast.makeText(dctx, "Post saved to clipboard ✓", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (_: Exception) {}
+                        } else {
+                            android.widget.Toast.makeText(dctx, "${post.author} turned off downloads for this post", android.widget.Toast.LENGTH_LONG).show()
+                        }
+                    }
+                )
             }
         }
     }

@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Emergency
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lock
@@ -699,6 +700,25 @@ fun ReelsScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
                         )
                         Text("Share", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
                     }
+                    Spacer(Modifier.height(18.dp))
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            Icons.Filled.Download, "Download", tint = Color.White,
+                            modifier = Modifier.size(25.dp).clickable {
+                                try {
+                                    val dm = rctx.getSystemService(android.app.DownloadManager::class.java)
+                                    val req = android.app.DownloadManager.Request(
+                                        android.net.Uri.parse("https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=700")
+                                    )
+                                        .setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                                        .setDestinationInExternalPublicDir(android.os.Environment.DIRECTORY_DOWNLOADS, "amora-reel.jpg")
+                                    dm.enqueue(req)
+                                    android.widget.Toast.makeText(rctx, "Downloading reel…", android.widget.Toast.LENGTH_SHORT).show()
+                                } catch (_: Exception) {}
+                            }
+                        )
+                        Text("Save", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
+                    }
                 }
             }
             LinearProgressIndicator(
@@ -999,6 +1019,7 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                 WhiteCard {
                     PrivacyPicker("Profile visibility", "Who can see your profile", "priv_profile", Icons.Filled.Public)
                     PrivacyPicker("Messages", "Who can message you", "priv_msg", Icons.Filled.Email)
+                    PrivacyPicker("Downloads of your content", "Who can download your posts & photos", "dl_allow", Icons.Filled.Download)
                     ToggleRow(Icons.Filled.Lock, "End-to-end encryption", "Default for all chats & calls", true)
                     ToggleRow(Icons.Filled.Favorite, "Dating visibility", "Hidden from contacts & coworkers", true)
                     ToggleRow(Icons.Filled.Visibility, "Read receipts", "Off for non-contacts", false)

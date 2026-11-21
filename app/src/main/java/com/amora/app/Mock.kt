@@ -73,7 +73,8 @@ data class Post(
     val comments: String,
     val verified: Boolean = false,
     val fileName: String? = null,
-    val fileMeta: String? = null
+    val fileMeta: String? = null,
+    val allowDl: Boolean = true
 )
 
 data class Chat(
@@ -207,7 +208,7 @@ object Mock {
             "Tokyo · 31 min · Public",
             "Night walk in Shibuya. The city never sleeps and honestly, same \uD83C\uDF03",
             "$U/photo-1540959733332-eab4deabeeaf?w=800",
-            "8.1k", "432"
+            "8.1k", "432", allowDl = false
         )
     )
 
