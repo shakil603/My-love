@@ -18,6 +18,9 @@ val DefRose = Color(0xFFFF4D6D)
 val DefOrchid = Color(0xFFC13BFF)
 val DefViolet = Color(0xFF7B2CFF)
 
+/* ---------- Screenshot / screen-record protection (FLAG_SECURE) ---------- */
+object SecureX { val on = mutableStateOf(false) }
+
 /* ---------- Live theme engine: dark mode + user-editable colors + wallpaper ---------- */
 object ThemeX {
     val mode = mutableStateOf("Auto")            // Auto | Light | Dark

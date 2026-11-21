@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ThemeX.load(this)
+        SecureX.on.value = Store.get(this, "secure_screen", "false") == "true"
         coil.Coil.setImageLoader(
             coil.ImageLoader.Builder(this).components {
                 if (android.os.Build.VERSION.SDK_INT >= 28) add(coil.decode.ImageDecoderDecoder.Factory())
@@ -45,6 +46,13 @@ class MainActivity : AppCompatActivity() {
         )
         enableEdgeToEdge()
         setContent {
+            androidx.compose.runtime.LaunchedEffect(SecureX.on.value) {
+                if (SecureX.on.value) {
+                    window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+                } else {
+                    window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+                }
+            }
             AmoraTheme {
                 AmoraApp()
             }
@@ -155,7 +163,7 @@ private data class Tab(val label: String, val icon: androidx.compose.ui.graphics
 
 @Composable
 fun MainScreen(go: (String) -> Unit) {
-    var selected by remember { mutableIntStateOf(0) }
+    var selected by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf(0) }
     val tabs = listOf(
         Tab(androidx.compose.ui.res.stringResource(R.string.tab_home), Icons.Filled.Home),
         Tab(androidx.compose.ui.res.stringResource(R.string.tab_discover), Icons.Filled.Favorite),

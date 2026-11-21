@@ -114,6 +114,43 @@ fun WhiteCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
 }
 
 @Composable
+fun SecureScreenToggle() {
+    val sctx0 = androidx.compose.ui.platform.LocalContext.current
+    Row(
+        Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(if (SecureX.on.value) Ink else Cloud),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Filled.Shield, null,
+                tint = if (SecureX.on.value) Mint else Orchid, modifier = Modifier.size(17.dp)
+            )
+        }
+        Spacer(Modifier.width(11.dp))
+        Column(Modifier.weight(1f)) {
+            Text("Block screenshots & screen recording", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+            Text(
+                if (SecureX.on.value) "ON — chats, calls & the whole app show black in captures"
+                else "OFF — screen can be captured",
+                fontSize = 10.sp,
+                color = if (SecureX.on.value) Color(0xFF047857) else Txt3,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        Switch(
+            checked = SecureX.on.value,
+            onCheckedChange = {
+                SecureX.on.value = it
+                Store.set(sctx0, "secure_screen", it.toString())
+            }
+        )
+    }
+}
+
+@Composable
 fun PrivacyPicker(title: String, sub: String, storeKey: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
     val pctx = androidx.compose.ui.platform.LocalContext.current
     var sel by remember { mutableStateOf(Store.get(pctx, storeKey, "Public")) }
@@ -644,11 +681,18 @@ fun ReelsScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
                         Spacer(Modifier.width(9.dp))
                         Text("yuki.tanaka", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
                         Spacer(Modifier.width(9.dp))
+                        var rfollow by remember { mutableStateOf("5" in Store.following(rctx)) }
                         Text(
-                            "Follow", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold,
+                            if (rfollow) "Following ✓" else "Follow",
+                            color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
                                 .border(1.5.dp, Color.White.copy(alpha = 0.7f), RoundedCornerShape(50))
+                                .clickable {
+                                    rfollow = !rfollow
+                                    val cur = Store.following(rctx)
+                                    Store.setFollowing(rctx, if (rfollow) cur + "5" else cur - "5")
+                                }
                                 .padding(horizontal = 12.dp, vertical = 5.dp)
                         )
                     }
@@ -868,12 +912,20 @@ fun SearchScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
                         Text("Daniel Okafor", fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
                         Text("Product Lead · runs design community", fontSize = 10.sp, color = Txt3)
                     }
+                    val s8ctx = androidx.compose.ui.platform.LocalContext.current
+                    var f8 by remember { mutableStateOf("8" in Store.following(s8ctx)) }
                     Text(
-                        "Follow", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Color.White,
+                        if (f8) "Following ✓" else "Follow",
+                        fontSize = 10.sp, fontWeight = FontWeight.ExtraBold,
+                        color = if (f8) Txt2 else Color.White,
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
-                            .background(AuroraGradient)
-                            .clickable { go("user/8") }
+                            .then(if (f8) Modifier.background(Cloud) else Modifier.background(AuroraGradient))
+                            .clickable {
+                                f8 = !f8
+                                val cur = Store.following(s8ctx)
+                                Store.setFollowing(s8ctx, if (f8) cur + "8" else cur - "8")
+                            }
                             .padding(horizontal = 14.dp, vertical = 9.dp)
                     )
                 }
@@ -1020,6 +1072,7 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                     PrivacyPicker("Profile visibility", "Who can see your profile", "priv_profile", Icons.Filled.Public)
                     PrivacyPicker("Messages", "Who can message you", "priv_msg", Icons.Filled.Email)
                     PrivacyPicker("Downloads of your content", "Who can download your posts & photos", "dl_allow", Icons.Filled.Download)
+                    SecureScreenToggle()
                     ToggleRow(Icons.Filled.Lock, "End-to-end encryption", "Default for all chats & calls", true)
                     ToggleRow(Icons.Filled.Favorite, "Dating visibility", "Hidden from contacts & coworkers", true)
                     ToggleRow(Icons.Filled.Visibility, "Read receipts", "Off for non-contacts", false)
@@ -1168,6 +1221,7 @@ fun SafetyScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
                         }
                         Text("›", color = Txt3, fontSize = 18.sp)
                     }
+                    SecureScreenToggle()
                     ToggleRow(Icons.Filled.VisibilityOff, "Incognito mode", "Only people you like can see you", true)
                     Row(Modifier.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(

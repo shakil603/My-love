@@ -140,6 +140,25 @@ fun UserProfileScreen(userId: String, onBack: () -> Unit, go: (String) -> Unit =
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val upctx = androidx.compose.ui.platform.LocalContext.current
+                    var ufollow by remember { mutableStateOf(u.id in Store.following(upctx)) }
+                    val followsYou = u.id in setOf("2", "5", "8")
+                    Text(
+                        if (ufollow) "Following ✓" else if (followsYou) "Follow back" else "Follow",
+                        fontSize = 12.sp, fontWeight = FontWeight.ExtraBold,
+                        color = if (ufollow) Txt2 else Color.White,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(17.dp))
+                            .then(if (ufollow) Modifier.background(Cloud) else Modifier.background(AuroraGradient))
+                            .clickable {
+                                ufollow = !ufollow
+                                val cur = Store.following(upctx)
+                                Store.setFollowing(upctx, if (ufollow) cur + u.id else cur - u.id)
+                            }
+                            .padding(vertical = 15.dp)
+                    )
                     GradientButton("Message", Modifier.weight(1f)) { go("chat/${u.id}") }
                     ProfileIconAction(Icons.Filled.Call, "Audio call") { go("audiocall/${u.id}") }
                     ProfileIconAction(Icons.Filled.Videocam, "Video call") { go("video/${u.id}") }
@@ -361,7 +380,8 @@ private fun EditField(label: String, value: String, minLines: Int = 1, onChange:
 @Composable
 fun FollowersScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     var tab by remember { mutableStateOf(0) }
-    val following = remember { mutableStateOf(setOf("3", "5")) }
+    val fctx = androidx.compose.ui.platform.LocalContext.current
+    val following = remember { mutableStateOf(Store.following(fctx)) }
     Column(Modifier.fillMaxSize().background(Paper)) {
         ScreenHeader("Connections", onBack)
         Row(Modifier.padding(horizontal = 18.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -409,6 +429,7 @@ fun FollowersScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
                             .background(if (isF) Cloud else Ink)
                             .clickable {
                                 following.value = if (isF) following.value - u.id else following.value + u.id
+                                Store.setFollowing(fctx, following.value)
                             }
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     )

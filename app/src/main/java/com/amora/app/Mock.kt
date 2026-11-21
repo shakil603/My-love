@@ -22,6 +22,11 @@ object Store {
         }
     } catch (e: Exception) { emptyList() }
 
+    fun following(ctx: Context): Set<String> =
+        get(ctx, "following", "3,5").split(",").filter { it.isNotBlank() }.toSet()
+
+    fun setFollowing(ctx: Context, ids: Set<String>) = set(ctx, "following", ids.joinToString(","))
+
     fun avatar(ctx: Context): String =
         get(ctx, "pavatar", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300")
 
