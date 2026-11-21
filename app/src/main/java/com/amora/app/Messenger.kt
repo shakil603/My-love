@@ -36,6 +36,9 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.LocationOn
@@ -273,6 +276,7 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
     var typing by remember { mutableStateOf(false) }
     var replyTo by remember { mutableStateOf<Message?>(null) }
     var pickerFor by remember { mutableIntStateOf(-1) }
+    var editing by remember { mutableIntStateOf(-1) }
     var showAttach by remember { mutableStateOf(false) }
     var vanish by remember { mutableStateOf(false) }
     var sendCount by remember { mutableIntStateOf(0) }
@@ -414,42 +418,95 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
                 itemsIndexed(listOf(0)) { _, _ -> TypingBubble() }
             }
         }
-        /* reaction picker */
+        /* reaction + actions picker */
         if (pickerFor >= 0) {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .background(Paper)
-                    .padding(horizontal = 14.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                listOf("❤️", "\uD83D\uDE02", "\uD83D\uDC4D", "\uD83D\uDE2E", "\uD83D\uDE22", "\uD83D\uDD25").forEach { e ->
-                    Text(
-                        e, fontSize = 22.sp,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .clickable {
-                                msgs[pickerFor] = msgs[pickerFor].copy(reaction = e)
-                                pickerFor = -1
-                            }
-                            .padding(6.dp)
-                    )
+            val pm = msgs[pickerFor]
+            Column(Modifier.fillMaxWidth().background(Paper)) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 14.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    listOf("❤️", "\uD83D\uDE02", "\uD83D\uDC4D", "\uD83D\uDE2E", "\uD83D\uDE22", "\uD83D\uDD25").forEach { e ->
+                        Text(
+                            e, fontSize = 22.sp,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .clickable {
+                                    msgs[pickerFor] = msgs[pickerFor].copy(reaction = e)
+                                    pickerFor = -1
+                                }
+                                .padding(6.dp)
+                        )
+                    }
                 }
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(AuroraSoft)
-                        .clickable {
-                            replyTo = msgs[pickerFor]
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 14.dp)
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    @Composable
+                    fun ActionChip(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(AuroraSoft)
+                                .clickable(onClick = onClick)
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                        ) {
+                            Icon(icon, null, tint = Orchid, modifier = Modifier.size(14.dp))
+                            Spacer(Modifier.width(4.dp))
+                            Text(label, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Orchid)
+                        }
+                    }
+                    ActionChip(Icons.Filled.Reply, "Reply") {
+                        replyTo = pm
+                        pickerFor = -1
+                    }
+                    if (pm.text != null) {
+                        ActionChip(Icons.Filled.ContentCopy, "Copy") {
+                            try {
+                                val cb = ctx.getSystemService(android.content.ClipboardManager::class.java)
+                                cb.setPrimaryClip(android.content.ClipData.newPlainText("Amora message", pm.text))
+                                android.widget.Toast.makeText(ctx, "Message copied", android.widget.Toast.LENGTH_SHORT).show()
+                            } catch (_: Exception) {}
                             pickerFor = -1
                         }
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                ) {
-                    Icon(Icons.Filled.Reply, null, tint = Orchid, modifier = Modifier.size(14.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text("Reply", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = Orchid)
+                    }
+                    if (pm.mine && pm.text != null) {
+                        ActionChip(Icons.Filled.Edit, "Edit") {
+                            editing = pickerFor
+                            input = pm.text
+                            pickerFor = -1
+                        }
+                    }
+                    if (pm.image != null || pm.fileName != null) {
+                        ActionChip(Icons.Filled.Download, "Download") {
+                            val allowed = pm.mine || Store.get(ctx, "dl_allow_${chat.id}", "Public") != "Private"
+                            if (allowed) {
+                                try {
+                                    if (pm.image != null) {
+                                        val dm = ctx.getSystemService(android.app.DownloadManager::class.java)
+                                        val req = android.app.DownloadManager.Request(android.net.Uri.parse(pm.image))
+                                            .setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                                            .setDestinationInExternalPublicDir(android.os.Environment.DIRECTORY_DOWNLOADS, "amora-photo.jpg")
+                                        dm.enqueue(req)
+                                        android.widget.Toast.makeText(ctx, "Downloading to Downloads folder…", android.widget.Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        android.widget.Toast.makeText(ctx, "${pm.fileName} saved to Downloads ✓", android.widget.Toast.LENGTH_SHORT).show()
+                                    }
+                                } catch (_: Exception) {}
+                            } else {
+                                android.widget.Toast.makeText(ctx, "Owner turned off downloads for this content", android.widget.Toast.LENGTH_LONG).show()
+                            }
+                            pickerFor = -1
+                        }
+                    }
                 }
             }
         }
@@ -521,6 +578,23 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
                 Text(e, fontSize = 18.sp, modifier = Modifier.clickable { input += e })
             }
         }
+        if (editing >= 0) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .background(AuroraSoft)
+                    .padding(horizontal = 16.dp, vertical = 7.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.Filled.Edit, null, tint = Orchid, modifier = Modifier.size(13.dp))
+                Spacer(Modifier.width(7.dp))
+                Text("Editing message", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Orchid, modifier = Modifier.weight(1f))
+                Icon(
+                    Icons.Filled.Close, "Cancel edit", tint = Txt3,
+                    modifier = Modifier.size(15.dp).clickable { editing = -1; input = "" }
+                )
+            }
+        }
         /* input row */
         Row(
             Modifier
@@ -566,7 +640,11 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
                     .clip(CircleShape)
                     .background(AuroraGradient)
                     .clickable {
-                        if (input.isBlank()) {
+                        if (editing >= 0 && input.isNotBlank()) {
+                            msgs[editing] = msgs[editing].copy(text = input.trim(), time = "edited")
+                            editing = -1
+                            input = ""
+                        } else if (input.isBlank()) {
                             send(Message(true, voice = true, voiceLen = "0:05", time = "now"))
                         } else {
                             send(
