@@ -29,12 +29,18 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.Work
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -78,7 +84,60 @@ fun UserProfileScreen(userId: String, onBack: () -> Unit, go: (String) -> Unit =
                 ) {
                     IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "Back", tint = Color.White) }
                     Spacer(Modifier.weight(1f))
-                    IconButton(onClick = {}) { Icon(Icons.Filled.MoreVert, "More", tint = Color.White) }
+                    Box {
+                        var menuOpen by remember { mutableStateOf(false) }
+                        val mctx = androidx.compose.ui.platform.LocalContext.current
+                        IconButton(onClick = { menuOpen = true }) { Icon(Icons.Filled.MoreVert, "More", tint = Color.White) }
+                        DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                            DropdownMenuItem(
+                                text = { Text("Share profile", fontWeight = FontWeight.Bold, fontSize = 13.sp) },
+                                leadingIcon = { Icon(Icons.Filled.Share, null, tint = Orchid, modifier = Modifier.size(18.dp)) },
+                                onClick = {
+                                    menuOpen = false
+                                    try {
+                                        val share = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                            type = "text/plain"
+                                            putExtra(
+                                                android.content.Intent.EXTRA_TEXT,
+                                                "Check out ${u.name} (${u.handle}) on Amora \uD83D\uDC9C amora://profile/${u.id} · Get the app: https://github.com/shakil603/My-love/releases/latest"
+                                            )
+                                        }
+                                        mctx.startActivity(android.content.Intent.createChooser(share, "Share profile"))
+                                    } catch (_: Exception) {}
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Copy profile link", fontWeight = FontWeight.Bold, fontSize = 13.sp) },
+                                leadingIcon = { Icon(Icons.Filled.ContentCopy, null, tint = Orchid, modifier = Modifier.size(18.dp)) },
+                                onClick = {
+                                    menuOpen = false
+                                    try {
+                                        val cb = mctx.getSystemService(android.content.ClipboardManager::class.java)
+                                        cb.setPrimaryClip(
+                                            android.content.ClipData.newPlainText("Amora profile", "amora://profile/${u.id}")
+                                        )
+                                        android.widget.Toast.makeText(mctx, "Profile link copied", android.widget.Toast.LENGTH_SHORT).show()
+                                    } catch (_: Exception) {}
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Report", fontWeight = FontWeight.Bold, fontSize = 13.sp) },
+                                leadingIcon = { Icon(Icons.Filled.Flag, null, tint = Rose, modifier = Modifier.size(18.dp)) },
+                                onClick = {
+                                    menuOpen = false
+                                    android.widget.Toast.makeText(mctx, "Report sent — reviewed within 24 h", android.widget.Toast.LENGTH_LONG).show()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Block", fontWeight = FontWeight.Bold, fontSize = 13.sp) },
+                                leadingIcon = { Icon(Icons.Filled.Block, null, tint = Rose, modifier = Modifier.size(18.dp)) },
+                                onClick = {
+                                    menuOpen = false
+                                    android.widget.Toast.makeText(mctx, "${u.name} blocked — they can no longer see or message you", android.widget.Toast.LENGTH_LONG).show()
+                                }
+                            )
+                        }
+                    }
                 }
             }
             Column(

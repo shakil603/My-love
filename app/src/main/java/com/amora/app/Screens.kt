@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Close
@@ -699,18 +700,63 @@ fun ProfileScreen(go: (String) -> Unit = {}) {
                     }
                 }
                 Row(
-                    Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(10.dp)
-                        .clip(RoundedCornerShape(50))
-                        .background(Color.Black.copy(alpha = 0.35f))
-                        .clickable { bannerPicker.launch(arrayOf("image/*")) }
-                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                    Modifier.align(Alignment.TopEnd).padding(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Filled.PhotoCamera, "Change banner", tint = Color.White, modifier = Modifier.size(13.dp))
-                    Spacer(Modifier.width(5.dp))
-                    Text("Banner", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
+                    Row(
+                        Modifier
+                            .clip(RoundedCornerShape(50))
+                            .background(Color.Black.copy(alpha = 0.35f))
+                            .clickable { bannerPicker.launch(arrayOf("image/*")) }
+                            .padding(horizontal = 10.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Filled.PhotoCamera, "Change banner", tint = Color.White, modifier = Modifier.size(13.dp))
+                        Spacer(Modifier.width(5.dp))
+                        Text("Banner", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
+                    }
+                    Box {
+                        var pmenu by remember { androidx.compose.runtime.mutableStateOf(false) }
+                        Box(
+                            Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(Color.Black.copy(alpha = 0.35f))
+                                .clickable { pmenu = true }
+                                .padding(horizontal = 8.dp, vertical = 6.dp)
+                        ) {
+                            Icon(Icons.Filled.MoreVert, "More", tint = Color.White, modifier = Modifier.size(15.dp))
+                        }
+                        androidx.compose.material3.DropdownMenu(expanded = pmenu, onDismissRequest = { pmenu = false }) {
+                            androidx.compose.material3.DropdownMenuItem(
+                                text = { Text("Share my profile", fontWeight = FontWeight.Bold, fontSize = 13.sp) },
+                                onClick = {
+                                    pmenu = false
+                                    try {
+                                        val share = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                            type = "text/plain"
+                                            putExtra(
+                                                android.content.Intent.EXTRA_TEXT,
+                                                "I'm on Amora as $pname ($phandle) \uD83D\uDC9C amora://profile/me · Get the app: https://github.com/shakil603/My-love/releases/latest"
+                                            )
+                                        }
+                                        ctx.startActivity(android.content.Intent.createChooser(share, "Share profile"))
+                                    } catch (_: Exception) {}
+                                }
+                            )
+                            androidx.compose.material3.DropdownMenuItem(
+                                text = { Text("Copy my profile link", fontWeight = FontWeight.Bold, fontSize = 13.sp) },
+                                onClick = {
+                                    pmenu = false
+                                    try {
+                                        val cb = ctx.getSystemService(android.content.ClipboardManager::class.java)
+                                        cb.setPrimaryClip(android.content.ClipData.newPlainText("Amora profile", "amora://profile/$phandle"))
+                                        android.widget.Toast.makeText(ctx, "Profile link copied", android.widget.Toast.LENGTH_SHORT).show()
+                                    } catch (_: Exception) {}
+                                }
+                            )
+                        }
+                    }
                 }
                 Box(
                     Modifier
