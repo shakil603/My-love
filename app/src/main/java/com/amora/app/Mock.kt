@@ -22,6 +22,11 @@ object Store {
         }
     } catch (e: Exception) { emptyList() }
 
+    fun blocked(ctx: Context): Set<String> =
+        get(ctx, "blocked", "").split(",").filter { it.isNotBlank() }.toSet()
+
+    fun setBlocked(ctx: Context, ids: Set<String>) = set(ctx, "blocked", ids.joinToString(","))
+
     fun following(ctx: Context): Set<String> =
         get(ctx, "following", "3,5").split(",").filter { it.isNotBlank() }.toSet()
 

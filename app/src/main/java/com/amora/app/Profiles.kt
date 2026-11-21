@@ -67,6 +67,13 @@ import coil.compose.AsyncImage
 @Composable
 fun UserProfileScreen(userId: String, onBack: () -> Unit, go: (String) -> Unit = {}) {
     val u = Mock.user(userId)
+    val uctx = androidx.compose.ui.platform.LocalContext.current
+    var ublocked by remember { mutableStateOf(u.id in Store.blocked(uctx)) }
+    var usec by remember { mutableStateOf(Store.get(uctx, "sec_user_${u.id}", "false") == "true") }
+    androidx.compose.runtime.DisposableEffect(usec) {
+        SecureX.local.value = usec
+        onDispose { SecureX.local.value = false }
+    }
     LazyColumn(Modifier.fillMaxSize().background(Paper), contentPadding = PaddingValues(bottom = 24.dp)) {
         item {
             Box(Modifier.fillMaxWidth()) {
@@ -129,12 +136,49 @@ fun UserProfileScreen(userId: String, onBack: () -> Unit, go: (String) -> Unit =
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Block", fontWeight = FontWeight.Bold, fontSize = 13.sp) },
+                                text = {
+                                    Text(
+                                        if (usec) "Screen protection: ON ✓" else "Screen protection: OFF",
+                                        fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                                        color = if (usec) Mint else Ink
+                                    )
+                                },
+                                leadingIcon = { Icon(Icons.Filled.Verified, null, tint = if (usec) Mint else Txt3, modifier = Modifier.size(18.dp)) },
+                                onClick = {
+                                    usec = !usec
+                                    Store.set(mctx, "sec_user_${u.id}", usec.toString())
+                                    android.widget.Toast.makeText(
+                                        mctx,
+                                        if (usec) "Screenshots blocked while viewing this profile" else "Screen protection off for this profile",
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        if (ublocked) "Unblock" else "Block",
+                                        fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                                        color = if (ublocked) Ink else Rose
+                                    )
+                                },
                                 leadingIcon = { Icon(Icons.Filled.Block, null, tint = Rose, modifier = Modifier.size(18.dp)) },
                                 onClick = {
                                     menuOpen = false
-                                    android.widget.Toast.makeText(mctx, "${u.name} blocked — they can no longer see or message you", android.widget.Toast.LENGTH_LONG).show()
+                                    ublocked = !ublocked
+                                    val cur = Store.blocked(mctx)
+                                    Store.setBlocked(mctx, if (ublocked) cur + u.id else cur - u.id)
+                                    android.widget.Toast.makeText(
+                                        mctx,
+                                        if (ublocked) "${u.name} blocked — they can no longer see or message you" else "${u.name} unblocked",
+                                        android.widget.Toast.LENGTH_LONG
+                                    ).show()
                                 }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Blocked list", fontWeight = FontWeight.Bold, fontSize = 13.sp) },
+                                leadingIcon = { Icon(Icons.Filled.MoreVert, null, tint = Txt3, modifier = Modifier.size(18.dp)) },
+                                onClick = { menuOpen = false; go("blocked") }
                             )
                         }
                     }
@@ -701,6 +745,73 @@ fun ProfileSetupScreen(onDone: () -> Unit, onBack: () -> Unit) {
                     Store.set(ctx, "precovery", recovery.trim())
                     Store.set(ctx, "ppin", pin)
                     onDone()
+                }
+            }
+        }
+    }
+}
+
+
+/* ---------- Blocked list — unblock anyone anytime ---------- */
+@Composable
+fun BlockedScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    var blocked by remember { mutableStateOf(Store.blocked(ctx)) }
+    Column(Modifier.fillMaxSize().background(Paper).statusBarsPadding()) {
+        ScreenHeader("Blocked", onBack, sub = "${blocked.size} blocked · unblock anytime")
+        if (blocked.isEmpty()) {
+            Column(
+                Modifier.fillMaxSize().padding(40.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(Modifier.height(60.dp))
+                Icon(Icons.Filled.Block, null, tint = Mist, modifier = Modifier.size(56.dp))
+                Spacer(Modifier.height(14.dp))
+                Text("Nobody is blocked", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    "Block anyone from their profile, a chat or a group — they appear here and can be unblocked anytime.",
+                    fontSize = 11.sp, color = Txt3, lineHeight = 17.sp,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+        } else {
+            LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 8.dp)) {
+                items(blocked.toList().size) { i ->
+                    val id = blocked.toList()[i]
+                    val user = Mock.users.firstOrNull { it.id == id }
+                    val chat = Mock.chats.firstOrNull { it.id == id }
+                    val name = user?.name ?: chat?.name ?: "User $id"
+                    val avatar = user?.avatar ?: chat?.avatar ?: ""
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { go("user/$id") }
+                            .padding(horizontal = 18.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (avatar.isNotBlank()) Avatar(avatar, 48)
+                        else Box(
+                            Modifier.size(48.dp).clip(CircleShape).background(Cloud),
+                            contentAlignment = Alignment.Center
+                        ) { Icon(Icons.Filled.Block, null, tint = Rose, modifier = Modifier.size(20.dp)) }
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(name, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Ink)
+                            Text("Can't see you, message you or call you", fontSize = 10.sp, color = Txt3)
+                        }
+                        Text(
+                            "Unblock", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Color.White,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(Ink)
+                                .clickable {
+                                    blocked = blocked - id
+                                    Store.setBlocked(ctx, blocked)
+                                }
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                    }
                 }
             }
         }

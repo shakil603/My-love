@@ -34,6 +34,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
@@ -44,6 +45,7 @@ import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PictureAsPdf
@@ -280,6 +282,13 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
     var showAttach by remember { mutableStateOf(false) }
     var vanish by remember { mutableStateOf(false) }
     var sendCount by remember { mutableIntStateOf(0) }
+    var isBlocked by remember { mutableStateOf(chatId in Store.blocked(ctx)) }
+    var secureHere by remember { mutableStateOf(Store.get(ctx, "sec_chat_$chatId", "false") == "true") }
+    var chatMenu by remember { mutableStateOf(false) }
+    androidx.compose.runtime.DisposableEffect(chatId, secureHere) {
+        SecureX.local.value = secureHere
+        onDispose { SecureX.local.value = false }
+    }
     val listState = rememberLazyListState()
 
     LaunchedEffect(sendCount) {
@@ -369,6 +378,55 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
             }
             IconButton(onClick = { go("audiocall/$chatId") }) { Icon(Icons.Filled.Call, "Audio call", tint = Ink) }
             IconButton(onClick = { go("video/$chatId") }) { Icon(Icons.Filled.Videocam, "Video call", tint = Ink) }
+            Box {
+                IconButton(onClick = { chatMenu = true }) { Icon(Icons.Filled.MoreVert, "More", tint = Ink) }
+                androidx.compose.material3.DropdownMenu(expanded = chatMenu, onDismissRequest = { chatMenu = false }) {
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = {
+                            Text(
+                                if (secureHere) "Screen protection: ON ✓" else "Screen protection: OFF",
+                                fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                                color = if (secureHere) Color(0xFF047857) else Ink
+                            )
+                        },
+                        onClick = {
+                            secureHere = !secureHere
+                            Store.set(ctx, "sec_chat_$chatId", secureHere.toString())
+                            android.widget.Toast.makeText(
+                                ctx,
+                                if (secureHere) "Screenshots & screen recording blocked in this ${if (isGroup) "group" else "chat"}"
+                                else "Screen protection off for this ${if (isGroup) "group" else "chat"}",
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    )
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = {
+                            Text(
+                                if (isBlocked) "Unblock ${if (isGroup) "group" else chat.name}"
+                                else "Block ${if (isGroup) "group" else chat.name}",
+                                fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                                color = if (isBlocked) Ink else Rose
+                            )
+                        },
+                        onClick = {
+                            chatMenu = false
+                            isBlocked = !isBlocked
+                            val cur = Store.blocked(ctx)
+                            Store.setBlocked(ctx, if (isBlocked) cur + chatId else cur - chatId)
+                            android.widget.Toast.makeText(
+                                ctx,
+                                if (isBlocked) "Blocked — they can't message or call you" else "Unblocked",
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    )
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text("Blocked list", fontWeight = FontWeight.Bold, fontSize = 13.sp) },
+                        onClick = { chatMenu = false; go("blocked") }
+                    )
+                }
+            }
         }
         if (vanish) {
             Row(
@@ -566,6 +624,35 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
                 AttachOption(Icons.Filled.Folder, "Any file") { go("upload") }
             }
         }
+        if (isBlocked) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFFFF1F2))
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.Filled.Block, null, tint = Rose, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    "You blocked ${chat.name} — no messages or calls",
+                    fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFFBE123C),
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    "Unblock", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(Ink)
+                        .clickable {
+                            isBlocked = false
+                            Store.setBlocked(ctx, Store.blocked(ctx) - chatId)
+                        }
+                        .padding(horizontal = 14.dp, vertical = 8.dp)
+                )
+            }
+        }
+        if (!isBlocked) {
         /* emoji quick bar */
         Row(
             Modifier
@@ -661,6 +748,7 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
                 if (input.isBlank()) Icon(Icons.Filled.Mic, "Record voice", tint = Color.White, modifier = Modifier.size(19.dp))
                 else Icon(Icons.Filled.Send, "Send", tint = Color.White, modifier = Modifier.size(18.dp))
             }
+        }
         }
     }
     }
