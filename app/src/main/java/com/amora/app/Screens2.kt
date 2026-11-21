@@ -1229,9 +1229,12 @@ fun SafetyScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
                             contentAlignment = Alignment.Center
                         ) { Icon(Icons.Filled.Block, null, tint = Orchid, modifier = Modifier.size(17.dp)) }
                         Spacer(Modifier.width(11.dp))
-                        Column(Modifier.weight(1f).clickable { go("followers") }) {
+                        Column(Modifier.weight(1f).clickable { go("blocked") }) {
                             Text("Block list", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                            Text("3 blocked · also hides from contacts", fontSize = 10.sp, color = Txt3)
+                            Text(
+                                "${Store.blocked(fctx).size} blocked · unblock anytime",
+                                fontSize = 10.sp, color = Txt3
+                            )
                         }
                         Text("›", color = Txt3, fontSize = 18.sp)
                     }

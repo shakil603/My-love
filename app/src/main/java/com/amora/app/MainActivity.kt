@@ -46,8 +46,8 @@ class MainActivity : AppCompatActivity() {
         )
         enableEdgeToEdge()
         setContent {
-            androidx.compose.runtime.LaunchedEffect(SecureX.on.value) {
-                if (SecureX.on.value) {
+            androidx.compose.runtime.LaunchedEffect(SecureX.on.value, SecureX.local.value) {
+                if (SecureX.on.value || SecureX.local.value) {
                     window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
                 } else {
                     window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
@@ -131,6 +131,7 @@ fun AmoraApp() {
             )
         }
         composable("theme") { ThemeScreen(onBack = back) }
+        composable("blocked") { BlockedScreen(onBack = back, go = go) }
         composable("language") { LanguageScreen(onBack = back) }
         composable("livehub") { LiveHubScreen(onBack = back, go = go) }
         composable("live/{room}") { bs ->
