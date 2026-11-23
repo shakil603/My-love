@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.Emergency
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.ArrowBack
@@ -1072,7 +1073,9 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                     PrivacyPicker("Profile visibility", "Who can see your profile", "priv_profile", Icons.Filled.Public)
                     PrivacyPicker("Messages", "Who can message you", "priv_msg", Icons.Filled.Email)
                     PrivacyPicker("Downloads of your content", "Who can download your posts & photos", "dl_allow", Icons.Filled.Download)
-                    SecureScreenToggle()
+                    PrivacyPicker("Screen capture of your content", "Who can screenshot or record your chats, profile & posts", "rec_allow", Icons.Filled.Videocam)
+                    PrivacyPicker("Screen capture of your content", "Public = anyone · Friends = only friends · Private = nobody", "rec_allow", Icons.Filled.Videocam)
+                        SecureScreenToggle()
                     ToggleRow(Icons.Filled.Lock, "End-to-end encryption", "Default for all chats & calls", true)
                     ToggleRow(Icons.Filled.Favorite, "Dating visibility", "Hidden from contacts & coworkers", true)
                     ToggleRow(Icons.Filled.Visibility, "Read receipts", "Off for non-contacts", false)

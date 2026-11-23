@@ -285,8 +285,11 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
     var isBlocked by remember { mutableStateOf(chatId in Store.blocked(ctx)) }
     var secureHere by remember { mutableStateOf(Store.get(ctx, "sec_chat_$chatId", "false") == "true") }
     var chatMenu by remember { mutableStateOf(false) }
-    androidx.compose.runtime.DisposableEffect(chatId, secureHere) {
-        SecureX.local.value = secureHere
+    /* the other side's own capture rule — synced from their account; Yuki demos "Private" */
+    val ownerRec = Store.get(ctx, "rec_allow_$chatId", if (chatId == "5") "Private" else "Public")
+    val ownerBlocks = ownerRec == "Private" || (ownerRec == "Friends" && chatId !in Store.following(ctx))
+    androidx.compose.runtime.DisposableEffect(chatId, secureHere, ownerBlocks) {
+        SecureX.local.value = secureHere || ownerBlocks
         onDispose { SecureX.local.value = false }
     }
     val listState = rememberLazyListState()
@@ -426,6 +429,22 @@ fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit 
                         onClick = { chatMenu = false; go("blocked") }
                     )
                 }
+            }
+        }
+        if (ownerBlocks) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFEFF6FF))
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.Filled.Lock, null, tint = Color(0xFF1D4ED8), modifier = Modifier.size(13.dp))
+                Spacer(Modifier.width(7.dp))
+                Text(
+                    "${chat.name} blocked screen capture — screenshots & recording are disabled here",
+                    fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1D4ED8)
+                )
             }
         }
         if (vanish) {
