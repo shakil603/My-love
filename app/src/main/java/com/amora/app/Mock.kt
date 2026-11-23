@@ -22,6 +22,47 @@ object Store {
         }
     } catch (e: Exception) { emptyList() }
 
+    /* ---- account registry: username + email/phone + password; soft delete & restore ---- */
+    private fun accArr(ctx: Context): org.json.JSONArray =
+        try { org.json.JSONArray(get(ctx, "accounts", "[]")) } catch (_: Exception) { org.json.JSONArray() }
+
+    private fun saveAcc(ctx: Context, a: org.json.JSONArray) = set(ctx, "accounts", a.toString())
+
+    fun findAccount(ctx: Context, idOrContact: String): org.json.JSONObject? {
+        val a = accArr(ctx)
+        val q = idOrContact.trim().removePrefix("@").lowercase()
+        if (q.isEmpty()) return null
+        for (i in 0 until a.length()) {
+            val o = a.getJSONObject(i)
+            if (o.getString("u").lowercase() == q || o.getString("c").lowercase() == q) return o
+        }
+        return null
+    }
+
+    fun addAccount(ctx: Context, user: String, contact: String, pass: String): String? {
+        if (findAccount(ctx, user) != null) return "That username is already taken"
+        if (findAccount(ctx, contact) != null) return "That email / phone is already registered"
+        val a = accArr(ctx)
+        a.put(
+            org.json.JSONObject()
+                .put("u", user.trim().removePrefix("@"))
+                .put("c", contact.trim())
+                .put("p", pass)
+                .put("del", false)
+        )
+        saveAcc(ctx, a)
+        return null
+    }
+
+    fun setAccountDeleted(ctx: Context, user: String, deleted: Boolean) {
+        val a = accArr(ctx)
+        for (i in 0 until a.length()) {
+            val o = a.getJSONObject(i)
+            if (o.getString("u").equals(user.trim().removePrefix("@"), true)) o.put("del", deleted)
+        }
+        saveAcc(ctx, a)
+    }
+
     fun blocked(ctx: Context): Set<String> =
         get(ctx, "blocked", "").split(",").filter { it.isNotBlank() }.toSet()
 
