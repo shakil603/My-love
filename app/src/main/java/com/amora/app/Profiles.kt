@@ -70,8 +70,11 @@ fun UserProfileScreen(userId: String, onBack: () -> Unit, go: (String) -> Unit =
     val uctx = androidx.compose.ui.platform.LocalContext.current
     var ublocked by remember { mutableStateOf(u.id in Store.blocked(uctx)) }
     var usec by remember { mutableStateOf(Store.get(uctx, "sec_user_${u.id}", "false") == "true") }
-    androidx.compose.runtime.DisposableEffect(usec) {
-        SecureX.local.value = usec
+    /* this user's own capture rule — synced from their account; Yuki demos "Private" */
+    val uOwnerRec = Store.get(uctx, "rec_allow_${u.id}", if (u.id == "5") "Private" else "Public")
+    val uOwnerBlocks = uOwnerRec == "Private" || (uOwnerRec == "Friends" && u.id !in Store.following(uctx))
+    androidx.compose.runtime.DisposableEffect(usec, uOwnerBlocks) {
+        SecureX.local.value = usec || uOwnerBlocks
         onDispose { SecureX.local.value = false }
     }
     LazyColumn(Modifier.fillMaxSize().background(Paper), contentPadding = PaddingValues(bottom = 24.dp)) {
@@ -91,6 +94,18 @@ fun UserProfileScreen(userId: String, onBack: () -> Unit, go: (String) -> Unit =
                 ) {
                     IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "Back", tint = Color.White) }
                     Spacer(Modifier.weight(1f))
+                    if (uOwnerBlocks) {
+                        Row(
+                            Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(Color.Black.copy(alpha = 0.45f))
+                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("\uD83D\uDD12 No screen capture", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.ExtraBold)
+                        }
+                        Spacer(Modifier.width(6.dp))
+                    }
                     Box {
                         var menuOpen by remember { mutableStateOf(false) }
                         val mctx = androidx.compose.ui.platform.LocalContext.current
