@@ -49,6 +49,7 @@ import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.UploadFile
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -1154,13 +1155,57 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                     }
                 }
                 Spacer(Modifier.height(14.dp))
+                Text("ACCOUNT", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3, letterSpacing = 2.sp)
+                Spacer(Modifier.height(7.dp))
                 WhiteCard {
+                    val authUser = Store.get(sctx, "auth_user", "")
+                    var armDelete by remember { mutableStateOf(false) }
+                    if (authUser.isNotEmpty()) {
+                        Row(Modifier.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(Cloud),
+                                contentAlignment = Alignment.Center
+                            ) { Icon(Icons.Filled.Person, null, tint = Orchid, modifier = Modifier.size(17.dp)) }
+                            Spacer(Modifier.width(11.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text("@$authUser", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                                Text("Account saved on this device", fontSize = 10.sp, color = Txt3)
+                            }
+                        }
+                    }
                     Text(
                         androidx.compose.ui.res.stringResource(R.string.sign_out), color = Color(0xFFF43F5E), fontWeight = FontWeight.ExtraBold, fontSize = 13.sp,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
-                            .clickable(onClick = onSignOut)
+                            .clickable {
+                                Store.set(sctx, "auth_user", "")
+                                onSignOut()
+                            }
                             .padding(4.dp)
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        if (armDelete) "Tap again to confirm — account is kept & restorable" else "Delete account",
+                        color = if (armDelete) Color.White else Color(0xFFBE123C),
+                        fontWeight = FontWeight.ExtraBold, fontSize = 12.sp,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .clip(RoundedCornerShape(50))
+                            .background(if (armDelete) Color(0xFFBE123C) else Color.Transparent)
+                            .clickable {
+                                if (!armDelete) armDelete = true
+                                else {
+                                    if (authUser.isNotEmpty()) Store.setAccountDeleted(sctx, authUser, true)
+                                    Store.set(sctx, "auth_user", "")
+                                    android.widget.Toast.makeText(
+                                        sctx,
+                                        "Account deleted — log in anytime and tap Restore to bring it back",
+                                        android.widget.Toast.LENGTH_LONG
+                                    ).show()
+                                    onSignOut()
+                                }
+                            }
+                            .padding(horizontal = 14.dp, vertical = 6.dp)
                     )
                 }
             }

@@ -65,15 +65,25 @@ fun AmoraApp() {
     val nav = rememberNavController()
     val go: (String) -> Unit = { route -> nav.navigate(route) }
     val back: () -> Unit = { nav.popBackStack() }
-    NavHost(navController = nav, startDestination = "onboarding") {
+    val actx = androidx.compose.ui.platform.LocalContext.current
+    val loggedIn = Store.get(actx, "auth_user", "").isNotEmpty()
+    NavHost(navController = nav, startDestination = if (loggedIn) "main" else "onboarding") {
         composable("onboarding") {
             OnboardingScreen(
-                onCreate = { nav.navigate("signup") },
-                onLogin = { nav.navigate("permissions") },
+                onCreate = { nav.navigate("auth/signup") },
+                onLogin = { nav.navigate("auth/login") },
                 onLanguage = { nav.navigate("language") }
             )
         }
         composable("signup") { SignupScreen(onNext = { nav.navigate("otp") }, onBack = back) }
+        composable("auth/{mode}") { bs ->
+            AuthScreen(
+                startMode = bs.arguments?.getString("mode") ?: "login",
+                onSignedUp = { nav.navigate("otp") },
+                onLoggedIn = { nav.navigate("main") { popUpTo(0) { inclusive = true } } },
+                onBack = back
+            )
+        }
         composable("otp") {
             OtpScreen(
                 onNext = { nav.navigate("setup") },
