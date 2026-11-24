@@ -1075,8 +1075,8 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                     PrivacyPicker("Messages", "Who can message you", "priv_msg", Icons.Filled.Email)
                     PrivacyPicker("Downloads of your content", "Who can download your posts & photos", "dl_allow", Icons.Filled.Download)
                     PrivacyPicker("Screen capture of your content", "Who can screenshot or record your chats, profile & posts", "rec_allow", Icons.Filled.Videocam)
-                    PrivacyPicker("Screen capture of your content", "Public = anyone · Friends = only friends · Private = nobody", "rec_allow", Icons.Filled.Videocam)
-                        SecureScreenToggle()
+                    SecureScreenToggle()
+                    AppLockToggle()
                     ToggleRow(Icons.Filled.Lock, "End-to-end encryption", "Default for all chats & calls", true)
                     ToggleRow(Icons.Filled.Favorite, "Dating visibility", "Hidden from contacts & coworkers", true)
                     ToggleRow(Icons.Filled.Visibility, "Read receipts", "Off for non-contacts", false)
@@ -1269,7 +1269,9 @@ fun SafetyScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
                         }
                         Text("›", color = Txt3, fontSize = 18.sp)
                     }
+                    PrivacyPicker("Screen capture of your content", "Public = anyone · Friends = only friends · Private = nobody", "rec_allow", Icons.Filled.Videocam)
                     SecureScreenToggle()
+                    AppLockToggle()
                     ToggleRow(Icons.Filled.VisibilityOff, "Incognito mode", "Only people you like can see you", true)
                     Row(Modifier.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(

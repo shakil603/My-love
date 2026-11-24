@@ -67,6 +67,13 @@ fun AmoraApp() {
     val back: () -> Unit = { nav.popBackStack() }
     val actx = androidx.compose.ui.platform.LocalContext.current
     val loggedIn = Store.get(actx, "auth_user", "").isNotEmpty()
+    var unlocked by androidx.compose.runtime.remember {
+        androidx.compose.runtime.mutableStateOf(Store.get(actx, "app_lock", "false") != "true" || !loggedIn)
+    }
+    if (!unlocked) {
+        AppLockScreen(onUnlocked = { unlocked = true })
+        return
+    }
     NavHost(navController = nav, startDestination = if (loggedIn) "main" else "onboarding") {
         composable("onboarding") {
             OnboardingScreen(
@@ -80,13 +87,17 @@ fun AmoraApp() {
             AuthScreen(
                 startMode = bs.arguments?.getString("mode") ?: "login",
                 onSignedUp = { nav.navigate("otp") },
-                onLoggedIn = { nav.navigate("main") { popUpTo(0) { inclusive = true } } },
+                onLoggedIn = {
+                    val vu = Store.get(actx, "auth_user", "")
+                    if (Store.get(actx, "verified_acct_$vu", "").isEmpty()) nav.navigate("verify/main")
+                    else nav.navigate("main") { popUpTo(0) { inclusive = true } }
+                },
                 onBack = back
             )
         }
         composable("otp") {
             OtpScreen(
-                onNext = { nav.navigate("setup") },
+                onNext = { nav.navigate("verify/setup") },
                 onBack = back
             )
         }
@@ -142,6 +153,13 @@ fun AmoraApp() {
         }
         composable("theme") { ThemeScreen(onBack = back) }
         composable("blocked") { BlockedScreen(onBack = back, go = go) }
+        composable("verify/{next}") { bs ->
+            val next = bs.arguments?.getString("next") ?: "main"
+            VerifyScreen(onDone = {
+                if (next == "main") nav.navigate("main") { popUpTo(0) { inclusive = true } }
+                else nav.navigate(next)
+            })
+        }
         composable("language") { LanguageScreen(onBack = back) }
         composable("livehub") { LiveHubScreen(onBack = back, go = go) }
         composable("live/{room}") { bs ->
