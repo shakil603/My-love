@@ -25,6 +25,9 @@ import androidx.compose.material.icons.filled.AlternateEmail
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Visibility
@@ -40,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
@@ -265,6 +269,243 @@ fun AuthScreen(
             "Accounts are saved on this device. Deleting an account never erases it —\nlog in again anytime and tap Restore.",
             fontSize = 10.sp, color = Txt3, lineHeight = 15.sp,
             modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 20.dp)
+        )
+    }
+}
+
+/* ---------- Step 4: hard identity verification — fingerprint or LIVE photo ---------- */
+
+fun runBiometric(ctx: android.content.Context, title: String, onOk: () -> Unit, onFail: (String) -> Unit) {
+    val act = ctx as? androidx.fragment.app.FragmentActivity
+        ?: return onFail("Fingerprint unavailable on this device")
+    val authenticators = androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK or
+        androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+    val bm = androidx.biometric.BiometricManager.from(act)
+    if (bm.canAuthenticate(authenticators) != androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS)
+        return onFail("No fingerprint or screen lock set on this phone — use Live photo instead")
+    val prompt = androidx.biometric.BiometricPrompt(
+        act,
+        androidx.core.content.ContextCompat.getMainExecutor(act),
+        object : androidx.biometric.BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationSucceeded(result: androidx.biometric.BiometricPrompt.AuthenticationResult) = onOk()
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) = onFail(errString.toString())
+        }
+    )
+    prompt.authenticate(
+        androidx.biometric.BiometricPrompt.PromptInfo.Builder()
+            .setTitle(title)
+            .setSubtitle("Fingerprint, face or screen lock")
+            .setAllowedAuthenticators(authenticators)
+            .build()
+    )
+}
+
+@Composable
+fun VerifyScreen(onDone: () -> Unit) {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    var method by remember { mutableStateOf("") }   // "", "finger", "photo"
+    var error by remember { mutableStateOf("") }
+    var selfie by remember { mutableStateOf<android.graphics.Bitmap?>(null) }
+
+    fun markVerified(m: String) {
+        method = m
+        error = ""
+        Store.set(ctx, "verified", "true")
+        val u = Store.get(ctx, "auth_user", "")
+        if (u.isNotEmpty()) Store.set(ctx, "verified_acct_$u", m)
+    }
+
+    val camera = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.TakePicturePreview()
+    ) { bmp ->
+        if (bmp != null) {
+            selfie = bmp
+            try {
+                val f = java.io.File(ctx.filesDir, "verify_selfie.jpg")
+                f.outputStream().use { bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, it) }
+                Store.set(ctx, "verify_photo", f.absolutePath)
+            } catch (_: Exception) {}
+            markVerified("photo")
+        } else error = "No photo captured — try again"
+    }
+    val camPerm = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+    ) { ok -> if (ok) camera.launch(null) else error = "Camera permission needed for the live photo" }
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(Paper)
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp)
+    ) {
+        Spacer(Modifier.height(26.dp))
+        Box(
+            Modifier.size(52.dp).clip(RoundedCornerShape(17.dp)).background(AuroraGradient),
+            contentAlignment = Alignment.Center
+        ) { Icon(Icons.Filled.Fingerprint, null, tint = Color.White, modifier = Modifier.size(28.dp)) }
+        Spacer(Modifier.height(18.dp))
+        Text("Step 4 — verify\nit's really you", fontSize = 27.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 33.sp)
+        Spacer(Modifier.height(6.dp))
+        Text(
+            "Hard security check. Prove you're a real, live person —\nchoose one of the two:",
+            fontSize = 12.sp, color = Txt2, lineHeight = 18.sp
+        )
+        Spacer(Modifier.height(22.dp))
+
+        /* fingerprint option */
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(19.dp))
+                .border(2.dp, if (method == "finger") Mint else Mist, RoundedCornerShape(19.dp))
+                .clickable {
+                    runBiometric(ctx, "Verify your identity",
+                        onOk = { markVerified("finger") },
+                        onFail = { msg -> error = msg })
+                }
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                Modifier.size(46.dp).clip(RoundedCornerShape(15.dp)).background(if (method == "finger") Mint else Cloud),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Filled.Fingerprint, null,
+                    tint = if (method == "finger") Color.White else Orchid, modifier = Modifier.size(26.dp))
+            }
+            Spacer(Modifier.width(13.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    if (method == "finger") "Fingerprint verified ✓" else "Your fingerprint",
+                    fontWeight = FontWeight.ExtraBold, fontSize = 14.sp,
+                    color = if (method == "finger") Mint else Ink
+                )
+                Text("Phone's fingerprint sensor, face or screen lock", fontSize = 10.sp, color = Txt3)
+            }
+            Text("›", color = Txt3, fontSize = 20.sp)
+        }
+        Spacer(Modifier.height(12.dp))
+
+        /* live photo option */
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(19.dp))
+                .border(2.dp, if (method == "photo") Mint else Mist, RoundedCornerShape(19.dp))
+                .clickable { camPerm.launch(android.Manifest.permission.CAMERA) }
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val s = selfie
+            if (s != null) {
+                androidx.compose.foundation.Image(
+                    bitmap = s.asImageBitmap(), contentDescription = null,
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                    modifier = Modifier.size(46.dp).clip(RoundedCornerShape(15.dp))
+                )
+            } else {
+                Box(
+                    Modifier.size(46.dp).clip(RoundedCornerShape(15.dp)).background(Cloud),
+                    contentAlignment = Alignment.Center
+                ) { Icon(Icons.Filled.PhotoCamera, null, tint = Orchid, modifier = Modifier.size(22.dp)) }
+            }
+            Spacer(Modifier.width(13.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    if (method == "photo") "Live photo verified ✓" else "Live photo",
+                    fontWeight = FontWeight.ExtraBold, fontSize = 14.sp,
+                    color = if (method == "photo") Mint else Ink
+                )
+                Text("Camera opens NOW — no gallery, no old pictures", fontSize = 10.sp, color = Txt3)
+            }
+            Text("›", color = Txt3, fontSize = 20.sp)
+        }
+
+        Spacer(Modifier.height(14.dp))
+        if (error.isNotEmpty()) {
+            Text(error, color = Color(0xFFBE123C), fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
+            Spacer(Modifier.height(10.dp))
+        }
+        if (method.isNotEmpty()) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Verified, null, tint = Sky, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(7.dp))
+                Text("Identity verified — blue badge added to your profile", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Sky)
+            }
+            Spacer(Modifier.height(14.dp))
+            GradientButton("Continue", Modifier.fillMaxWidth(), onClick = onDone)
+        }
+        Spacer(Modifier.height(24.dp))
+    }
+}
+
+/* ---------- App lock: fingerprint required to open Amora ---------- */
+
+@Composable
+fun AppLockScreen(onUnlocked: () -> Unit) {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    var error by remember { mutableStateOf("") }
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        runBiometric(ctx, "Unlock Amora", onOk = onUnlocked, onFail = { msg -> error = msg })
+    }
+    Column(
+        Modifier.fillMaxSize().background(NightGradient).statusBarsPadding().navigationBarsPadding().padding(28.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(Modifier.weight(1f))
+        Box(
+            Modifier.size(74.dp).clip(RoundedCornerShape(24.dp)).background(AuroraGradient),
+            contentAlignment = Alignment.Center
+        ) { Icon(Icons.Filled.Fingerprint, null, tint = Color.White, modifier = Modifier.size(40.dp)) }
+        Spacer(Modifier.height(20.dp))
+        Text("Amora is locked", color = Color.White, fontSize = 21.sp, fontWeight = FontWeight.ExtraBold)
+        Spacer(Modifier.height(6.dp))
+        Text("Unlock with your fingerprint, face or screen lock", color = Color.White.copy(alpha = 0.75f), fontSize = 12.sp)
+        if (error.isNotEmpty()) {
+            Spacer(Modifier.height(10.dp))
+            Text(error, color = Color(0xFFFCA5A5), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        }
+        Spacer(Modifier.height(22.dp))
+        GradientButton("Unlock", Modifier.fillMaxWidth(), onClick = {
+            runBiometric(ctx, "Unlock Amora", onOk = onUnlocked, onFail = { msg -> error = msg })
+        })
+        Spacer(Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun AppLockToggle() {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    var on by remember { mutableStateOf(Store.get(ctx, "app_lock", "false") == "true") }
+    Row(Modifier.fillMaxWidth().padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(if (on) Ink else Cloud),
+            contentAlignment = Alignment.Center
+        ) { Icon(Icons.Filled.Fingerprint, null, tint = if (on) Color.White else Orchid, modifier = Modifier.size(17.dp)) }
+        Spacer(Modifier.width(11.dp))
+        Column(Modifier.weight(1f)) {
+            Text("App lock — fingerprint", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+            Text(
+                if (on) "Fingerprint needed every time Amora opens" else "Off — anyone with your phone can open Amora",
+                fontSize = 10.sp, color = Txt3
+            )
+        }
+        androidx.compose.material3.Switch(
+            checked = on,
+            onCheckedChange = { v ->
+                if (v) {
+                    runBiometric(ctx, "Confirm fingerprint to enable app lock",
+                        onOk = { on = true; Store.set(ctx, "app_lock", "true") },
+                        onFail = { msg ->
+                            android.widget.Toast.makeText(ctx, msg, android.widget.Toast.LENGTH_SHORT).show()
+                        })
+                } else {
+                    on = false; Store.set(ctx, "app_lock", "false")
+                }
+            }
         )
     }
 }
