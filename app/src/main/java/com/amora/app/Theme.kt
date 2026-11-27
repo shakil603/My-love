@@ -19,6 +19,8 @@ val DefOrchid = Color(0xFFC13BFF)
 val DefViolet = Color(0xFF7B2CFF)
 
 /* ---------- Screenshot / screen-record protection (FLAG_SECURE) ---------- */
+object DemoX { val on = mutableStateOf(false) }
+
 object SecureX {
     val on = mutableStateOf(false)      // global toggle
     val local = mutableStateOf(false)   // active for the current chat/profile/group

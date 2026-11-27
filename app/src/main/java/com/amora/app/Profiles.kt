@@ -503,7 +503,10 @@ fun FollowersScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     Column(Modifier.fillMaxSize().background(Paper)) {
         ScreenHeader("Connections", onBack)
         Row(Modifier.padding(horizontal = 18.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("Followers · 48.2k", "Following · 1,284").forEachIndexed { i, t ->
+            listOf(
+                "Followers · ${Mock.users.size}",
+                "Following · ${Store.following(fctx).count { fid -> Mock.users.any { it.id == fid } }}"
+            ).forEachIndexed { i, t ->
                 val on = tab == i
                 Text(
                     t, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold,
@@ -518,6 +521,24 @@ fun FollowersScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
         }
         Spacer(Modifier.height(6.dp))
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 8.dp)) {
+            if (Mock.users.isEmpty()) {
+                item {
+                    Column(
+                        Modifier.fillMaxWidth().padding(horizontal = 40.dp, vertical = 60.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("\uD83E\uDD1D", fontSize = 40.sp)
+                        Spacer(Modifier.height(12.dp))
+                        Text("No connections yet", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = Ink)
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            "Demo accounts are removed — real followers will show up here.",
+                            fontSize = 11.sp, color = Txt3, lineHeight = 17.sp,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                }
+            }
             items(Mock.users.size) { i ->
                 val u = Mock.users[i]
                 val isF = u.id in following.value
@@ -794,8 +815,8 @@ fun BlockedScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
             LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 8.dp)) {
                 items(blocked.toList().size) { i ->
                     val id = blocked.toList()[i]
-                    val user = Mock.users.firstOrNull { it.id == id }
-                    val chat = Mock.chats.firstOrNull { it.id == id }
+                    val user = Mock.usersAll.firstOrNull { it.id == id }
+                    val chat = Mock.chatsAll.firstOrNull { it.id == id }
                     val name = user?.name ?: chat?.name ?: "User $id"
                     val avatar = user?.avatar ?: chat?.avatar ?: ""
                     Row(

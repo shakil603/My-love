@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         ThemeX.load(this)
         SecureX.on.value = Store.get(this, "secure_screen", "false") == "true"
+        DemoX.on.value = Store.get(this, "demo_data", "false") == "true"
         coil.Coil.setImageLoader(
             coil.ImageLoader.Builder(this).components {
                 if (android.os.Build.VERSION.SDK_INT >= 28) add(coil.decode.ImageDecoderDecoder.Factory())

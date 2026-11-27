@@ -52,8 +52,24 @@ import coil.compose.AsyncImage
 @Composable
 fun LikedYouScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     Column(Modifier.fillMaxSize().background(Paper)) {
-        ScreenHeader(androidx.compose.ui.res.stringResource(R.string.liked_you), onBack, sub = "27 people liked your profile")
+        ScreenHeader(androidx.compose.ui.res.stringResource(R.string.liked_you), onBack, sub = if (Mock.users.isEmpty()) "Nobody yet — demo data removed" else "${Mock.users.size} people liked your profile")
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
+            if (Mock.users.isEmpty()) {
+                Column(
+                    Modifier.fillMaxWidth().padding(vertical = 60.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("\uD83D\uDC95", fontSize = 40.sp)
+                    Spacer(Modifier.height(12.dp))
+                    Text("No likes yet", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = Ink)
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        "When a real person likes your profile, they'll appear here.",
+                        fontSize = 11.sp, color = Txt3,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                }
+            }
             for (row in Mock.users.chunked(2)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     row.forEach { u ->
@@ -104,6 +120,24 @@ fun NearbyScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     Column(Modifier.fillMaxSize().background(Paper)) {
         ScreenHeader(androidx.compose.ui.res.stringResource(R.string.nearby), onBack, sub = "Sharing approximate location only")
         LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 6.dp)) {
+            if (Mock.users.isEmpty()) {
+                item {
+                    Column(
+                        Modifier.fillMaxWidth().padding(horizontal = 40.dp, vertical = 60.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("\uD83D\uDCCD", fontSize = 40.sp)
+                        Spacer(Modifier.height(12.dp))
+                        Text("Nobody nearby yet", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = Ink)
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            "Demo accounts are removed — real people near you will appear here.",
+                            fontSize = 11.sp, color = Txt3,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                }
+            }
             items(Mock.users.size) { i ->
                 val u = Mock.users[i]
                 Row(
@@ -151,8 +185,8 @@ fun NearbyScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
 
 @Composable
 fun GroupInfoScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit = {}) {
-    val chat = Mock.chats.firstOrNull { it.id == chatId } ?: Mock.chats[1]
-    val members = Mock.users.take(5)
+    val chat = Mock.chatsAll.firstOrNull { it.id == chatId } ?: Mock.chatsAll[1]
+    val members = Mock.usersAll.take(5)
     LazyColumn(Modifier.fillMaxSize().background(Paper), contentPadding = PaddingValues(bottom = 24.dp)) {
         item {
             ScreenHeader("Group info", onBack)

@@ -211,6 +211,24 @@ fun ChatsScreen(onOpenChat: (String) -> Unit, go: (String) -> Unit = {}) {
                 Box(Modifier.size(8.dp).clip(CircleShape).background(Mint))
             }
         }
+        if (filtered.isEmpty()) {
+            item {
+                Column(
+                    Modifier.fillMaxWidth().padding(horizontal = 40.dp, vertical = 60.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("\uD83D\uDCAC", fontSize = 40.sp)
+                    Spacer(Modifier.height(12.dp))
+                    Text("No chats yet", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = Ink)
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        "Demo accounts have been removed. Find real people in Live chat or invite friends to Amora.",
+                        fontSize = 11.sp, color = Txt3, lineHeight = 17.sp,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                }
+            }
+        }
         itemsIndexed(filtered) { _, chat ->
             Row(
                 Modifier
@@ -268,7 +286,7 @@ fun ChatsScreen(onOpenChat: (String) -> Unit, go: (String) -> Unit = {}) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ConversationScreen(chatId: String, onBack: () -> Unit, go: (String) -> Unit = {}) {
-    val chat = Mock.chats.firstOrNull { it.id == chatId } ?: Mock.chats.first()
+    val chat = Mock.chatsAll.firstOrNull { it.id == chatId } ?: Mock.chatsAll.first()
     val isGroup = chat.kind == "group" || chat.kind == "work"
     val ctx = androidx.compose.ui.platform.LocalContext.current
     val msgs = remember {

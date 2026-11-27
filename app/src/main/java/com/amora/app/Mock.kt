@@ -69,7 +69,7 @@ object Store {
     fun setBlocked(ctx: Context, ids: Set<String>) = set(ctx, "blocked", ids.joinToString(","))
 
     fun following(ctx: Context): Set<String> =
-        get(ctx, "following", "3,5").split(",").filter { it.isNotBlank() }.toSet()
+        get(ctx, "following", "").split(",").filter { it.isNotBlank() }.toSet()
 
     fun setFollowing(ctx: Context, ids: Set<String>) = set(ctx, "following", ids.joinToString(","))
 
@@ -178,7 +178,7 @@ data class User(
 object Mock {
     private const val U = "https://images.unsplash.com"
 
-    val users = listOf(
+    val usersAll = listOf(
         User(
             "1", "Amara Okoye", "@amara.o", "$U/photo-1524504388940-b1c1722653e1?w=400", "$U/photo-1507525428034-b723cf961d3e?w=900",
             "Sunset chaser · UX designer by day, salsa dancer by night. Looking for someone who laughs at bad puns.",
@@ -228,9 +228,11 @@ object Mock {
         )
     )
 
-    fun user(id: String): User = users.firstOrNull { it.id == id } ?: users.first()
+    val users: List<User> get() = if (DemoX.on.value) usersAll else emptyList()
 
-    val stories = listOf(
+    fun user(id: String): User = usersAll.firstOrNull { it.id == id } ?: usersAll.first()
+
+    val storiesAll = listOf(
         Story("You", "", isAdd = true),
         Story("Sofia", "$U/photo-1494790108377-be9c29b29330?w=200"),
         Story("Rafi", "$U/photo-1500648767791-00dcc994a43e?w=200"),
@@ -239,7 +241,7 @@ object Mock {
         Story("Amara", "$U/photo-1524504388940-b1c1722653e1?w=200")
     )
 
-    val posts = listOf(
+    val postsAll = listOf(
         Post(
             "7", "Sofia Martínez", "$U/photo-1494790108377-be9c29b29330?w=200",
             "Barcelona · 12 min · Public",
@@ -263,7 +265,7 @@ object Mock {
         )
     )
 
-    val chats = listOf(
+    val chatsAll = listOf(
         Chat("1", "Amara \uD83D\uDC98", "$U/photo-1524504388940-b1c1722653e1?w=200", "typing…", "now", 2, true, kind = "match", pinned = true),
         Chat("2", "Project Phoenix \uD83D\uDCBC", "$U/photo-1522071820081-009f0129c71c?w=200", "\uD83D\uDCCA Nadia: Q3-Forecast.xlsx · 2.1 MB", "09:12", 5, false, kind = "work", pinned = true),
         Chat("3", "Rafi Ahmed", "$U/photo-1500648767791-00dcc994a43e?w=200", "\uD83C\uDF99 Voice message · 0:42", "08:47", 0, true),
@@ -271,6 +273,10 @@ object Mock {
         Chat("5", "Yuki Tanaka", "$U/photo-1534528741775-53994a69daeb?w=200", "\uD83C\uDFAC trailer_final_v3.mp4 · seen", "Yesterday", 0, false),
         Chat("6", "Omar Haddad", "$U/photo-1506794778202-cad84cf45f1d?w=200", "\uD83D\uDDDC assets-pack.zip · 48 files", "Mon", 0, false)
     )
+
+    val stories get() = if (DemoX.on.value) storiesAll else storiesAll.take(0)
+    val posts get() = if (DemoX.on.value) postsAll else postsAll.take(0)
+    val chats: List<Chat> get() = if (DemoX.on.value) chatsAll else emptyList()
 
     val messages = listOf(
         Message(false, text = "Hey! Did you check the gallery I sent? \uD83D\uDDBC", time = "09:02"),
