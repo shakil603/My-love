@@ -656,6 +656,31 @@ fun StoryScreen(onBack: () -> Unit) {
 fun ReelsScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     val rctx = androidx.compose.ui.platform.LocalContext.current
     var rliked by remember { mutableStateOf(false) }
+    if (!DemoX.on.value) {
+        Box(Modifier.fillMaxSize().background(Color.Black), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(32.dp)) {
+                Text("\uD83C\uDFAC", fontSize = 44.sp)
+                Spacer(Modifier.height(12.dp))
+                Text("No reels yet", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    "Demo reels are deleted — reels from real people will play here.",
+                    color = Color.White.copy(alpha = 0.7f), fontSize = 11.sp,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+                Spacer(Modifier.height(18.dp))
+                Text(
+                    "Go back", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(Color.White.copy(alpha = 0.18f))
+                        .clickable(onClick = onBack)
+                        .padding(horizontal = 18.dp, vertical = 10.dp)
+                )
+            }
+        }
+        return
+    }
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         AsyncImage(
             model = "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=700",
@@ -783,7 +808,7 @@ private data class Notif(val emoji: String, val title: String, val sub: String, 
 
 @Composable
 fun NotificationsScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
-    val notifs = listOf(
+    val notifs = if (!DemoX.on.value) emptyList() else listOf(
         Notif("\uD83D\uDC98", "Amara matched with you — 94% compatible", "8 min ago", "Say hi"),
         Notif("❤️", "Sofia and 213 others liked your post", "26 min ago", null),
         Notif("\uD83C\uDF99", "Rafi sent you a voice message", "1 h ago · 0:42", "Play"),
@@ -794,6 +819,24 @@ fun NotificationsScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
     Column(Modifier.fillMaxSize().background(Paper).statusBarsPadding()) {
         ScreenHeader(androidx.compose.ui.res.stringResource(R.string.notifications), onBack)
         LazyColumn(contentPadding = PaddingValues(16.dp)) {
+            if (notifs.isEmpty()) {
+                item {
+                    Column(
+                        Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 60.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("\uD83D\uDD14", fontSize = 40.sp)
+                        Spacer(Modifier.height(12.dp))
+                        Text("No notifications", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = Ink)
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            "All demo notifications are deleted — only real activity will appear here.",
+                            fontSize = 11.sp, color = Txt3, lineHeight = 17.sp,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                }
+            }
             items(notifs.size) { i ->
                 val n = notifs[i]
                 Row(
@@ -882,7 +925,25 @@ fun SearchScreen(onBack: () -> Unit, go: (String) -> Unit = {}) {
             }
         }
         LazyColumn(contentPadding = PaddingValues(16.dp)) {
-            item {
+            if (!DemoX.on.value) {
+                item {
+                    Column(
+                        Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 60.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("\uD83D\uDD0D", fontSize = 40.sp)
+                        Spacer(Modifier.height(12.dp))
+                        Text("Search everything", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = Ink)
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            "Demo results are deleted. Real people, posts, files and groups will show up here as the community grows.",
+                            fontSize = 11.sp, color = Txt3, lineHeight = 17.sp,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                }
+            }
+            if (DemoX.on.value) item {
                 Text("PEOPLE", fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = Txt3, letterSpacing = 2.sp)
                 Spacer(Modifier.height(8.dp))
                 Row(
@@ -1160,6 +1221,27 @@ fun SettingsScreen(onBack: () -> Unit, onSafety: () -> Unit, onLanguage: () -> U
                 WhiteCard {
                     val authUser = Store.get(sctx, "auth_user", "")
                     var armDelete by remember { mutableStateOf(false) }
+                    Row(Modifier.fillMaxWidth().padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            Modifier.size(36.dp).clip(RoundedCornerShape(12.dp)).background(Cloud),
+                            contentAlignment = Alignment.Center
+                        ) { Icon(Icons.Filled.Visibility, null, tint = Orchid, modifier = Modifier.size(17.dp)) }
+                        Spacer(Modifier.width(11.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text("Demo content", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                            Text(
+                                if (DemoX.on.value) "Sample accounts visible — for preview only" else "Off — all fake demo accounts deleted",
+                                fontSize = 10.sp, color = Txt3
+                            )
+                        }
+                        androidx.compose.material3.Switch(
+                            checked = DemoX.on.value,
+                            onCheckedChange = { v ->
+                                DemoX.on.value = v
+                                Store.set(sctx, "demo_data", v.toString())
+                            }
+                        )
+                    }
                     if (authUser.isNotEmpty()) {
                         Row(Modifier.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(

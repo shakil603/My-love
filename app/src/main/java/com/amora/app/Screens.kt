@@ -272,6 +272,24 @@ fun FeedScreen(go: (String) -> Unit = {}) {
             }
             Spacer(Modifier.height(14.dp))
         }
+        if (Mock.posts.isEmpty()) {
+            item {
+                Column(
+                    Modifier.fillMaxWidth().padding(horizontal = 40.dp, vertical = 70.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("\uD83C\uDF31", fontSize = 40.sp)
+                    Spacer(Modifier.height(12.dp))
+                    Text("Your feed is fresh & real", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = Ink)
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        "Demo posts are gone. Posts from real people you follow will appear here.",
+                        fontSize = 11.sp, color = Txt3, lineHeight = 17.sp,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                }
+            }
+        }
         items(Mock.posts) { post ->
             PostCard(post, go)
             Spacer(Modifier.height(14.dp))
@@ -392,6 +410,24 @@ fun PostCard(post: Post, go: (String) -> Unit = {}) {
 @Composable
 fun DiscoverScreen(go: (String) -> Unit = {}) {
     var idx by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    if (Mock.users.isEmpty()) {
+        Column(
+            Modifier.fillMaxSize().padding(40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text("\uD83D\uDC9C", fontSize = 44.sp)
+            Spacer(Modifier.height(12.dp))
+            Text("No profiles yet", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, color = Ink)
+            Spacer(Modifier.height(6.dp))
+            Text(
+                "Demo profiles have been removed — only real verified people will appear here.",
+                fontSize = 11.sp, color = Txt3, lineHeight = 17.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+        }
+        return
+    }
     val u = Mock.users[idx % Mock.users.size]
     Column(Modifier.fillMaxSize()) {
         Row(
